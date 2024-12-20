@@ -5,16 +5,18 @@ import cbbtcLogo from "../public/cbbtc.png";
 import daiLogo from "../public/dai.png";
 import usdcLogo from "../public/usdc.png";
 import usdtLogo from "../public/usdt.png";
+import usdLogo from "../public/usd.png";
+import euroLogo from "../public/euro.png";
 
 type Token = {
   label: string;
   logo: any;
   decimals: number;
-  Ethereum: string;
-  Sepolia: string;
-  Optimism: string;
-  Arbitrum: string;
-  Base: string;
+  Ethereum: string | null;
+  Sepolia: string | null;
+  Optimism: string | null;
+  Arbitrum: string | null;
+  Base: string | null;
 
   [key: string]: any;
 };
@@ -29,6 +31,26 @@ export const tokensDetails: Token[] = [
     Optimism: "0x0000000000000000000000000000000000000000",
     Arbitrum: "0x0000000000000000000000000000000000000000",
     Base: "0x0000000000000000000000000000000000000000",
+  },
+  {
+    label: "USD",
+    logo: usdLogo,
+    decimals: 1,
+    Ethereum: null,
+    Sepolia: null,
+    Optimism: null,
+    Arbitrum: null,
+    Base: null,
+  },
+  {
+    label: "EURO",
+    logo: euroLogo,
+    decimals: 1,
+    Ethereum: null,
+    Sepolia: null,
+    Optimism: null,
+    Arbitrum: null,
+    Base: null,
   },
   {
     label: "WETH",
