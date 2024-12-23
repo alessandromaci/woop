@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
+import MenuItem from "@mui/material/MenuItem";
 import Confetti from "react-confetti";
 import useWindowSize from "./../../hooks/useWindowSize/useWindowSize";
 
@@ -20,10 +21,12 @@ import {
   setEtherscanBase,
   setEtherscanAddress,
   tokensDetails,
+  tokenIdMap,
 } from "../../utils/constants";
 import { sendNotification } from "../../utils/push";
 import mixpanel from "mixpanel-browser";
 import { getEnsName } from "../../utils/ens";
+import { getCoinPrices } from "../../utils/quotes";
 
 import ERC20 from "../../abi/ERC20.abi.json";
 import Footer from "../../components/Footer";
@@ -47,11 +50,29 @@ interface Request {
 const Request = () => {
   const [request, setRequest] = React.useState<Request>();
   const [amount, setAmount] = React.useState<string>("0.01");
+  const [amountPreviewToDisplay, setAmountPreviewToDisplay] = React.useState<
+    string | null
+  >(null);
+  const [amountPreviewToPay, setAmountPreviewToPay] = React.useState<
+    string | null
+  >(null);
   const [recipient, setRecipient] = React.useState<`0x${string}`>("0x");
   const [description, setDescription] = React.useState<string>("");
+  const [tokenAddress, setTokenAddress] = React.useState<any>("");
+  const [selectedToken, setSelectedToken] = React.useState<{
+    label: string;
+    logo: any;
+    decimals: number;
+    Ethereum: string | null;
+    Sepolia: string | null;
+    Optimism: string | null;
+    Arbitrum: string | null;
+    Base: string | null;
+  }>(tokensDetails[0]);
   const [ensName, setEnsName] = React.useState<string>("");
   const [network, setNetwork] = React.useState<string>("");
   const [networkName, setNetworkName] = React.useState<string>("");
+  const [chainId, setChainId] = React.useState<string>("");
   const [allowPayerSelectAmount, setAllowPayerSelectAmount] =
     React.useState<boolean>(false);
   const [woopBadRequest, setWoopBadRequest] = React.useState<string>("");
@@ -60,7 +81,10 @@ const Request = () => {
   const [badRequest, setBadRequest] = React.useState<boolean>(false);
   const [wrongNetwork, setWrongNetwork] = React.useState<boolean>(false);
   const [isNativeTx, setIsNativeTx] = React.useState<boolean>(false);
+  const [isFiatTx, setIsFiatTx] = React.useState<boolean>(false);
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
+  const [selectorVisibility, setSelectorVisibility] =
+    React.useState<boolean>(false);
   const router = useRouter();
   const { id } = router.query;
   const { isConnected: connected, address } = useAccount();
@@ -88,6 +112,7 @@ const Request = () => {
       setNetwork(json.network);
       setNetworkName(json.networkName);
       setDescription(json.description);
+      setTokenAddress(json.tokenAddress);
 
       if (json.value == "allowPayerSelectAmount") {
         setAllowPayerSelectAmount(true);
@@ -109,6 +134,10 @@ const Request = () => {
       let tokenName: string = json.tokenName;
       if (tokenName == "ETH" || tokenName == "MATIC") {
         setIsNativeTx(true);
+      }
+
+      if (tokenName == "USD" || tokenName == "EURO") {
+        setIsFiatTx(true);
       }
 
       const recipient = await getEnsName(json.from);
@@ -186,7 +215,7 @@ const Request = () => {
 
   // wagmi erc20 transaction
   const { data } = useSimulateContract({
-    address: request?.tokenAddress as `0x${string}` | undefined,
+    address: tokenAddress as `0x${string}` | undefined,
     abi: ERC20,
     functionName: "transfer",
     args: [request?.from, parseEther(amount)],
@@ -236,6 +265,11 @@ const Request = () => {
     if (id) {
       callIpfs();
       callIpfsForNetwork().then((result: any) => checkAndUpdateNetwork(result));
+    }
+
+    if (chain) {
+      setSelectedToken(tokensDetails[0]);
+      setChainId(chain.name);
     }
   }, [chain, id]);
 
@@ -297,6 +331,73 @@ const Request = () => {
   React.useEffect(() => {
     randomGif();
   }, []);
+
+  React.useEffect(() => {
+    const fetchExchangeRateAndCalculate = async () => {
+      if (selectedToken && request) {
+        try {
+          // Map tokenName to CoinGecko ID
+          const tokenName = selectedToken?.label;
+
+          const tokenId = tokenIdMap[tokenName];
+
+          const currency =
+            request.tokenName === "EURO"
+              ? "eur"
+              : request.tokenName.toLowerCase();
+
+          if (!tokenId) {
+            console.error(`Token ID not found for token name: ${tokenName}`);
+            return;
+          }
+
+          // Fetch the exchange rate dynamically
+          const prices = await getCoinPrices(tokenId, currency);
+          const exchangeRate = prices[tokenId]?.[currency];
+
+          if (!exchangeRate) {
+            console.error(`Exchange rate not found for token ID: ${tokenId}`);
+            return;
+          }
+
+          // Set token address for the selected network
+          const tokenAddress =
+            selectedToken[networkName as keyof typeof selectedToken];
+          setTokenAddress(tokenAddress);
+
+          // Calculate the amount to pay in tokens
+          const fiatValue = parseFloat(request?.value || "0"); // Ensure fiatValue is a number
+          const amountToPayInToken = fiatValue / exchangeRate;
+          const amountToPayInTokenFixed = amountToPayInToken.toFixed(4);
+
+          setAmountPreviewToDisplay(amountToPayInTokenFixed);
+
+          // Adjust for token decimals if necessary
+          if (selectedToken.decimals !== 18) {
+            const adjustedAmount: string = (
+              Number(amountToPayInTokenFixed) /
+              Number(10 ** (18 - selectedToken.decimals))
+            ).toFixed(18);
+            setAmount(adjustedAmount);
+          } else {
+            setAmount(amountToPayInTokenFixed);
+          }
+        } catch (error) {
+          console.error(
+            "Error fetching exchange rate or calculating token amount:",
+            error
+          );
+        }
+      }
+    };
+
+    fetchExchangeRateAndCalculate();
+    if (selectedToken.label == "ETH") {
+      setIsNativeTx(true);
+    } else {
+      setIsNativeTx(false);
+    }
+  }, [selectedToken, request, networkName]);
 
   const colors = [
     "rgba(16, 130, 178, 1)",
@@ -490,10 +591,15 @@ const Request = () => {
                   <div className="px-4 pb-4 pt-1">
                     <div className="mt-3 text-center w-full my-6">
                       <p className="font-bold md:text-5xl text-4xl mb-2">
-                        {request?.decimals == 18
-                          ? amount
-                          : Number(amount) * 10 ** 12}{" "}
-                        {request?.tokenName}
+                        {`${
+                          isFiatTx
+                            ? amountPreviewToDisplay
+                            : request?.decimals === 18
+                            ? amount
+                            : Number(amount) * 10 ** 12
+                        } ${
+                          isFiatTx ? selectedToken.label : request?.tokenName
+                        }`}
                       </p>
                       <p className="text-xs text-slate-300 mb-2 text-center">
                         <a
@@ -534,7 +640,9 @@ const Request = () => {
                   <div className="px-4 pb-4 pt-1">
                     <div className="mt-3 text-center w-full my-6">
                       <p className="font-bold md:text-5xl text-4xl mb-2">
-                        {amount} {request?.tokenName}
+                        {`${isFiatTx ? amountPreviewToDisplay : amount} ${
+                          isFiatTx ? selectedToken.label : request?.tokenName
+                        }`}
                       </p>
                       <p className="text-xs text-slate-300 mb-2 text-center">
                         <a
@@ -619,6 +727,201 @@ const Request = () => {
                         style={{ maxWidth: "100%" }}
                       />
                       <div className="flex-shrink-0">{request?.tokenName}</div>
+                    </div>
+                  </>
+
+                  <div className="">
+                    <button
+                      type="button"
+                      className={cx(
+                        "flex justify-center items-center border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white capitalize hover:border-white hover:bg-white hover:text-slate-700"
+                      )}
+                      disabled={
+                        (isNativeTx
+                          ? !Boolean(dataNative) || isLoadingNative
+                          : !Boolean(data?.request) || isLoading) ||
+                        wrongNetwork
+                      }
+                      onClick={
+                        isNativeTx
+                          ? () =>
+                              sendTransaction({
+                                to: recipient,
+                                value: amount
+                                  ? BigInt(parseEther(amount).toString())
+                                  : undefined,
+                              })
+                          : () => writeContract(data!.request)
+                      }
+                    >
+                      {isNativeTx ? (
+                        isLoadingNative ? (
+                          <svg
+                            className="animate-spin rounded-full w-5 h-5 mr-3 bg-white-500"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              strokeWidth="4"
+                              stroke="currentColor"
+                              strokeDasharray="32"
+                              strokeLinecap="round"
+                              fill="transparent"
+                            />
+                          </svg>
+                        ) : (
+                          "Pay Woop"
+                        )
+                      ) : isLoading ? (
+                        <>
+                          <svg
+                            className="animate-spin rounded-full w-5 h-5 mr-3 bg-white-500"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              strokeWidth="4"
+                              stroke="currentColor"
+                              strokeDasharray="32"
+                              strokeLinecap="round"
+                              fill="transparent"
+                            />
+                          </svg>
+                        </>
+                      ) : (
+                        "Pay Woop"
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ) : isFiatTx ? (
+                <div className="px-4 pb-4 pt-1 relative">
+                  <>
+                    <div className="absolute top-0 right-3 p-1">
+                      {request && findIcon(request?.tokenName)}
+                    </div>
+                    <p className="text-xs text-slate-300 mb-2 flex items-center">
+                      <a
+                        className="underline underline-offset-4"
+                        href={`${setEtherscanAddress(network, request?.from)}`}
+                      >
+                        {ensName ? (
+                          <p className="flex items-center">
+                            <span className="font-bold">{ensName}</span>
+                            {/* <Image
+                            alt="ens"
+                            src={ens}
+                            className=""
+                            width={20}
+                            height={20}
+                          /> */}
+                          </p>
+                        ) : (
+                          <span className="font-bold">
+                            {request?.from.slice(0, 4)}...
+                            {request?.from.slice(-4)}
+                          </span>
+                        )}
+                      </a>
+                      <span className="ml-1">{"requested:"}</span>
+                    </p>
+                    <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
+                      {request?.value} {request?.tokenName}
+                    </div>
+                    <p className="text-xs text-slate-300 mb-2 flex items-center">
+                      <span className="ml-1">{"Select token to pay:"}</span>
+                    </p>
+                    <button
+                      type="button"
+                      style={{
+                        width: 110,
+                        height: 38,
+                        position: "absolute",
+                        top: 142,
+                        right: 16,
+                      }}
+                      className="bg-white shadow-md rounded-xl text-slate-900 hover:shadow-xl hover:bg-white"
+                      onClick={() => setSelectorVisibility(!selectorVisibility)}
+                    >
+                      <div className="flex items-center w-full ml-1">
+                        <Image
+                          alt={selectedToken.label}
+                          src={selectedToken.logo}
+                          className="pr-1 ml-1"
+                          width={30}
+                          height={30}
+                        />
+                        <span className="ml-1 text-slate-700 font-base font-semibold">
+                          {selectedToken.label}
+                        </span>
+                      </div>
+                    </button>
+
+                    {selectorVisibility && (
+                      <section className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen z-30">
+                        <div
+                          onClick={() =>
+                            setSelectorVisibility(!selectorVisibility)
+                          }
+                          className="fixed top-0 left-0 w-screen h-screen bg-slate-900 opacity-30"
+                        ></div>
+                        <div className="z-20 bg-white rounded-xl shadow-xl py-2 px-2 md:w-80 w-full m-5">
+                          <p className="font-base font-semibold text-slate-700 pl-4 pb-3 pt-2 border-b mb-3">
+                            Select currency
+                          </p>
+                          {tokensDetails
+                            .filter((token) => {
+                              if (
+                                token.label === "USD" ||
+                                token.label === "EURO"
+                              ) {
+                                return false; // Exclude USD and EURO
+                              }
+                              if (chainId === "Base") {
+                                return token.label !== "WBTC"; // Exclude WBTC for Base
+                              } else {
+                                return token.label !== "cbBTC"; // Exclude cbBTC for other chains
+                              }
+                            })
+                            .map((token, i) => {
+                              return (
+                                <MenuItem
+                                  key={token.label}
+                                  onClick={() => {
+                                    setSelectedToken(token);
+                                    setSelectorVisibility(!selectorVisibility);
+                                  }}
+                                  value={token.label}
+                                  sx={{
+                                    marginBottom:
+                                      tokensDetails.length - 1 === i ? 0 : 1,
+                                  }}
+                                  className="cursor-pointer hover:bg-slate-200 rounded-xl p-1"
+                                >
+                                  <div className="flex items-center">
+                                    <Image
+                                      alt={token.label}
+                                      src={token.logo}
+                                      className="p-1"
+                                      width={40}
+                                      height={40}
+                                    />
+                                    <span className="ml-3 text-slate-700 font-base font-semibold">
+                                      {token.label}
+                                    </span>
+                                  </div>
+                                </MenuItem>
+                              );
+                            })}
+                        </div>
+                      </section>
+                    )}
+                    <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
+                      {amountPreviewToDisplay ? amountPreviewToDisplay : "..."}
                     </div>
                   </>
 

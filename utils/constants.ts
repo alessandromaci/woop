@@ -35,22 +35,22 @@ export const tokensDetails: Token[] = [
   {
     label: "USD",
     logo: usdLogo,
-    decimals: 1,
-    Ethereum: null,
-    Sepolia: null,
-    Optimism: null,
-    Arbitrum: null,
-    Base: null,
+    decimals: 18,
+    Ethereum: "0x0000000000000000000000000000000000000000",
+    Sepolia: "0x0000000000000000000000000000000000000000",
+    Optimism: "0x0000000000000000000000000000000000000000",
+    Arbitrum: "0x0000000000000000000000000000000000000000",
+    Base: "0x0000000000000000000000000000000000000000",
   },
   {
     label: "EURO",
     logo: euroLogo,
-    decimals: 1,
-    Ethereum: null,
-    Sepolia: null,
-    Optimism: null,
-    Arbitrum: null,
-    Base: null,
+    decimals: 18,
+    Ethereum: "0x0000000000000000000000000000000000000000",
+    Sepolia: "0x0000000000000000000000000000000000000000",
+    Optimism: "0x0000000000000000000000000000000000000000",
+    Arbitrum: "0x0000000000000000000000000000000000000000",
+    Base: "0x0000000000000000000000000000000000000000",
   },
   {
     label: "WETH",
@@ -164,6 +164,8 @@ export const networks: any = [
 ];
 export const tokens: any = [
   "ETH",
+  "USD",
+  "EURO",
   "WETH",
   "cbBTC",
   "WBTC",
@@ -171,6 +173,17 @@ export const tokens: any = [
   "USDC",
   "USDT",
 ];
+
+// to be used for coingecko api
+export const tokenIdMap: Record<string, string> = {
+  ETH: "ethereum",
+  WETH: "weth",
+  cbBTC: "coinbase-wrapped-btc",
+  WBTC: "wrapped-bitcoin",
+  DAI: "dai",
+  USDC: "usd-coin",
+  USDT: "tether",
+};
 
 export const selectToken = (token: any, network: any): string | undefined => {
   let selectedToken: Token | undefined;
@@ -189,6 +202,8 @@ export const selectToken = (token: any, network: any): string | undefined => {
 export const selectTokenDecimals = (token: any): number | undefined => {
   const tokens: string[] | undefined = [
     "ETH",
+    "USD",
+    "EURO",
     "WETH",
     "cbBTC",
     "WBTC",

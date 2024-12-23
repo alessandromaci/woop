@@ -157,7 +157,7 @@ export default function Payment(props: any) {
           ></div>
           <div className="z-20 bg-white rounded-xl shadow-xl py-2 px-2 md:w-80 w-full m-5">
             <p className="font-base font-semibold text-slate-700 pl-4 pb-3 pt-2 border-b mb-3">
-              Select a token
+              Select currency
             </p>
             {tokensDetails
               .filter((token) => {
@@ -278,10 +278,6 @@ export default function Payment(props: any) {
               ></div>
             </div>
           </label>
-
-          {/* <p className="font-medium font-base text-sm text-white mt-12 mb-2 pl-2">
-            <span>What's this for?</span>
-          </p> */}
 
           <div className="font-medium font-base text-sm text-white mt-12 mb-2 pl-2">
             {`What's this for?`}
