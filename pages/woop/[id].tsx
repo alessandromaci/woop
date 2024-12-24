@@ -333,69 +333,71 @@ const Request = () => {
   }, []);
 
   React.useEffect(() => {
-    const fetchExchangeRateAndCalculate = async () => {
-      if (selectedToken && request) {
-        try {
-          // Map tokenName to CoinGecko ID
-          const tokenName = selectedToken?.label;
+    if (isFiatTx == true) {
+      const fetchExchangeRateAndCalculate = async () => {
+        if (selectedToken && request) {
+          try {
+            // Map tokenName to CoinGecko ID
+            const tokenName = selectedToken?.label;
 
-          const tokenId = tokenIdMap[tokenName];
+            const tokenId = tokenIdMap[tokenName];
 
-          const currency =
-            request.tokenName === "EURO"
-              ? "eur"
-              : request.tokenName.toLowerCase();
+            const currency =
+              request.tokenName === "EURO"
+                ? "eur"
+                : request.tokenName.toLowerCase();
 
-          if (!tokenId) {
-            console.error(`Token ID not found for token name: ${tokenName}`);
-            return;
+            if (!tokenId) {
+              console.error(`Token ID not found for token name: ${tokenName}`);
+              return;
+            }
+
+            // Fetch the exchange rate dynamically
+            const prices = await getCoinPrices(tokenId, currency);
+            const exchangeRate = prices[tokenId]?.[currency];
+
+            if (!exchangeRate) {
+              console.error(`Exchange rate not found for token ID: ${tokenId}`);
+              return;
+            }
+
+            // Set token address for the selected network
+            const tokenAddress =
+              selectedToken[networkName as keyof typeof selectedToken];
+            setTokenAddress(tokenAddress);
+
+            // Calculate the amount to pay in tokens
+            const fiatValue = parseFloat(request?.value || "0"); // Ensure fiatValue is a number
+            const amountToPayInToken = fiatValue / exchangeRate;
+            const amountToPayInTokenFixed = amountToPayInToken.toFixed(4);
+
+            setAmountPreviewToDisplay(amountToPayInTokenFixed);
+
+            // Adjust for token decimals if necessary
+            if (selectedToken.decimals !== 18) {
+              const adjustedAmount: string = (
+                Number(amountToPayInTokenFixed) /
+                Number(10 ** (18 - selectedToken.decimals))
+              ).toFixed(18);
+              setAmount(adjustedAmount);
+            } else {
+              setAmount(amountToPayInTokenFixed);
+            }
+          } catch (error) {
+            console.error(
+              "Error fetching exchange rate or calculating token amount:",
+              error
+            );
           }
-
-          // Fetch the exchange rate dynamically
-          const prices = await getCoinPrices(tokenId, currency);
-          const exchangeRate = prices[tokenId]?.[currency];
-
-          if (!exchangeRate) {
-            console.error(`Exchange rate not found for token ID: ${tokenId}`);
-            return;
-          }
-
-          // Set token address for the selected network
-          const tokenAddress =
-            selectedToken[networkName as keyof typeof selectedToken];
-          setTokenAddress(tokenAddress);
-
-          // Calculate the amount to pay in tokens
-          const fiatValue = parseFloat(request?.value || "0"); // Ensure fiatValue is a number
-          const amountToPayInToken = fiatValue / exchangeRate;
-          const amountToPayInTokenFixed = amountToPayInToken.toFixed(4);
-
-          setAmountPreviewToDisplay(amountToPayInTokenFixed);
-
-          // Adjust for token decimals if necessary
-          if (selectedToken.decimals !== 18) {
-            const adjustedAmount: string = (
-              Number(amountToPayInTokenFixed) /
-              Number(10 ** (18 - selectedToken.decimals))
-            ).toFixed(18);
-            setAmount(adjustedAmount);
-          } else {
-            setAmount(amountToPayInTokenFixed);
-          }
-        } catch (error) {
-          console.error(
-            "Error fetching exchange rate or calculating token amount:",
-            error
-          );
         }
-      }
-    };
+      };
 
-    fetchExchangeRateAndCalculate();
-    if (selectedToken.label == "ETH") {
-      setIsNativeTx(true);
-    } else {
-      setIsNativeTx(false);
+      fetchExchangeRateAndCalculate();
+      if (selectedToken.label == "ETH") {
+        setIsNativeTx(true);
+      } else {
+        setIsNativeTx(false);
+      }
     }
   }, [selectedToken, request, networkName]);
 

@@ -100,7 +100,7 @@ export const tokensDetails: Token[] = [
     Sepolia: "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
     Optimism: "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
     Arbitrum: "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
-    Base: "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA",
+    Base: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
   },
   {
     label: "USDT",
