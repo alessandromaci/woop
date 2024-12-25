@@ -77,7 +77,6 @@ const Request = () => {
     React.useState<boolean>(false);
   const [woopBadRequest, setWoopBadRequest] = React.useState<string>("");
   const [woopBadNetwork, setWoopBadNetwork] = React.useState<string>("");
-  const [gif, setGif] = React.useState("");
   const [badRequest, setBadRequest] = React.useState<boolean>(false);
   const [wrongNetwork, setWrongNetwork] = React.useState<boolean>(false);
   const [isNativeTx, setIsNativeTx] = React.useState<boolean>(false);
@@ -329,10 +328,6 @@ const Request = () => {
   }, [isSuccess, isSuccessNative]);
 
   React.useEffect(() => {
-    randomGif();
-  }, []);
-
-  React.useEffect(() => {
     if (isFiatTx == true) {
       const fetchExchangeRateAndCalculate = async () => {
         if (selectedToken && request) {
@@ -421,18 +416,6 @@ const Request = () => {
         />
       )
     );
-  };
-
-  const gifs = [
-    "https://media.giphy.com/media/l3q2wJsC23ikJg9xe/giphy.gif",
-    "https://media.giphy.com/media/TpegB7FzEXfnWlrorG/giphy.gif",
-    "https://media.giphy.com/media/8BHjXpkB7GfqJUbAxa/giphy.gif",
-    "https://media.giphy.com/media/opfF5TLS75Oms/giphy.gif",
-    "https://media.giphy.com/media/Tw4z4MD34y11K/giphy.gif",
-  ];
-
-  const randomGif = () => {
-    setGif(gifs[Math.floor(Math.random() * gifs.length)]);
   };
 
   return (
@@ -622,9 +605,6 @@ const Request = () => {
                           </span>
                         )}
                       </p>
-                      <div className="m-3">
-                        <img src={gif} alt="Thank you" />
-                      </div>
                     </div>
                     <Link href="/">
                       <button
@@ -657,13 +637,6 @@ const Request = () => {
                         {ensName ? (
                           <a>
                             <span className="mr-1 font-bold">{ensName}</span>
-                            {/* <Image
-                              alt="ens"
-                              src={ens}
-                              className=""
-                              width={20}
-                              height={20}
-                            /> */}
                           </a>
                         ) : (
                           <span className="font-bold">
@@ -672,9 +645,6 @@ const Request = () => {
                           </span>
                         )}
                       </p>
-                    </div>
-                    <div className="m-3">
-                      <img src={gif} alt="Thank you" />
                     </div>
                     <Link href="/">
                       <button
@@ -814,13 +784,6 @@ const Request = () => {
                         {ensName ? (
                           <p className="flex items-center">
                             <span className="font-bold">{ensName}</span>
-                            {/* <Image
-                            alt="ens"
-                            src={ens}
-                            className=""
-                            width={20}
-                            height={20}
-                          /> */}
                           </p>
                         ) : (
                           <span className="font-bold">
