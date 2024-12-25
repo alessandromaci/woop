@@ -589,7 +589,7 @@ const Request = () => {
                       <p className="text-xs text-slate-300 mb-2 text-center">
                         <a
                           className="underline underline-offset-4 mr-1"
-                          href={`${setEtherscanBase(networkName, hashNative)}`}
+                          href={`${setEtherscanBase(networkName, hash)}`}
                         >
                           sent
                         </a>
