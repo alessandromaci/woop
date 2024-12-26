@@ -578,13 +578,11 @@ const Request = () => {
                       <p className="font-bold md:text-5xl text-4xl mb-2">
                         {`${
                           isFiatTx
-                            ? amountPreviewToDisplay
+                            ? request?.value
                             : request?.decimals === 18
                             ? amount
                             : Number(amount) * 10 ** 12
-                        } ${
-                          isFiatTx ? selectedToken.label : request?.tokenName
-                        }`}
+                        } ${request?.tokenName}`}
                       </p>
                       <p className="text-xs text-slate-300 mb-2 text-center">
                         <a
@@ -622,8 +620,8 @@ const Request = () => {
                   <div className="px-4 pb-4 pt-1">
                     <div className="mt-3 text-center w-full my-6">
                       <p className="font-bold md:text-5xl text-4xl mb-2">
-                        {`${isFiatTx ? amountPreviewToDisplay : amount} ${
-                          isFiatTx ? selectedToken.label : request?.tokenName
+                        {`${isFiatTx ? request?.value : amount} ${
+                          request?.tokenName
                         }`}
                       </p>
                       <p className="text-xs text-slate-300 mb-2 text-center">
@@ -671,13 +669,6 @@ const Request = () => {
                         {ensName ? (
                           <p className="flex items-center">
                             <span className="font-bold">{ensName}</span>
-                            {/* <Image
-                              alt="ens"
-                              src={ens}
-                              className=""
-                              width={20}
-                              height={20}
-                            /> */}
                           </p>
                         ) : (
                           <span className="font-bold">
@@ -972,13 +963,6 @@ const Request = () => {
                         {ensName ? (
                           <p className="flex items-center">
                             <span className="font-bold">{ensName}</span>
-                            {/* <Image
-                              alt="ens"
-                              src={ens}
-                              className=""
-                              width={20}
-                              height={20}
-                            /> */}
                           </p>
                         ) : (
                           <span className="font-bold">
