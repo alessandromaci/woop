@@ -89,7 +89,7 @@ export default function Payment(props: any) {
           network: chain?.id,
           networkName: chain?.name,
           tokenName: selectedToken.label,
-          tokenAddress: selectToken(selectedToken.label, chainId),
+          tokenAddress: selectToken(selectedToken.label, chain?.name),
         };
 
         const path = await uploadIpfs(data).finally(() => {

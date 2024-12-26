@@ -154,9 +154,11 @@ export const tokenIdMap: Record<string, string> = {
 };
 
 export const selectToken = (token: any, network: any): string | undefined => {
+  const flatTokens = tokens.flat();
+
   let selectedToken: Token | undefined;
 
-  if (networks.includes(network) && tokens.includes(token)) {
+  if (networks.includes(network) && flatTokens.includes(token)) {
     selectedToken = tokensDetails.find((t) => t.label === token);
   }
 
