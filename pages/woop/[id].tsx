@@ -246,13 +246,13 @@ const Request = () => {
     } else {
       if (isNativeTx) {
         if (!sendTransaction && !badRequest) {
-          setWoopBadRequest(`Insufficient ${request?.tokenName} balance`);
+          setWoopBadRequest(`Insufficient balance`);
         } else {
           setWoopBadRequest("");
         }
       } else {
         if (!Boolean(data?.request) && !badRequest) {
-          setWoopBadRequest(`Insufficient ${request?.tokenName} balance`);
+          setWoopBadRequest(`Insufficient balance`);
         } else {
           setWoopBadRequest("");
         }
