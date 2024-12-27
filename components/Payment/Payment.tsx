@@ -101,6 +101,8 @@ export default function Payment(props: any) {
       setBadRequest("The requested amount must be higher than zero");
     } else if (amount == "") {
       setBadRequest("The requested amount must be higher than zero");
+    } else if (isEditingRecipient) {
+      setBadRequest("Enter a valid Ethereum address");
     } else {
       try {
         setIpfsLoading(true);
