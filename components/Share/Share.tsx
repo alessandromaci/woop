@@ -99,33 +99,15 @@ export const Share: React.FC<{
             </div>
             <div
               onClick={() => {
-                if (navigator.share) {
-                  navigator
-                    .share({
-                      title: "Woop Pay",
-                      text: `Hey, can you please send me ${amount} ${token.label} for ${description} at`,
-                      url: `${baseUrl}${path}`,
-                    })
-                    .then(() => console.log("Successful share"))
-                    .catch((error) => console.log("Error sharing", error));
-                } else {
-                  navigator.clipboard.writeText(`${baseUrl}${path}`);
-                  setCopySuccess(true);
-                  setTimeout(() => {
-                    setCopySuccess(false);
-                  }, 1000);
-                }
+                navigator.clipboard.writeText(`${baseUrl}${path}`);
+                setCopySuccess(true);
               }}
               className={cx(
                 styles.buttons,
-                "w-full font-base cursor-pointer focus:outline-0 focus:text-slate-700  h-16 rounded-xl transition-all font-semibold text-slate-500 capitalize hover:border-slate-700 hover:bg-slate-200 hover:text-slate-500 flex items-center justify-center"
+                "w-full font-base cursor-pointer focus:outline-0 focus:text-slate-700 h-16 rounded-xl transition-all font-semibold text-slate-500 capitalize hover:border-slate-700 hover:bg-slate-200 hover:text-slate-500 flex items-center justify-center"
               )}
             >
-              {!navigator.share && copySuccess
-                ? "Copied"
-                : !copySuccess
-                ? "Share Link"
-                : "Share"}
+              {copySuccess ? "Copied!" : "Copy Link"}
             </div>
           </div>
           <div className="flex justify-between mt-3">
@@ -138,7 +120,9 @@ export const Share: React.FC<{
                   url={`${baseUrl}${path}`}
                   title={`Hey, can you please send me ${
                     amount == "allowPayerSelectAmount" ? "some" : amount
-                  } ${token.label} for ${description} at`}
+                  } ${token.label} ${
+                    description ? `for ${description}` : ``
+                  } at`}
                 >
                   <WhatsappIcon size={30} round />
                 </WhatsappShareButton>
@@ -148,7 +132,9 @@ export const Share: React.FC<{
                   url={`${baseUrl}${path}`}
                   title={`Hey, can you please send me ${
                     amount == "allowPayerSelectAmount" ? "some" : amount
-                  } ${token.label} for ${description} at`}
+                  } ${token.label} ${
+                    description ? `for ${description}` : ``
+                  } at`}
                 >
                   <TelegramIcon size={30} round />
                 </TelegramShareButton>
@@ -158,7 +144,9 @@ export const Share: React.FC<{
                   url={`${baseUrl}${path}`}
                   title={`Hey, can you please send me ${
                     amount == "allowPayerSelectAmount" ? "some" : amount
-                  } ${token.label} for ${description} at`}
+                  } ${token.label} ${
+                    description ? `for ${description}` : ``
+                  } at`}
                 >
                   <TwitterIcon size={30} round />
                 </TwitterShareButton>
