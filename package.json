@@ -27,7 +27,7 @@
     "mixpanel-browser": "^2.47.0",
     "next": "14.2.3",
     "next-qrcode": "^2.5.1",
-    "next-share": "^0.25.0",
+    "next-share": "^0.27.0",
     "npm-check-updates": "^16.14.20",
     "qr-code-styling": "^1.6.0-rc.1",
     "react": "18.2.0",

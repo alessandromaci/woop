@@ -10,6 +10,7 @@ import cx from "classnames";
 
 import { useAccount } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { isAddress } from "viem";
 
 import { uploadIpfs } from "../../utils/ipfs";
 import {
@@ -26,11 +27,11 @@ export default function Payment(props: any) {
     label: string;
     logo: any;
     decimals: number;
-    Ethereum: string;
-    Sepolia: string;
-    Optimism: string;
-    Arbitrum: string;
-    Base: string;
+    Ethereum: string | null;
+    Sepolia: string | null;
+    Optimism: string | null;
+    Arbitrum: string | null;
+    Base: string | null;
   }>(tokensDetails[0]);
   const [amount, setAmount] = React.useState<string>("");
   const [description, setDescription] = React.useState<string>("");
@@ -42,6 +43,12 @@ export default function Payment(props: any) {
   const [allowPayerSelectAmount, setAllowPayerSelectAmount] =
     React.useState<boolean>(false);
   const { isConnected: connected, address } = useAccount();
+  const [recipientAddress, setRecipientAddress] = React.useState<string>(
+    address || ""
+  );
+  const [isEditingRecipient, setIsEditingRecipient] =
+    React.useState<boolean>(false);
+  const [newAddress, setNewAddress] = React.useState<string>(address || "");
   const { chain } = useAccount();
   const { openConnectModal } = useConnectModal();
 
@@ -49,9 +56,10 @@ export default function Payment(props: any) {
     React.useState<boolean>(false);
   const [isShareActive, setIsShareActive] = useState<boolean>(false);
   const [badRequest, setBadRequest] = useState<any>("");
+  const [hydrated, setHydrated] = useState(false);
   const MIXPANEL_ID = process.env.NEXT_PUBLIC_MIXPANEL_ID;
 
-  // initiate tracking activity
+  // start tracking activity
   if (MIXPANEL_ID) {
     mixpanel.init(MIXPANEL_ID);
   }
@@ -69,6 +77,22 @@ export default function Payment(props: any) {
     }
   };
 
+  const saveNewAddress = () => {
+    setBadRequest("");
+    if (isAddress(newAddress)) {
+      setRecipientAddress(newAddress);
+      setIsEditingRecipient(false);
+    } else {
+      setBadRequest("Invalid Ethereum address.");
+    }
+  };
+
+  const handleNewAddressChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setNewAddress(event.target.value);
+  };
+
   //main functions
   const createRequest = async () => {
     setBadRequest("");
@@ -77,19 +101,21 @@ export default function Payment(props: any) {
       setBadRequest("The requested amount must be higher than zero");
     } else if (amount == "") {
       setBadRequest("The requested amount must be higher than zero");
+    } else if (isEditingRecipient) {
+      setBadRequest("Enter a valid Ethereum address");
     } else {
       try {
         setIpfsLoading(true);
         const data = {
           version: "1.0.0",
-          from: address,
+          from: recipientAddress,
           value: amount,
           description: description,
           decimals: selectTokenDecimals(selectedToken.label),
           network: chain?.id,
           networkName: chain?.name,
           tokenName: selectedToken.label,
-          tokenAddress: selectToken(selectedToken.label, chainId),
+          tokenAddress: selectToken(selectedToken.label, chain?.name),
         };
 
         const path = await uploadIpfs(data).finally(() => {
@@ -147,6 +173,10 @@ export default function Payment(props: any) {
     }
   }, [chain]);
 
+  React.useEffect(() => {
+    setHydrated(true);
+  }, []);
+
   return (
     <>
       {selectorVisibility && (
@@ -157,7 +187,7 @@ export default function Payment(props: any) {
           ></div>
           <div className="z-20 bg-white rounded-xl shadow-xl py-2 px-2 md:w-80 w-full m-5">
             <p className="font-base font-semibold text-slate-700 pl-4 pb-3 pt-2 border-b mb-3">
-              Select a token
+              Select currency
             </p>
             {tokensDetails
               .filter((token) => {
@@ -279,10 +309,6 @@ export default function Payment(props: any) {
             </div>
           </label>
 
-          {/* <p className="font-medium font-base text-sm text-white mt-12 mb-2 pl-2">
-            <span>What's this for?</span>
-          </p> */}
-
           <div className="font-medium font-base text-sm text-white mt-12 mb-2 pl-2">
             {`What's this for?`}
           </div>
@@ -302,6 +328,56 @@ export default function Payment(props: any) {
             />
             <div className="absolute right-3 bottom-4 text-white text-[8px]">
               {characterCount}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <div className="font-medium font-base text-sm text-white mb-2 pl-2">
+            {`Recipient`}
+          </div>
+          <div className="flex justify-between items-center w-full">
+            <div className="flex items-center justify-center flex-1 h-10 border border-white rounded-xl bg-transparent text-white mx-1">
+              <span className="font-medium">{chainId}</span>
+            </div>
+
+            <div className="flex items-center justify-between flex-1 h-10 border border-white rounded-xl bg-transparent text-white px-4 mx-1">
+              {!isEditingRecipient ? (
+                <>
+                  <div className="font-medium">
+                    {hydrated
+                      ? `${recipientAddress.slice(
+                          0,
+                          4
+                        )}...${recipientAddress.slice(-4)}`
+                      : ""}
+                  </div>
+                  <button
+                    type="button"
+                    className="text-white text-lg"
+                    onClick={() => setIsEditingRecipient(true)}
+                  >
+                    ▼
+                  </button>
+                </>
+              ) : (
+                <div className="flex items-center w-full">
+                  <input
+                    type="text"
+                    className="w-full h-8 rounded-md bg-transparent text-white text-center font-medium"
+                    value={newAddress}
+                    onChange={handleNewAddressChange}
+                    placeholder="0x..."
+                  />
+                  <button
+                    type="button"
+                    className="ml-2 text-blue-400"
+                    onClick={saveNewAddress}
+                  >
+                    Change
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
