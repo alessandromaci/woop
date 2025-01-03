@@ -30,10 +30,7 @@ export default function Layout({ children }: LayoutProps) {
         <Container maxWidth="sm" className="w-full z-10">
           <Box
             component="form"
-            className={cx(
-              styles.containerBox,
-              "p-2 rounded-3xl shadow-md w-full"
-            )}
+            className={cx(styles.containerBox, "p-2 rounded shadow-md w-full")}
           >
             {children}
           </Box>

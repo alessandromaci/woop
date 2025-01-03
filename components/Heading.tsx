@@ -1,6 +1,6 @@
 import Image from "next/image";
 import logo from "../public/WoopPayLogo.svg";
-import logoMobile from "../public/icon.svg";
+import logoMobile from "../public/woop_logo.png";
 import Wallet from "./Wallet";
 import styles from "./Wallet.module.scss";
 import notificationStyles from "./Notification/notification.module.scss";
@@ -67,8 +67,8 @@ const Header: React.FC<IHeaderProps> = (props) => {
           <Image
             alt="woop-pay"
             src={logoMobile}
-            width={40}
-            height={40}
+            width={60}
+            height={80}
             className={cx("md:hidden")}
           />
         </div>

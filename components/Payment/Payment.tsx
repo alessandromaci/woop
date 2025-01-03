@@ -136,7 +136,6 @@ export default function Payment(props: any) {
           selectedToken.label,
           path
         );
-        console.log(path);
         setPath(path);
 
         setIsShareActive(true);
@@ -169,7 +168,6 @@ export default function Payment(props: any) {
     if (chain) {
       setSelectedToken(tokensDetails[0]);
       setChainId(chain.name);
-      console.log(chain.name);
     }
   }, [chain]);
 
@@ -185,8 +183,8 @@ export default function Payment(props: any) {
             onClick={() => setSelectorVisibility(!selectorVisibility)}
             className="fixed top-0 left-0 w-screen h-screen bg-slate-900 opacity-30"
           ></div>
-          <div className="z-20 bg-white rounded-xl shadow-xl py-2 px-2 md:w-80 w-full m-5">
-            <p className="font-base font-semibold text-slate-700 pl-4 pb-3 pt-2 border-b mb-3">
+          <div className="z-20 bg-white rounded shadow-xl py-2 px-2 md:w-80 w-full m-5">
+            <p className="font-base font-semibold text-slate-600 pl-4 pb-3 pt-2 border-b mb-3">
               Select currency
             </p>
             {tokensDetails
@@ -209,7 +207,7 @@ export default function Payment(props: any) {
                     sx={{
                       marginBottom: tokensDetails.length - 1 === i ? 0 : 1,
                     }}
-                    className="cursor-pointer hover:bg-slate-200 rounded-xl p-1"
+                    className="cursor-pointer hover:border-black hover:bg-gray-200 rounded p-1"
                   >
                     <div className="flex items-center">
                       <Image
@@ -219,7 +217,7 @@ export default function Payment(props: any) {
                         width={40}
                         height={40}
                       />
-                      <span className="ml-3 text-slate-700 font-base font-semibold">
+                      <span className="ml-3 text-slate-600 font-base font-semibold">
                         {token.label}
                       </span>
                     </div>
@@ -235,81 +233,126 @@ export default function Payment(props: any) {
           <ErrorsUi errorMsg={badRequest} errorNtk={""} />
         </div>
 
-        <p className="font-medium font-base text-sm text-white mb-2 pl-2">
-          <span className="md:block hidden">Select amount to request</span>
-          <span className="md:hidden">Requesting</span>
-        </p>
+        {/* Logo Section */}
+        <div className="flex justify-center mt-2 mb-2">
+          <Image alt="Logo" src="/woop_logo.png" width={100} height={80} />
+        </div>
 
-        <div className="relative">
-          {allowPayerSelectAmount ? (
-            <input
-              autoFocus={isConnected}
-              className={cx(
-                styles.mainInput,
-                "border-white rounded-xl border font-medium text-3l focus:outline-0 focus:white w-full h-16 mb-2 font-sans text-white bg-transparent pl-4"
-              )}
-              placeholder="Payer sets an amount"
-              value={"Payer sets an amount"}
-              readOnly
-            ></input>
-          ) : (
-            <input
-              autoFocus={isConnected}
-              className={cx(
-                styles.mainInput,
-                "border-white rounded-xl border font-medium text-3xl focus:outline-0 focus:white w-full h-16 mb-2 font-sans text-white bg-transparent pl-4"
-              )}
-              type="number"
-              step="0.000000"
-              placeholder="0.00"
-              value={amount}
-              onChange={handleAmountChange}
-            ></input>
-          )}
+        {/* Recipient Section with chain name and address recipient */}
+        <>
+          <div className="mt-1 mb-2">
+            <div className="font-medium font-base text-sm text-slate-600 mb-2 pl-2">
+              {`Recipient`}
+            </div>
+            <div className="flex items-center w-full">
+              {/* Chain ID Section (1/3 of the width) */}
+              <div className="flex items-center justify-center basis-1/3 h-10 border border-black rounded bg-transparent text-slate-600">
+                <span className="font-medium">{chainId}</span>
+              </div>
 
-          <button
-            type="button"
-            style={{
-              width: 110,
-              height: 38,
-              position: "absolute",
-              top: -20,
-              right: 25,
-            }}
-            className="bg-white shadow-md rounded-xl text-slate-900 hover:shadow-xl hover:bg-white"
-            onClick={() => setSelectorVisibility(!selectorVisibility)}
-          >
-            <div className="flex items-center w-full ml-1">
+              {/* Space Between */}
+              <div className="mx-2"></div>
+
+              {/* Address Section (2/3 of the width) */}
+              <div className="flex items-center justify-between basis-2/3 h-10 border border-black hover:bg-gray-200 rounded bg-transparent text-slate-600 px-4">
+                {!isEditingRecipient ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingRecipient(true)}
+                    className="flex items-center justify-between w-full h-full text-left"
+                  >
+                    {/* Recipient Address */}
+                    <span className="font-medium">
+                      {hydrated
+                        ? `${recipientAddress.slice(
+                            0,
+                            6
+                          )}...${recipientAddress.slice(-6)}`
+                        : ""}
+                    </span>
+
+                    {/* Down Arrow */}
+                    <span className="text-slate-600 text-lg">▼</span>
+                  </button>
+                ) : (
+                  <div className="flex items-center w-full">
+                    <input
+                      type="text"
+                      className="w-full h-8 rounded-md bg-transparent text-slate-600 text-center font-medium placeholder-gray"
+                      value={newAddress}
+                      onChange={handleNewAddressChange}
+                      placeholder="0x..."
+                    />
+                    <button
+                      type="button"
+                      className="ml-5 text-blue-400"
+                      onClick={saveNewAddress}
+                    >
+                      Save
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          <hr className="my-2 border-t border-gray-300" />
+        </>
+
+        {/* Amount Input Section */}
+        <>
+          <p className="font-medium font-base text-sm text-slate-600 mb-2 pl-2">
+            <span>What's the amount?</span>
+          </p>
+
+          <div className="relative border border-black rounded h-16 w-full">
+            {allowPayerSelectAmount ? (
+              <input
+                autoFocus={isConnected}
+                className={cx(
+                  styles.mainInput,
+                  "border-none font-medium text-3xl focus:outline-0 focus:border-gray-500 w-full h-16 px-4 bg-transparent placeholder-gray-400"
+                )}
+                placeholder="Payer sets an amount"
+                value={"Payer sets an amount"}
+                readOnly
+              />
+            ) : (
+              <input
+                autoFocus={isConnected}
+                className={cx(
+                  styles.mainInput,
+                  "border-none font-medium text-3xl text-slate-600 focus:outline-0 focus:border-gray-500 w-full h-16 px-4 bg-transparent placeholder-gray-400"
+                )}
+                type="number"
+                step="0.000000"
+                placeholder="0.00"
+                value={amount}
+                onChange={handleAmountChange}
+              />
+            )}
+
+            <button
+              type="button"
+              className="absolute top-1/2 right-2 transform -translate-y-1/2 flex items-center justify-between hover:bg-gray-200 border-l border border-black px-2 h-12 rounded"
+              onClick={() => setSelectorVisibility(!selectorVisibility)}
+            >
               <Image
                 alt={selectedToken.label}
                 src={selectedToken.logo}
-                className="pr-1 ml-1"
-                width={30}
-                height={30}
+                width={20}
+                height={20}
               />
-              <span className="ml-1 text-slate-700 font-base font-semibold">
+              <p className="ml-2 mr-2 text-slate-600 font-medium">
                 {selectedToken.label}
-              </span>
-            </div>
-          </button>
+              </p>
+              <span className="ml-2 text-slate-600 text-lg">▼</span>
+            </button>
+          </div>
+        </>
 
-          <label className="flex items-center font-base text-sm text-white pl-2">
-            <span className="mr-3 ">Let payer choose the amount</span>
-            <div
-              className={`w-8 h-4 bg-gray-400 rounded-full cursor-pointer ${
-                allowPayerSelectAmount ? "bg-green-500" : ""
-              }`}
-              onClick={() => setAllowPayerSelectAmount(!allowPayerSelectAmount)}
-            >
-              <div
-                className={`w-4 h-4 bg-white rounded-full shadow-md transform duration-300 ease-in-out ${
-                  allowPayerSelectAmount ? "translate-x-4" : ""
-                }`}
-              ></div>
-            </div>
-          </label>
-
-          <div className="font-medium font-base text-sm text-white mt-12 mb-2 pl-2">
+        {/* Request Description Input Section */}
+        <div>
+          <div className="font-medium font-base text-sm text-slate-600 mt-6 mb-2 pl-2">
             {`What's this for?`}
           </div>
 
@@ -318,7 +361,7 @@ export default function Payment(props: any) {
               autoFocus={isConnected}
               className={cx(
                 styles.mainInput,
-                "border-white rounded-xl border font-medium text-[22px] focus:outline-0 focus:white w-full h-16 mb-3 font-sans text-white bg-transparent pl-4"
+                "border-black rounded border font-medium text-[22px] focus:outline-0 focus:black w-full h-16 mb-3 font-sans text-slate-600 bg-transparent pl-4"
               )}
               type="text"
               placeholder="coffee ☕"
@@ -326,73 +369,24 @@ export default function Payment(props: any) {
               onChange={handleDescriptionChange}
               maxLength={MAX_CHARACTER_LIMIT}
             />
-            <div className="absolute right-3 bottom-4 text-white text-[8px]">
+            <div className="absolute right-3 bottom-4 text-slate-600 text-[8px]">
               {characterCount}
             </div>
           </div>
         </div>
 
-        <div className="mt-4">
-          <div className="font-medium font-base text-sm text-white mb-2 pl-2">
-            {`Recipient`}
-          </div>
-          <div className="flex justify-between items-center w-full">
-            <div className="flex items-center justify-center flex-1 h-10 border border-white rounded-xl bg-transparent text-white mx-1">
-              <span className="font-medium">{chainId}</span>
-            </div>
-
-            <div className="flex items-center justify-between flex-1 h-10 border border-white rounded-xl bg-transparent text-white px-4 mx-1">
-              {!isEditingRecipient ? (
-                <>
-                  <div className="font-medium">
-                    {hydrated
-                      ? `${recipientAddress.slice(
-                          0,
-                          4
-                        )}...${recipientAddress.slice(-4)}`
-                      : ""}
-                  </div>
-                  <button
-                    type="button"
-                    className="text-white text-lg"
-                    onClick={() => setIsEditingRecipient(true)}
-                  >
-                    ▼
-                  </button>
-                </>
-              ) : (
-                <div className="flex items-center w-full">
-                  <input
-                    type="text"
-                    className="w-full h-8 rounded-md bg-transparent text-white text-center font-medium"
-                    value={newAddress}
-                    onChange={handleNewAddressChange}
-                    placeholder="0x..."
-                  />
-                  <button
-                    type="button"
-                    className="ml-2 text-blue-400"
-                    onClick={saveNewAddress}
-                  >
-                    Change
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
+        {/* Create Payment Request with link and qr code*/}
         <button
           type="button"
           className={cx(
-            "flex justify-center items-center border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white hover:border-white hover:bg-white hover:text-slate-700 mt-12"
+            "flex justify-center items-center border-black border font-base text-lg focus:outline-0 focus:text-slate-600 w-full h-16 rounded transition-all font-bold text-slate-600 hover:border-black hover:bg-[#007BFF] hover:text-white mt-6"
           )}
           onClick={isConnected ? createRequest : openConnectModal}
         >
           {ipfsLoading ? (
             <>
               <svg
-                className="animate-spin rounded-full w-5 h-5 mr-3 bg-white-500"
+                className="animate-spin rounded-full w-5 h-5 mr-3 bg-black-500"
                 viewBox="0 0 24 24"
               >
                 <circle
@@ -408,11 +402,22 @@ export default function Payment(props: any) {
               </svg>
             </>
           ) : isConnected ? (
-            "Create Woop"
+            "Request"
           ) : (
             "Connect Wallet"
           )}
         </button>
+      </div>
+
+      <div className="flex justify-center items-center mt-5 mb-2">
+        <span className="text-xs text-gray-500 mr-1">powered by</span>
+        <Image
+          alt="Woop Logo"
+          src="/woop_logo.png"
+          width={45}
+          height={10}
+          className="inline-block"
+        />
       </div>
 
       {isShareActive && (

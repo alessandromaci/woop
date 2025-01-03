@@ -1,27 +1,17 @@
 .baseContainer {
-    background: linear-gradient(
-      0.6turn,
-      rgba(38, 142, 200, 1)
-,
-      rgb(6, 34, 92)
-    );
-  }
+  background: #e6e7e9; /* Light bluish-gray tone similar to Kiln */
+  color: #000000; /* Ensure text contrast for readability */
+}
 
-  .containerBase {
-    background-repeat: repeat;
-    background-image: url("/double-bubble-dark.webp");
-    opacity: 0.2;
-    background-blend-mode: hard-light;
-    background-size: 350px;
-  }
+.containerBase {
+  background-repeat: repeat;
+  opacity: 0.2;
+  background-blend-mode: hard-light;
+  background-size: 350px;
+}
 
-  .containerBox {
-    background: linear-gradient(
-      0.6turn,
-      rgba(79, 76, 227, 1),
-      rgba(16, 130, 178, 1)
-
-    );
-    border: 1px solid rgba(33, 35, 167, 0.5);
-    width: 100%;
-  }
+.containerBox {
+  background: linear-gradient(rgb(255, 255, 255), rgb(255, 255, 255));
+  border: 1px solid rgba(33, 35, 167, 0.5);
+  width: 100%;
+}

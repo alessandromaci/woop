@@ -1,18 +1,18 @@
 .mainInput {
-    &:focus {
-        background-color: rgba(255, 255, 255, 0.3);
-        &::placeholder {
-            color: rgba(255, 255, 255, 1);
-            opacity: 1;
-        }
-    }
+  &:focus {
+    background-color: rgba(255, 255, 255, 0.3);
     &::placeholder {
-        color: rgba(255, 255, 255, 0.7);
-        opacity: 1;
+      color: rgba(142, 139, 139, 0.7);
+      opacity: 1;
     }
+  }
+  &::placeholder {
+    color: rgba(142, 139, 139, 0.7);
+    opacity: 1;
+  }
 }
 
 .shareBackground {
-background-color: rgb(247, 252, 255);
-border: 1px solid rgb(6, 34, 92,0.4);
+  background-color: rgb(247, 252, 255);
+  border: 1px solid rgb(6, 34, 92, 0.4);
 }
