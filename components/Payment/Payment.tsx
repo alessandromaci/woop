@@ -34,6 +34,7 @@ export default function Payment(props: any) {
     Base: string | null;
   }>(tokensDetails[0]);
   const [amount, setAmount] = React.useState<string>("");
+  const [currencyPrefix, setCurrencyPrefix] = React.useState<string>("");
   const [description, setDescription] = React.useState<string>("");
   const [characterCount, setCharacterCount] = useState(MAX_CHARACTER_LIMIT);
   const [path, setPath] = React.useState<string>("");
@@ -163,6 +164,16 @@ export default function Payment(props: any) {
       setAmount("allowPayerSelectAmount");
     }
   }, [allowPayerSelectAmount]);
+
+  React.useEffect(() => {
+    if (selectedToken.label === "USD") {
+      setCurrencyPrefix("$");
+    } else if (selectedToken.label === "EURO") {
+      setCurrencyPrefix("€");
+    } else {
+      setCurrencyPrefix(""); // No prefix for crypto assets
+    }
+  }, [selectedToken]);
 
   React.useEffect(() => {
     if (chain) {
@@ -316,18 +327,27 @@ export default function Payment(props: any) {
               readOnly
             />
           ) : (
-            <input
-              autoFocus={isConnected}
-              className={cx(
-                styles.mainInput,
-                "border-none font-medium text-3xl text-slate-600 focus:outline-0 focus:border-gray-500 w-full h-16 px-4 bg-transparent placeholder-gray-400"
+            <div
+              className={`flex items-center h-full ${
+                currencyPrefix ? "px-4" : ""
+              }`}
+            >
+              {currencyPrefix && (
+                <span className="text-2xl text-gray-500">{currencyPrefix}</span>
               )}
-              type="number"
-              step="0.000000"
-              placeholder="0.00"
-              value={amount}
-              onChange={handleAmountChange}
-            />
+              <input
+                autoFocus={isConnected}
+                className={cx(
+                  styles.mainInput,
+                  "border-none font-medium text-3xl text-slate-600 focus:outline-0 focus:border-gray-500 w-full h-16 px-4 bg-transparent placeholder-gray-400"
+                )}
+                type="number"
+                step="0.000000"
+                placeholder="0.00"
+                value={amount}
+                onChange={handleAmountChange}
+              />
+            </div>
           )}
 
           <button
