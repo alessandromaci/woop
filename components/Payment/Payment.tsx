@@ -299,56 +299,71 @@ export default function Payment(props: any) {
         </>
 
         {/* Amount Input Section */}
-        <>
-          <p className="font-medium font-base text-sm text-slate-600 mb-2 pl-2">
-            <span>What's the amount?</span>
-          </p>
+        <p className="font-medium font-base text-sm text-slate-600 mb-2 pl-2">
+          <span>What's the amount?</span>
+        </p>
 
-          <div className="relative border border-black rounded h-16 w-full">
-            {allowPayerSelectAmount ? (
-              <input
-                autoFocus={isConnected}
-                className={cx(
-                  styles.mainInput,
-                  "border-none font-medium text-3xl focus:outline-0 focus:border-gray-500 w-full h-16 px-4 bg-transparent placeholder-gray-400"
-                )}
-                placeholder="Payer sets an amount"
-                value={"Payer sets an amount"}
-                readOnly
-              />
-            ) : (
-              <input
-                autoFocus={isConnected}
-                className={cx(
-                  styles.mainInput,
-                  "border-none font-medium text-3xl text-slate-600 focus:outline-0 focus:border-gray-500 w-full h-16 px-4 bg-transparent placeholder-gray-400"
-                )}
-                type="number"
-                step="0.000000"
-                placeholder="0.00"
-                value={amount}
-                onChange={handleAmountChange}
-              />
-            )}
+        <div className="relative border border-black rounded h-16 w-full mb-3">
+          {allowPayerSelectAmount ? (
+            <input
+              autoFocus={isConnected}
+              className={cx(
+                styles.mainInput,
+                "border-none font-medium focus:outline-0 focus:border-gray-500 w-full h-16 px-4 bg-transparent placeholder-gray-400"
+              )}
+              placeholder="Payer sets an amount"
+              value={"Payer sets an amount"}
+              readOnly
+            />
+          ) : (
+            <input
+              autoFocus={isConnected}
+              className={cx(
+                styles.mainInput,
+                "border-none font-medium text-3xl text-slate-600 focus:outline-0 focus:border-gray-500 w-full h-16 px-4 bg-transparent placeholder-gray-400"
+              )}
+              type="number"
+              step="0.000000"
+              placeholder="0.00"
+              value={amount}
+              onChange={handleAmountChange}
+            />
+          )}
 
-            <button
-              type="button"
-              className="absolute top-1/2 right-2 transform -translate-y-1/2 flex items-center justify-between hover:bg-gray-200 border-l border border-black px-2 h-12 rounded"
-              onClick={() => setSelectorVisibility(!selectorVisibility)}
+          <button
+            type="button"
+            className="absolute top-1/2 right-2 transform -translate-y-1/2 flex items-center justify-between hover:bg-gray-200 border-l border border-black px-2 h-12 rounded"
+            onClick={() => setSelectorVisibility(!selectorVisibility)}
+          >
+            <Image
+              alt={selectedToken.label}
+              src={selectedToken.logo}
+              width={20}
+              height={20}
+            />
+            <p className="ml-2 mr-2 text-slate-600 font-medium">
+              {selectedToken.label}
+            </p>
+            <span className="ml-2 text-slate-600 text-lg">▼</span>
+          </button>
+
+          {/* Let Payer Choose Amount */}
+          <label className="flex items-center font-base text-xs text-black pl-2 mt-1">
+            <span className="mr-2">Let payer choose the amount</span>
+            <div
+              className={`w-8 h-4 bg-gray-400 rounded-full cursor-pointer ${
+                allowPayerSelectAmount ? "bg-green-600" : ""
+              }`}
+              onClick={() => setAllowPayerSelectAmount(!allowPayerSelectAmount)}
             >
-              <Image
-                alt={selectedToken.label}
-                src={selectedToken.logo}
-                width={20}
-                height={20}
-              />
-              <p className="ml-2 mr-2 text-slate-600 font-medium">
-                {selectedToken.label}
-              </p>
-              <span className="ml-2 text-slate-600 text-lg">▼</span>
-            </button>
-          </div>
-        </>
+              <div
+                className={`w-4 h-4 bg-white rounded-full shadow-md transform duration-300 ease-in-out ${
+                  allowPayerSelectAmount ? "translate-x-4" : ""
+                }`}
+              ></div>
+            </div>
+          </label>
+        </div>
 
         {/* Request Description Input Section */}
         <div>
@@ -429,7 +444,7 @@ export default function Payment(props: any) {
           <div
             className={cx(
               styles.shareBackground,
-              "z-20 rounded-3xl shadow-xl py-2 px-2 md:w-96 w-full m-5"
+              "z-20 rounded-3xl shadow-xl py-2 px-2 md:w-96 m-5"
             )}
           >
             <Share
