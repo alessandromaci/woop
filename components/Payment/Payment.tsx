@@ -194,8 +194,8 @@ export default function Payment(props: any) {
             onClick={() => setSelectorVisibility(!selectorVisibility)}
             className="fixed top-0 left-0 w-screen h-screen bg-slate-900 opacity-30"
           ></div>
-          <div className="z-20 bg-white rounded shadow-xl py-2 px-2 md:w-80 w-full m-5">
-            <p className="font-base font-semibold text-slate-600 pl-4 pb-3 pt-2 border-b mb-3">
+          <div className="z-20 bg-white rounded shadow-xl py-4 px-6 md:w-80 w-full m-5">
+            <p className="font-base font-semibold text-slate-700 pb-3 border-b mb-3">
               Select currency
             </p>
             {tokensDetails
@@ -218,20 +218,18 @@ export default function Payment(props: any) {
                     sx={{
                       marginBottom: tokensDetails.length - 1 === i ? 0 : 1,
                     }}
-                    className="cursor-pointer hover:border-black hover:bg-gray-200 rounded p-1"
+                    className="cursor-pointer hover:bg-gray-100 px-4 py-2 rounded-md flex items-center"
                   >
-                    <div className="flex items-center">
-                      <Image
-                        alt={token.label}
-                        src={token.logo}
-                        className="p-1"
-                        width={40}
-                        height={40}
-                      />
-                      <span className="ml-3 text-slate-600 font-base font-semibold">
-                        {token.label}
-                      </span>
-                    </div>
+                    <Image
+                      alt={token.label}
+                      src={token.logo}
+                      className="mr-3"
+                      width={30}
+                      height={30}
+                    />
+                    <span className="text-gray-800 font-medium">
+                      {token.label}
+                    </span>
                   </MenuItem>
                 );
               })}

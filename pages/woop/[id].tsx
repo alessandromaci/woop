@@ -464,10 +464,10 @@ const Request = () => {
             component="form"
             className={cx(
               styles.containerBox,
-              "rounded-3xl shadow-md w-full relative z-20"
+              "rounded shadow-md w-full relative z-20"
             )}
           >
-            <section className="justify-items-left font-base text-white">
+            <section className="justify-items-left font-base text-slate-600">
               <div
                 className={cx(
                   styles.topContainer,
@@ -479,7 +479,7 @@ const Request = () => {
                     ? "No Woop to pay here"
                     : isNativeTx
                     ? isSuccessNative
-                      ? "Woop sent!"
+                      ? "Payment sent!"
                       : description
                       ? `${
                           description.charAt(0).toUpperCase() +
@@ -487,22 +487,13 @@ const Request = () => {
                         }`
                       : "Payment requested!"
                     : isSuccess
-                    ? "Woop sent!"
+                    ? "Payment sent!"
                     : description
                     ? `${
                         description.charAt(0).toUpperCase() +
                         description.slice(1)
                       }`
                     : "Payment requested!"}
-                </p>
-                <p className="text-3xl ml-2">
-                  {badRequest
-                    ? "⚠️"
-                    : isSuccess
-                    ? "💸"
-                    : isSuccessNative
-                    ? "💸"
-                    : "✨"}
                 </p>
               </div>
               {badRequest ? (
@@ -512,7 +503,7 @@ const Request = () => {
                     <Link href="/">
                       <button
                         className={cx(
-                          "border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white capitalize hover:border-white hover:bg-white hover:text-slate-700"
+                          "border-black border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded transition-all font-bold text-slate-600 capitalize hover:border-black hover:bg-[#007BFF] hover:text-white"
                         )}
                       >
                         Go back
@@ -526,7 +517,7 @@ const Request = () => {
                     <div className="absolute top-0 right-3 p-1">
                       {request && findIcon(request?.tokenName)}
                     </div>
-                    <p className="text-xs text-slate-300 mb-2 flex items-center">
+                    <p className="font-medium font-base text-sm text-slate-600 mb-2 flex items-center">
                       <a
                         className="underline underline-offset-4"
                         href={`${setEtherscanAddress(network, request?.from)}`}
@@ -534,13 +525,6 @@ const Request = () => {
                         {ensName ? (
                           <p className="flex items-center">
                             <span className="mr-1 font-bold">{ensName}</span>
-                            {/* <Image
-                              alt="ens"
-                              src={ens}
-                              className=""
-                              width={20}
-                              height={20}
-                            /> */}
                           </p>
                         ) : (
                           <span className="font-bold">
@@ -563,7 +547,7 @@ const Request = () => {
                     <button
                       type="button"
                       className={cx(
-                        "flex justify-center items-center border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white capitalize hover:border-white hover:bg-white hover:text-slate-700"
+                        "flex justify-center items-center border-black border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded transition-all font-bold text-slate-600 capitalize hover:border-black hover:bg-[#007BFF] hover:text-white"
                       )}
                       onClick={openConnectModal}
                     >
@@ -584,7 +568,7 @@ const Request = () => {
                             : Number(amount) * 10 ** 12
                         } ${request?.tokenName}`}
                       </p>
-                      <p className="text-xs text-slate-300 mb-2 text-center">
+                      <p className="font-medium font-base text-sm text-slate-600 mb-2 text-center">
                         <a
                           className="underline underline-offset-4 mr-1"
                           href={`${setEtherscanBase(networkName, hash)}`}
@@ -607,7 +591,7 @@ const Request = () => {
                     <Link href="/">
                       <button
                         className={cx(
-                          "border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white capitalize hover:border-white hover:bg-white hover:text-slate-700"
+                          "border-black border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded transition-all font-bold text-slate-600 capitalize hover:border-black hover:bg-[#007BFF] hover:text-white"
                         )}
                       >
                         Close
@@ -624,7 +608,7 @@ const Request = () => {
                           request?.tokenName
                         }`}
                       </p>
-                      <p className="text-xs text-slate-300 mb-2 text-center">
+                      <p className="font-medium font-base text-sm text-slate-600 mb-2 text-center">
                         <a
                           className="underline underline-offset-4 mr-1"
                           href={`${setEtherscanBase(networkName, hashNative)}`}
@@ -647,7 +631,7 @@ const Request = () => {
                     <Link href="/">
                       <button
                         className={cx(
-                          "border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white capitalize hover:border-white hover:bg-white hover:text-slate-700"
+                          "border-black border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded transition-all font-bold text-slate-600 capitalize hover:border-black hover:bg-[#007BFF] hover:text-white"
                         )}
                       >
                         Close
@@ -661,7 +645,7 @@ const Request = () => {
                     <div className="absolute top-0 right-3 p-1">
                       {request && findIcon(request?.tokenName)}
                     </div>
-                    <div className="text-xs text-slate-300 mb-2 flex items-center">
+                    <div className="font-medium font-base text-sm text-slate-600 mb-2 flex items-center">
                       <a
                         className="underline underline-offset-4"
                         href={`${setEtherscanAddress(network, request?.from)}`}
@@ -683,7 +667,7 @@ const Request = () => {
                     </div>
                     <div className="mt-3 md:text-6xl text-5xl font-bold my-6 text-center items-center">
                       <input
-                        className="bg-transparent text-white text-center focus:outline-none mr-1"
+                        className="bg-transparent text-slate-600 text-center focus:outline-none mr-1"
                         type="number"
                         placeholder="0.001"
                         onChange={handleAmountChange}
@@ -697,7 +681,7 @@ const Request = () => {
                     <button
                       type="button"
                       className={cx(
-                        "flex justify-center items-center border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white capitalize hover:border-white hover:bg-white hover:text-slate-700"
+                        "flex justify-center items-center border-black border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded transition-all font-bold text-slate-600 capitalize hover:border-black hover:bg-[#007BFF] hover:text-white"
                       )}
                       disabled={
                         (isNativeTx
@@ -735,7 +719,7 @@ const Request = () => {
                             />
                           </svg>
                         ) : (
-                          "Pay Woop"
+                          "Pay now"
                         )
                       ) : isLoading ? (
                         <>
@@ -756,7 +740,7 @@ const Request = () => {
                           </svg>
                         </>
                       ) : (
-                        "Pay Woop"
+                        "Pay now"
                       )}
                     </button>
                   </div>
@@ -767,7 +751,7 @@ const Request = () => {
                     <div className="absolute top-0 right-3 p-1">
                       {request && findIcon(request?.tokenName)}
                     </div>
-                    <p className="text-xs text-slate-300 mb-2 flex items-center">
+                    <p className="font-medium font-base text-sm text-slate-600 mb-2 flex items-center">
                       <a
                         className="underline underline-offset-4"
                         href={`${setEtherscanAddress(network, request?.from)}`}
@@ -788,63 +772,62 @@ const Request = () => {
                     <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
                       {request?.value} {request?.tokenName}
                     </div>
-                    <p className="text-xs text-slate-300 mb-2 flex items-center">
-                      <span className="ml-1">{"Select token to pay:"}</span>
-                    </p>
-                    <button
-                      type="button"
-                      style={{
-                        width: 110,
-                        height: 38,
-                        position: "absolute",
-                        top: 142,
-                        right: 16,
-                      }}
-                      className="bg-white shadow-md rounded-xl text-slate-900 hover:shadow-xl hover:bg-white"
-                      onClick={() => setSelectorVisibility(!selectorVisibility)}
-                    >
-                      <div className="flex items-center w-full ml-1">
-                        <Image
-                          alt={selectedToken.label}
-                          src={selectedToken.logo}
-                          className="pr-1 ml-1"
-                          width={30}
-                          height={30}
-                        />
-                        <span className="ml-1 text-slate-700 font-base font-semibold">
-                          {selectedToken.label}
-                        </span>
-                      </div>
-                    </button>
 
-                    {selectorVisibility && (
-                      <section className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen z-30">
-                        <div
+                    <div className="pb-4 pt-1 relative">
+                      <div className="flex items-center justify-between">
+                        <p className="font-medium font-base text-sm text-slate-600">
+                          {"Select token to pay:"}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-3">
+                        <div className="md:text-6xl text-5xl font-bold text-slate-600">
+                          {amountPreviewToDisplay
+                            ? amountPreviewToDisplay
+                            : "..."}
+                        </div>
+                        <button
+                          type="button"
+                          className="flex items-center justify-between bg-white border border-black px-3 h-14 rounded hover:bg-gray-200 hover:shadow-md transition"
                           onClick={() =>
                             setSelectorVisibility(!selectorVisibility)
                           }
-                          className="fixed top-0 left-0 w-screen h-screen bg-slate-900 opacity-30"
-                        ></div>
-                        <div className="z-20 bg-white rounded-xl shadow-xl py-2 px-2 md:w-80 w-full m-5">
-                          <p className="font-base font-semibold text-slate-700 pl-4 pb-3 pt-2 border-b mb-3">
-                            Select currency
+                        >
+                          <Image
+                            alt={selectedToken.label}
+                            src={selectedToken.logo}
+                            className="mr-2"
+                            width={20}
+                            height={20}
+                          />
+                          <p className="text-slate-600 font-medium mr-2">
+                            {selectedToken.label}
                           </p>
-                          {tokensDetails
-                            .filter((token) => {
-                              if (
-                                token.label === "USD" ||
-                                token.label === "EURO"
-                              ) {
-                                return false; // Exclude USD and EURO
-                              }
-                              if (chainId === "Base") {
-                                return token.label !== "WBTC"; // Exclude WBTC for Base
-                              } else {
-                                return token.label !== "cbBTC"; // Exclude cbBTC for other chains
-                              }
-                            })
-                            .map((token, i) => {
-                              return (
+                          <span className="text-slate-600 text-lg">▼</span>
+                        </button>
+                      </div>
+
+                      {selectorVisibility && (
+                        <section className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen z-30">
+                          <div
+                            onClick={() =>
+                              setSelectorVisibility(!selectorVisibility)
+                            }
+                            className="fixed top-0 left-0 w-screen h-screen bg-slate-900 opacity-30"
+                          ></div>
+                          <div className="z-20 bg-white rounded shadow-xl py-4 px-6 md:w-80 w-full m-5">
+                            <p className="font-base font-semibold text-slate-700 pb-3 border-b mb-3">
+                              Select currency
+                            </p>
+                            {tokensDetails
+                              .filter((token) => {
+                                if (["USD", "EURO"].includes(token.label))
+                                  return false;
+                                if (chainId === "Base")
+                                  return token.label !== "WBTC";
+                                return token.label !== "cbBTC";
+                              })
+                              .map((token, i) => (
                                 <MenuItem
                                   key={token.label}
                                   onClick={() => {
@@ -852,32 +835,23 @@ const Request = () => {
                                     setSelectorVisibility(!selectorVisibility);
                                   }}
                                   value={token.label}
-                                  sx={{
-                                    marginBottom:
-                                      tokensDetails.length - 1 === i ? 0 : 1,
-                                  }}
-                                  className="cursor-pointer hover:bg-slate-200 rounded-xl p-1"
+                                  className="cursor-pointer hover:bg-gray-100 px-4 py-2 rounded-md flex items-center"
                                 >
-                                  <div className="flex items-center">
-                                    <Image
-                                      alt={token.label}
-                                      src={token.logo}
-                                      className="p-1"
-                                      width={40}
-                                      height={40}
-                                    />
-                                    <span className="ml-3 text-slate-700 font-base font-semibold">
-                                      {token.label}
-                                    </span>
-                                  </div>
+                                  <Image
+                                    alt={token.label}
+                                    src={token.logo}
+                                    className="mr-3"
+                                    width={30}
+                                    height={30}
+                                  />
+                                  <span className="text-gray-800 font-medium">
+                                    {token.label}
+                                  </span>
                                 </MenuItem>
-                              );
-                            })}
-                        </div>
-                      </section>
-                    )}
-                    <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
-                      {amountPreviewToDisplay ? amountPreviewToDisplay : "..."}
+                              ))}
+                          </div>
+                        </section>
+                      )}
                     </div>
                   </>
 
@@ -885,7 +859,7 @@ const Request = () => {
                     <button
                       type="button"
                       className={cx(
-                        "flex justify-center items-center border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white capitalize hover:border-white hover:bg-white hover:text-slate-700"
+                        "flex justify-center items-center border-black border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded transition-all font-bold text-slate-600 capitalize hover:border-black hover:bg-[#007BFF] hover:text-white"
                       )}
                       disabled={
                         (isNativeTx
@@ -923,7 +897,7 @@ const Request = () => {
                             />
                           </svg>
                         ) : (
-                          "Pay Woop"
+                          "Pay now"
                         )
                       ) : isLoading ? (
                         <>
@@ -944,7 +918,7 @@ const Request = () => {
                           </svg>
                         </>
                       ) : (
-                        "Pay Woop"
+                        "Pay now"
                       )}
                     </button>
                   </div>
@@ -955,7 +929,7 @@ const Request = () => {
                     <div className="absolute top-0 right-3 p-1">
                       {request && findIcon(request?.tokenName)}
                     </div>
-                    <p className="text-xs text-slate-300 mb-2 flex items-center">
+                    <p className="font-medium font-base text-sm text-slate-600 mb-2 flex items-center">
                       <a
                         className="underline underline-offset-4"
                         href={`${setEtherscanAddress(network, request?.from)}`}
@@ -982,7 +956,7 @@ const Request = () => {
                     <button
                       type="button"
                       className={cx(
-                        "flex justify-center items-center border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white capitalize hover:border-white hover:bg-white hover:text-slate-700"
+                        "flex justify-center items-center border-black border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded transition-all font-bold text-slate-600 capitalize hover:border-black hover:bg-[#007BFF] hover:text-white"
                       )}
                       disabled={
                         (isNativeTx
@@ -1020,7 +994,7 @@ const Request = () => {
                             />
                           </svg>
                         ) : (
-                          "Pay Woop"
+                          "Pay now"
                         )
                       ) : isLoading ? (
                         <>
@@ -1041,13 +1015,23 @@ const Request = () => {
                           </svg>
                         </>
                       ) : (
-                        "Pay Woop"
+                        "Pay now"
                       )}
                     </button>
                   </div>
                 </div>
               )}
             </section>
+            <div className="flex justify-center items-center mt-5 mb-3">
+              <span className="text-xs text-gray-500 mr-1">powered by</span>
+              <Image
+                alt="Woop Logo"
+                src="/woop_logo.png"
+                width={45}
+                height={10}
+                className="inline-block"
+              />
+            </div>
           </Box>
         </Container>
       </article>

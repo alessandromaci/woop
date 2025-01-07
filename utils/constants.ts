@@ -115,7 +115,7 @@ export const setEtherscanAddress = (
   if (network == "Arbitrum") {
     return `https://arbiscan.io/address/${address}`;
   } else if (network == "Sepolia") {
-    return `https://goerli.etherscan.io/address/${address}`;
+    return `https://sepolia.etherscan.io/address/${address}`;
   } else if (network == "Optimism") {
     return `https://optimistic.etherscan.io/address/${address}`;
   } else if (network == "Ethereum") {
@@ -127,7 +127,7 @@ export const setEtherscanAddress = (
   }
 };
 
-export const baseUrl: string = "https://wooppay.xyz/woop/";
+export const baseUrl: string = "https://app.woop.ink/woop/";
 
 export const pushUrl: string = "https://staging.push.org/#/inbox";
 
