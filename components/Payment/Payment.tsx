@@ -300,7 +300,7 @@ export default function Payment(props: any) {
 
         {/* Amount Input Section */}
         <p className="font-medium font-base text-sm text-slate-600 mb-2 pl-2">
-          <span>What's the amount?</span>
+          <span>What&apos;s the amount?</span>
         </p>
 
         <div className="relative border border-black rounded h-16 w-full mb-3">
