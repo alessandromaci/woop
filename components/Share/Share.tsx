@@ -33,31 +33,32 @@ export const Share: React.FC<{
     const initQR = async () => {
       const QRCodeStyling = await require("qr-code-styling");
       const qrCodeBuild = new QRCodeStyling({
-        width: 357,
-        height: 357,
-        image: "icon.svg",
+        image: "woop_logo_64x.svg",
+        width: 800,
+        height: 600,
         dotsOptions: {
-          gradient: {
-            type: "linear",
-            colorStops: [
-              { offset: 0, color: "rgb(6, 34, 92)" },
-              { offset: 1, color: "rgba(38, 142, 200, 1)" },
-            ],
-            rotation: 2.35,
-          },
-          type: "extra-rounded",
+          color: "#000000",
+          type: "square",
         },
         imageOptions: {
           crossOrigin: "anonymous",
-          margin: 10,
+          margin: 15,
         },
         backgroundOptions: {
-          color: "transparent",
+          color: "#FFFFFF",
+          transparent: false,
+        },
+        cornersSquareOptions: {
+          color: "#000000",
+          type: "extra-rounded",
+        },
+        cornersDotOptions: {
+          color: "#000000",
+          type: "dot",
         },
       });
+
       setqrCode(qrCodeBuild);
-      // Add logic with `term`
-      // qrCode.append(qrContainer.current);
     };
     initQR();
   }, []);
@@ -78,80 +79,76 @@ export const Share: React.FC<{
   }, [qrCode, baseUrl, path, width]);
 
   return (
-    <div className="flex flex-col p-2">
+    <div className="flex flex-col p-4 max-w-sm mx-auto bg-white rounded">
       {path ? (
-        <div className="">
+        <div>
+          {/* QR Code Section */}
           <div className="flex justify-center">
             <div ref={qrContainer}></div>
           </div>
-          <p className="font-base text-base font-medium text-slate-500 mt-2">
+
+          {/* Payment Request Section */}
+          <p className="font-base text-base font-medium text-slate-700 mt-4">
             Send this payment request:
           </p>
-          <div className="mt-2 flex gap-2 place-content-evenly">
-            <div
+          <div className="mt-4 flex gap-4">
+            {/* Back Button */}
+            <button
               onClick={() => visibility(false)}
-              className={cx(
-                styles.buttons,
-                "w-full cursor-pointer font-base h-16 rounded-xl transition-all font-semibold text-slate-500 capitalize flex items-center justify-center"
-              )}
+              className="w-full h-12 rounded-lg bg-gray-100 hover:bg-gray-200 text-slate-700 font-medium transition flex items-center justify-center"
             >
-              {"Back"}
-            </div>
-            <div
+              Back
+            </button>
+
+            {/* Copy Link Button */}
+            <button
+              type="button"
               onClick={() => {
                 navigator.clipboard.writeText(`${baseUrl}${path}`);
                 setCopySuccess(true);
               }}
-              className={cx(
-                styles.buttons,
-                "w-full font-base cursor-pointer focus:outline-0 focus:text-slate-700 h-16 rounded-xl transition-all font-semibold text-slate-500 capitalize hover:border-slate-700 hover:bg-slate-200 hover:text-slate-500 flex items-center justify-center"
-              )}
+              className="w-full h-12 rounded-lg bg-gray-100 hover:bg-gray-200 text-slate-700 font-medium transition flex items-center justify-center"
             >
               {copySuccess ? "Copied!" : "Copy Link"}
-            </div>
+            </button>
           </div>
-          <div className="flex justify-between mt-3">
-            <section className="flex items-center">
-              <p className="font-base text-base font-medium text-slate-500 mr-2 ml-1">
-                Share:
-              </p>
-              <div className="mr-2 flex items-center">
-                <WhatsappShareButton
-                  url={`${baseUrl}${path}`}
-                  title={`Hey, can you please send me ${
-                    amount == "allowPayerSelectAmount" ? "some" : amount
-                  } ${token.label} ${
-                    description ? `for ${description}` : ``
-                  } at`}
-                >
-                  <WhatsappIcon size={30} round />
-                </WhatsappShareButton>
-              </div>
-              <div className="mr-2 flex items-center">
-                <TelegramShareButton
-                  url={`${baseUrl}${path}`}
-                  title={`Hey, can you please send me ${
-                    amount == "allowPayerSelectAmount" ? "some" : amount
-                  } ${token.label} ${
-                    description ? `for ${description}` : ``
-                  } at`}
-                >
-                  <TelegramIcon size={30} round />
-                </TelegramShareButton>
-              </div>
-              <div className="flex items-center">
-                <TwitterShareButton
-                  url={`${baseUrl}${path}`}
-                  title={`Hey, can you please send me ${
-                    amount == "allowPayerSelectAmount" ? "some" : amount
-                  } ${token.label} ${
-                    description ? `for ${description}` : ``
-                  } at`}
-                >
-                  <TwitterIcon size={30} round />
-                </TwitterShareButton>
-              </div>
-            </section>
+
+          {/* Share Section */}
+          <div className="flex items-center mt-6">
+            <p className="font-base text-base font-medium text-slate-700 mr-2">
+              Share:
+            </p>
+            <div className="flex gap-2">
+              {/* WhatsApp Share */}
+              <WhatsappShareButton
+                url={`${baseUrl}${path}`}
+                title={`Hey, can you please send me ${
+                  amount == "allowPayerSelectAmount" ? "some" : amount
+                } ${token.label} ${description ? `for ${description}` : ``} at`}
+              >
+                <WhatsappIcon size={32} round />
+              </WhatsappShareButton>
+
+              {/* Telegram Share */}
+              <TelegramShareButton
+                url={`${baseUrl}${path}`}
+                title={`Hey, can you please send me ${
+                  amount == "allowPayerSelectAmount" ? "some" : amount
+                } ${token.label} ${description ? `for ${description}` : ``} at`}
+              >
+                <TelegramIcon size={32} round />
+              </TelegramShareButton>
+
+              {/* Twitter Share */}
+              <TwitterShareButton
+                url={`${baseUrl}${path}`}
+                title={`Hey, can you please send me ${
+                  amount == "allowPayerSelectAmount" ? "some" : amount
+                } ${token.label} ${description ? `for ${description}` : ``} at`}
+              >
+                <TwitterIcon size={32} round />
+              </TwitterShareButton>
+            </div>
           </div>
         </div>
       ) : (
