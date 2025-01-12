@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 import { Share } from "../Share/Share";
 import ErrorsUi from "../ErrorsUi/ErrorsUi";
@@ -218,7 +219,7 @@ export default function Payment(props: any) {
                     sx={{
                       marginBottom: tokensDetails.length - 1 === i ? 0 : 1,
                     }}
-                    className="cursor-pointer hover:bg-gray-100 px-4 py-2 rounded-md flex items-center"
+                    className="cursor-pointer hover:bg-gray-300 px-4 py-2 rounded-md flex items-center"
                   >
                     <Image
                       alt={token.label}
@@ -242,16 +243,130 @@ export default function Payment(props: any) {
           <ErrorsUi errorMsg={badRequest} errorNtk={""} />
         </div>
 
-        {/* Logo Section */}
-        <div className="flex justify-center mt-2 mb-2">
-          <Image alt="Logo" src="/woop_logo.png" width={100} height={80} />
+        {/*Logo*/}
+        <div className="flex justify-between items-center mt-2 mb-3">
+          {/* Left Image */}
+          <Image alt="Logo" src="/woop_logo.png" width={70} height={50} />
+
+          {/* Styled Version*/}
+          <p className="bg-[#007BFF] text-white text-sm font-bold px-4 py-1 rounded-full shadow-md lowercase tracking-wider">
+            v1 BETA
+          </p>
+        </div>
+
+        {/* Menu Selection */}
+        <div className="flex items-center justify-center mt-2 mb-3 border border-gray-600 rounded-md overflow-hidden">
+          {/* Receive Button */}
+          <div
+            className={cx(
+              "flex justify-center items-center font-base text-lg w-1/2 h-9 text-white bg-[#007BFF] transition-all"
+            )}
+          >
+            Receive
+          </div>
+
+          {/* Track Button */}
+          <Link
+            href="/dashboard" // Replace with your dashboard route
+            className={cx(
+              "flex justify-center items-center font-base text-lg w-1/2 h-9 text-black hover:bg-gray-300 transition-all"
+            )}
+          >
+            Track
+          </Link>
+        </div>
+
+        {/* Amount Input Section */}
+        <p className="font-medium font-base text-xl text-slate-600 mb-2 pl-2">
+          <span>Select amount</span>
+        </p>
+
+        <div className="relative border border-black rounded h-auto w-full mb-3 p-4">
+          {/* Row with Input and Token Selector */}
+          <div className="flex items-center justify-between">
+            {allowPayerSelectAmount ? (
+              <input
+                autoFocus={isConnected}
+                className={cx(
+                  styles.mainInput,
+                  "border-none font-medium focus:outline-0 focus:border-gray-500 text-3xl text-gray-400 flex-grow h-20 bg-transparent placeholder-gray-400"
+                )}
+                placeholder="Open amount"
+                value={"Open amount"}
+                readOnly
+              />
+            ) : (
+              <div className="flex items-center flex-grow">
+                {currencyPrefix && (
+                  <span className="text-3xl text-gray-500 flex items-center mr-2">
+                    {currencyPrefix}
+                  </span>
+                )}
+                <input
+                  autoFocus={isConnected}
+                  className={cx(
+                    styles.mainInput,
+                    "border-none font-medium text-5xl text-slate-600 focus:outline-0 focus:border-gray-500 w-full h-20 bg-transparent placeholder-gray-400"
+                  )}
+                  type="number"
+                  step="0.000000"
+                  placeholder="0.00"
+                  value={amount}
+                  onChange={handleAmountChange}
+                />
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="flex items-center hover:bg-gray-300 border border-black px-2 py-2 rounded h-16"
+              style={{ width: "auto", minWidth: "120px" }}
+              onClick={() => setSelectorVisibility(!selectorVisibility)}
+            >
+              {/* Token Icon */}
+              <Image
+                alt={selectedToken.label}
+                src={selectedToken.logo}
+                width={24}
+                height={24}
+                className="flex-shrink-0"
+              />
+              {/* Token Label */}
+              <p className="ml-2 text-slate-600 font-medium text-base">
+                {selectedToken.label}
+              </p>
+              {/* Down Arrow */}
+              <span className="ml-3 text-slate-600 text-lg leading-none">
+                ▼
+              </span>
+            </button>
+          </div>
+
+          {/* "Any amount" toggle below */}
+          <div className="flex items-center mt-4">
+            <div
+              className={`w-6 h-3 bg-gray-400 rounded-full cursor-pointer ${
+                allowPayerSelectAmount ? "bg-green-600" : ""
+              }`}
+              onClick={() => setAllowPayerSelectAmount(!allowPayerSelectAmount)}
+            >
+              <div
+                className={`w-3 h-3 bg-white rounded-full shadow-md transform duration-300 ease-in-out ${
+                  allowPayerSelectAmount ? "translate-x-3" : ""
+                }`}
+              ></div>
+            </div>
+            <span className="ml-2 text-black font-base text-sm">
+              Any amount
+            </span>
+          </div>
         </div>
 
         {/* Recipient Section with chain name and address recipient */}
         <>
           <div className="mt-1 mb-2">
-            <div className="font-medium font-base text-sm text-slate-600 mb-2 pl-2">
-              {`Recipient`}
+            <div className="font-medium font-base text-xl text-slate-600 mb-2 pl-2">
+              {`Send to`}
             </div>
             <div className="flex items-center w-full">
               {/* Chain ID Section (1/3 of the width) */}
@@ -263,7 +378,7 @@ export default function Payment(props: any) {
               <div className="mx-2"></div>
 
               {/* Address Section (2/3 of the width) */}
-              <div className="flex items-center justify-between basis-2/3 h-10 border border-black hover:bg-gray-200 rounded bg-transparent text-slate-600 px-4">
+              <div className="flex items-center justify-between basis-2/3 h-10 border border-black hover:bg-gray-300 rounded bg-transparent text-slate-600 px-4">
                 {!isEditingRecipient ? (
                   <button
                     type="button"
@@ -304,89 +419,13 @@ export default function Payment(props: any) {
               </div>
             </div>
           </div>
-          <hr className="my-2 border-t border-gray-300" />
         </>
-
-        {/* Amount Input Section */}
-        <p className="font-medium font-base text-sm text-slate-600 mb-2 pl-2">
-          <span>What&apos;s the amount?</span>
-        </p>
-
-        <div className="relative border border-black rounded h-16 w-full mb-3">
-          {allowPayerSelectAmount ? (
-            <input
-              autoFocus={isConnected}
-              className={cx(
-                styles.mainInput,
-                "border-none font-medium focus:outline-0 focus:border-gray-500 w-full h-16 px-4 bg-transparent placeholder-gray-400"
-              )}
-              placeholder="Payer sets an amount"
-              value={"Payer sets an amount"}
-              readOnly
-            />
-          ) : (
-            <div
-              className={`flex items-center h-full ${
-                currencyPrefix ? "px-4" : ""
-              }`}
-            >
-              {currencyPrefix && (
-                <span className="text-2xl text-gray-500">{currencyPrefix}</span>
-              )}
-              <input
-                autoFocus={isConnected}
-                className={cx(
-                  styles.mainInput,
-                  "border-none font-medium text-3xl text-slate-600 focus:outline-0 focus:border-gray-500 w-full h-16 px-4 bg-transparent placeholder-gray-400"
-                )}
-                type="number"
-                step="0.000000"
-                placeholder="0.00"
-                value={amount}
-                onChange={handleAmountChange}
-              />
-            </div>
-          )}
-
-          <button
-            type="button"
-            className="absolute top-1/2 right-2 transform -translate-y-1/2 flex items-center justify-between hover:bg-gray-200 border-l border border-black px-2 h-12 rounded"
-            onClick={() => setSelectorVisibility(!selectorVisibility)}
-          >
-            <Image
-              alt={selectedToken.label}
-              src={selectedToken.logo}
-              width={20}
-              height={20}
-            />
-            <p className="ml-2 mr-2 text-slate-600 font-medium">
-              {selectedToken.label}
-            </p>
-            <span className="ml-2 text-slate-600 text-lg">▼</span>
-          </button>
-
-          {/* Let Payer Choose Amount */}
-          <label className="flex items-center font-base text-xs text-black pl-2 mt-1">
-            <span className="mr-2">Let payer choose the amount</span>
-            <div
-              className={`w-8 h-4 bg-gray-400 rounded-full cursor-pointer ${
-                allowPayerSelectAmount ? "bg-green-600" : ""
-              }`}
-              onClick={() => setAllowPayerSelectAmount(!allowPayerSelectAmount)}
-            >
-              <div
-                className={`w-4 h-4 bg-white rounded-full shadow-md transform duration-300 ease-in-out ${
-                  allowPayerSelectAmount ? "translate-x-4" : ""
-                }`}
-              ></div>
-            </div>
-          </label>
-        </div>
 
         {/* Request Description Input Section */}
         <div>
-          <div className="font-medium font-base text-sm text-slate-600 mt-6 mb-2 pl-2">
-            {`What's this for?`}
+          <div className="font-medium font-base text-xl text-slate-600 mt-1 mb-2 pl-2">
+            {`Message `}
+            <span className="text-sm">(Optional)</span>
           </div>
 
           <div className="relative">
@@ -397,7 +436,7 @@ export default function Payment(props: any) {
                 "border-black rounded border font-medium text-[22px] focus:outline-0 focus:black w-full h-16 mb-3 font-sans text-slate-600 bg-transparent pl-4"
               )}
               type="text"
-              placeholder="coffee ☕"
+              placeholder="e.g. pizza 🍕"
               value={description}
               onChange={handleDescriptionChange}
               maxLength={MAX_CHARACTER_LIMIT}
@@ -412,7 +451,7 @@ export default function Payment(props: any) {
         <button
           type="button"
           className={cx(
-            "flex justify-center items-center border-black border font-base text-lg focus:outline-0 focus:text-slate-600 w-full h-16 rounded transition-all font-bold text-slate-600 hover:border-black hover:bg-[#007BFF] hover:text-white mt-6"
+            "flex justify-center items-center border-black border font-base text-lg focus:outline-0 w-full h-16 rounded-full transition-all font-bold text-white bg-[#007BFF] hover:bg-[#0056b3] hover:text-white hover:border-[#0056b3] mt-6"
           )}
           onClick={isConnected ? createRequest : openConnectModal}
         >
@@ -435,7 +474,7 @@ export default function Payment(props: any) {
               </svg>
             </>
           ) : isConnected ? (
-            "Request"
+            "Continue"
           ) : (
             "Connect Wallet"
           )}
