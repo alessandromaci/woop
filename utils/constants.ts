@@ -129,6 +129,8 @@ export const setEtherscanAddress = (
 
 export const baseUrl: string = "https://app.woop.ink/woop/";
 
+export const telegramLink: string = "https://t.me/woop_pay";
+
 export const pushUrl: string = "https://staging.push.org/#/inbox";
 
 export const MAX_CHARACTER_LIMIT: number = 30;

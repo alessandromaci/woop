@@ -1,9 +1,13 @@
 import * as React from "react";
-import Layout from "../components/Layout";
+import Layout from "../components/layout/Layout";
 import Payment from "../components/Payment/Payment";
-import SEO from "../components/Seo";
+import ConfigMenu from "../components/ConfigMenu";
+import SEO from "../components/common/Seo";
 
 export default function Home() {
+  const [theme, setTheme] = React.useState("white");
+  const [logo, setLogo] = React.useState("/default_logo.png");
+
   return (
     <>
       <SEO

@@ -1,43 +1,77 @@
 .containerBox {
-  background: linear-gradient(
-    0.6turn,
-    rgba(79, 76, 227, 1),
-    rgba(16, 130, 178, 1)
-  );
+  background: linear-gradient(rgb(255, 255, 255), rgb(255, 255, 255));
   border: 1px solid rgba(33, 35, 167, 0.5);
   width: 100%;
 }
 
 .containerBoxNew {
-  background: linear-gradient(
-    0.6turn,
-    rgba(79, 76, 227, 1),
-    rgba(16, 130, 178, 1)
-  );
+  background: #ffffff;
   border: 1px solid rgba(33, 35, 167, 0.5);
+  border-radius: 16px;
 }
 
 .baseContainer {
-  background: linear-gradient(0.6turn, rgba(38, 142, 200, 1), rgb(6, 34, 92));
+  background: #e6e7e9;
+  color: #000000;
 }
 
 .baseArticle {
   max-height: calc(100vh - 180px);
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.baseArticle::-webkit-scrollbar {
+  display: none;
 }
 
 .containerBase {
   background-repeat: repeat;
-  background-image: url("/double-bubble-dark.webp");
   opacity: 0.2;
   background-blend-mode: hard-light;
-  background-size: 400px;
+  background-size: 350px;
 }
 
 .containerDisplay {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 16px;
+  max-width: 100%;
+  overflow-y: auto;
+  height: calc(100vh - 120px);
+  scroll-behavior: smooth;
 }
 
 .topContainer {
   border-bottom: 1px solid rgba(33, 35, 167, 0.5);
+}
+
+.scrollableList {
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+  padding: 8px;
+}
+
+.icon {
+  width: 32px;
+  height: 32px;
+  margin-right: 8px;
+}
+
+.detailsButton {
+  background: #f0f0f0;
+  border: 1px solid rgba(33, 35, 167, 0.5);
+  border-radius: 12px;
+  padding: 8px 16px;
+  color: #000000;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: all 0.2s ease-in-out;
+}
+
+.detailsButton:hover {
+  background: #d6d6d6;
+  border-color: #2123a7;
 }
