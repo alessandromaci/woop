@@ -196,7 +196,7 @@ export default function Payment(props: any) {
             className="fixed top-0 left-0 w-screen h-screen bg-slate-900 opacity-30"
           ></div>
           <div className="z-20 bg-white rounded shadow-xl py-4 px-6 md:w-80 w-full m-5">
-            <p className="font-base font-semibold text-slate-700 pb-3 border-b mb-3">
+            <p className="font-base font-semibold text-slate-700 pb-3 border-b mb-2">
               Select currency
             </p>
             {tokensDetails
@@ -244,7 +244,7 @@ export default function Payment(props: any) {
         </div>
 
         {/*Logo*/}
-        <div className="flex justify-between items-center mt-2 mb-3">
+        <div className="flex justify-between items-center mt-2 mb-2">
           {/* Left Image */}
           <Image alt="Logo" src="/woop_logo.png" width={70} height={50} />
 
@@ -255,11 +255,11 @@ export default function Payment(props: any) {
         </div>
 
         {/* Menu Selection */}
-        <div className="flex items-center justify-center mt-2 mb-3 border border-gray-600 rounded-md overflow-hidden">
+        <div className="flex items-center justify-center mt-2 mb-2 border border-gray-600 rounded-md overflow-hidden">
           {/* Receive Button */}
           <div
             className={cx(
-              "flex justify-center items-center font-base text-lg w-1/2 h-9 text-white bg-[#007BFF] transition-all"
+              "flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 text-white bg-[#007BFF] transition-all"
             )}
           >
             Receive
@@ -269,7 +269,7 @@ export default function Payment(props: any) {
           <Link
             href="/dashboard" // Replace with your dashboard route
             className={cx(
-              "flex justify-center items-center font-base text-lg w-1/2 h-9 text-black hover:bg-gray-300 transition-all"
+              "flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 text-black hover:bg-gray-300 transition-all"
             )}
           >
             Track
@@ -277,24 +277,26 @@ export default function Payment(props: any) {
         </div>
 
         {/* Amount Input Section */}
-        <p className="font-medium font-base text-xl text-slate-600 mb-2 pl-2">
+        <p className="font-sans text-base leading-snug font-medium text-slate-600 mt-2 mb-2 pl-2">
           <span>Select amount</span>
         </p>
 
-        <div className="relative border border-black rounded h-auto w-full mb-3 p-4">
+        <div className="relative border border-black rounded w-full mb-2 pb-4 pl-4 pr-4 pt-2">
           {/* Row with Input and Token Selector */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between space-x-4">
             {allowPayerSelectAmount ? (
-              <input
-                autoFocus={isConnected}
-                className={cx(
-                  styles.mainInput,
-                  "border-none font-medium focus:outline-0 focus:border-gray-500 text-3xl text-gray-400 flex-grow h-20 bg-transparent placeholder-gray-400"
-                )}
-                placeholder="Open amount"
-                value={"Open amount"}
-                readOnly
-              />
+              <div className="flex-grow">
+                <input
+                  autoFocus={isConnected}
+                  className={cx(
+                    styles.mainInput,
+                    "border-none font-medium focus:outline-0 focus:border-gray-500 text-3xl text-gray-400 w-full h-20 bg-transparent placeholder-gray-400"
+                  )}
+                  placeholder="Open amount"
+                  value={"Open amount"}
+                  readOnly
+                />
+              </div>
             ) : (
               <div className="flex items-center flex-grow">
                 {currencyPrefix && (
@@ -319,8 +321,8 @@ export default function Payment(props: any) {
 
             <button
               type="button"
-              className="flex items-center hover:bg-gray-300 border border-black px-2 py-2 rounded h-16"
-              style={{ width: "auto", minWidth: "120px" }}
+              className="flex items-center hover:bg-gray-300 border border-black px-2 rounded-full h-12"
+              style={{ width: "auto", minWidth: "110px" }}
               onClick={() => setSelectorVisibility(!selectorVisibility)}
             >
               {/* Token Icon */}
@@ -332,31 +334,40 @@ export default function Payment(props: any) {
                 className="flex-shrink-0"
               />
               {/* Token Label */}
-              <p className="ml-2 text-slate-600 font-medium text-base">
+              <p className="ml-1 text-slate-600 font-medium text-base">
                 {selectedToken.label}
               </p>
               {/* Down Arrow */}
-              <span className="ml-3 text-slate-600 text-lg leading-none">
-                ▼
-              </span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="ml-2 w-5 h-5 text-gray-500"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
             </button>
           </div>
 
           {/* "Any amount" toggle below */}
-          <div className="flex items-center mt-4">
+          <div className="flex items-center mt-2">
             <div
-              className={`w-6 h-3 bg-gray-400 rounded-full cursor-pointer ${
-                allowPayerSelectAmount ? "bg-green-600" : ""
+              className={`w-6 h-4 bg-gray-400 rounded-full cursor-pointer ${
+                allowPayerSelectAmount ? "bg-slate-600" : ""
               }`}
               onClick={() => setAllowPayerSelectAmount(!allowPayerSelectAmount)}
             >
               <div
-                className={`w-3 h-3 bg-white rounded-full shadow-md transform duration-300 ease-in-out ${
-                  allowPayerSelectAmount ? "translate-x-3" : ""
+                className={`w-4 h-4 bg-white rounded-full shadow-md transform duration-300 ease-in-out ${
+                  allowPayerSelectAmount ? "translate-x-2" : ""
                 }`}
               ></div>
             </div>
-            <span className="ml-2 text-black font-base text-sm">
+            <span className="ml-2 text-black font-sans text-sm leading-snug">
               Any amount
             </span>
           </div>
@@ -364,21 +375,21 @@ export default function Payment(props: any) {
 
         {/* Recipient Section with chain name and address recipient */}
         <>
-          <div className="mt-1 mb-2">
-            <div className="font-medium font-base text-xl text-slate-600 mb-2 pl-2">
-              {`Send to`}
+          <div className="mt-2 mb-2">
+            <div className="font-sans text-base leading-snug font-medium text-slate-600 mb-2 pl-2">
+              {`Receive funds on`}
             </div>
             <div className="flex items-center w-full">
               {/* Chain ID Section (1/3 of the width) */}
-              <div className="flex items-center justify-center basis-1/3 h-10 border border-black rounded bg-transparent text-slate-600">
+              <div className="flex items-center justify-center basis-1/3 h-12 border border-black rounded bg-transparent text-slate-600">
                 <span className="font-medium">{chainId}</span>
               </div>
 
               {/* Space Between */}
-              <div className="mx-2"></div>
+              <div className="mx-1"></div>
 
               {/* Address Section (2/3 of the width) */}
-              <div className="flex items-center justify-between basis-2/3 h-10 border border-black hover:bg-gray-300 rounded bg-transparent text-slate-600 px-4">
+              <div className="flex items-center justify-between basis-2/3 h-12 border border-black hover:bg-gray-300 rounded bg-transparent text-slate-600 px-4">
                 {!isEditingRecipient ? (
                   <button
                     type="button"
@@ -396,7 +407,18 @@ export default function Payment(props: any) {
                     </span>
 
                     {/* Down Arrow */}
-                    <span className="text-slate-600 text-lg">▼</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="ml-3 w-5 h-5 text-gray-500"
+                    >
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
                   </button>
                 ) : (
                   <div className="flex items-center w-full">
@@ -423,9 +445,9 @@ export default function Payment(props: any) {
 
         {/* Request Description Input Section */}
         <div>
-          <div className="font-medium font-base text-xl text-slate-600 mt-1 mb-2 pl-2">
+          <div className="font-sans text-base leading-snug font-medium text-slate-600 mt-2 mb-2 pl-2">
             {`Message `}
-            <span className="text-sm">(Optional)</span>
+            <span className="text-sm font-sans">(optional)</span>
           </div>
 
           <div className="relative">
@@ -433,7 +455,7 @@ export default function Payment(props: any) {
               autoFocus={isConnected}
               className={cx(
                 styles.mainInput,
-                "border-black rounded border font-medium text-[22px] focus:outline-0 focus:black w-full h-16 mb-3 font-sans text-slate-600 bg-transparent pl-4"
+                "border-black rounded border font-medium text-[22px] focus:outline-0 focus:black w-full h-12 mb-2 font-sans text-slate-600 bg-transparent pl-4"
               )}
               type="text"
               placeholder="e.g. pizza 🍕"
@@ -451,7 +473,7 @@ export default function Payment(props: any) {
         <button
           type="button"
           className={cx(
-            "flex justify-center items-center border-black border font-base text-lg focus:outline-0 w-full h-16 rounded-full transition-all font-bold text-white bg-[#007BFF] hover:bg-[#0056b3] hover:text-white hover:border-[#0056b3] mt-6"
+            "flex justify-center items-center border-black border font-sans font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white bg-[#007BFF] hover:bg-[#0056b3] hover:text-white hover:border-[#0056b3] mt-3"
           )}
           onClick={isConnected ? createRequest : openConnectModal}
         >
@@ -481,7 +503,7 @@ export default function Payment(props: any) {
         </button>
       </div>
 
-      <div className="flex justify-center items-center mt-5 mb-2">
+      <div className="flex justify-center items-center mt-2 mb-2">
         <span className="text-xs text-gray-500 mr-1">powered by</span>
         <Image
           alt="Woop Logo"
