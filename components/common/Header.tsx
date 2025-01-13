@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import Logo from "../../public/woop_logo.png";
 import Wallet from "./Wallet";
@@ -8,11 +8,26 @@ import { telegramLink } from "../../utils/constants";
 const Header = () => {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const router = useRouter();
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="absolute top-0 left-0 w-full flex justify-between p-7 z-30 items-center bg-transparent">
       {/* Logo Section with Dropdown */}
-      <div className="relative">
+      <div className="relative" ref={menuRef}>
         {/* Logo */}
         <div className="flex items-center">
           <Image alt="woop" src={Logo} width={80} height={60} />
@@ -66,7 +81,6 @@ const Header = () => {
             <p className="block w-full text-left font-sans text-bold font-medium px-4 py-2 text-gray-800 mt-4">
               Need help?
             </p>
-            {/* Updated Contact Us Button */}
             <a
               href={telegramLink}
               target="_blank"
