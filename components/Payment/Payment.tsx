@@ -23,7 +23,7 @@ import {
 import mixpanel from "mixpanel-browser";
 import { sendNotificationRequest } from "../../utils/push";
 
-export default function Payment(props: any) {
+export default function Payment({ theme, logo }: { theme: string; logo: any }) {
   const [selectedToken, setSelectedToken] = React.useState<{
     label: string;
     logo: any;
@@ -53,7 +53,6 @@ export default function Payment(props: any) {
   const [newAddress, setNewAddress] = React.useState<string>(address || "");
   const { chain } = useAccount();
   const { openConnectModal } = useConnectModal();
-
   const [selectorVisibility, setSelectorVisibility] =
     React.useState<boolean>(false);
   const [isShareActive, setIsShareActive] = useState<boolean>(false);
@@ -193,10 +192,20 @@ export default function Payment(props: any) {
         <section className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen z-30">
           <div
             onClick={() => setSelectorVisibility(!selectorVisibility)}
-            className="fixed top-0 left-0 w-screen h-screen bg-slate-900 opacity-30"
+            className={`fixed top-0 left-0 w-screen h-screen ${
+              theme === "dark" ? "bg-slate-900" : "bg-slate-100"
+            } opacity-30`}
           ></div>
-          <div className="z-20 bg-white rounded shadow-xl py-4 px-6 md:w-80 w-full m-5">
-            <p className="font-base font-semibold text-slate-700 pb-3 border-b mb-2">
+          <div
+            className={`z-20 ${
+              theme === "dark" ? "bg-gray-800" : "bg-white"
+            } rounded shadow-xl py-4 px-6 md:w-80 w-full m-5`}
+          >
+            <p
+              className={`font-base font-semibold ${
+                theme === "dark" ? "text-gray-200" : "text-slate-700"
+              } pb-3 border-b mb-2`}
+            >
               Select currency
             </p>
             {tokensDetails
@@ -219,7 +228,8 @@ export default function Payment(props: any) {
                     sx={{
                       marginBottom: tokensDetails.length - 1 === i ? 0 : 1,
                     }}
-                    className="cursor-pointer hover:bg-gray-300 px-4 py-2 rounded-md flex items-center"
+                    className={`cursor-pointer hover:$
+                      {theme === "dark" ? "bg-gray-700" : "bg-gray-300"} px-4 py-2 rounded-md flex items-center`}
                   >
                     <Image
                       alt={token.label}
@@ -228,7 +238,11 @@ export default function Payment(props: any) {
                       width={30}
                       height={30}
                     />
-                    <span className="text-gray-800 font-medium">
+                    <span
+                      className={`${
+                        theme === "dark" ? "text-gray-300" : "text-gray-800"
+                      } font-medium`}
+                    >
                       {token.label}
                     </span>
                   </MenuItem>
@@ -244,54 +258,59 @@ export default function Payment(props: any) {
         </div>
 
         {/*Logo*/}
-        <div className="flex justify-between items-center mt-2 mb-2">
-          {/* Left Image */}
-          <Image alt="Logo" src="/woop_logo.png" width={70} height={50} />
-
-          {/* Styled Version*/}
-          <p className="bg-[#007BFF] text-white text-sm font-bold px-4 py-1 rounded-full shadow-md lowercase tracking-wider">
-            v1 BETA
-          </p>
+        <div className="flex justify-center items-center mt-2 mb-2">
+          <Image
+            alt="Logo"
+            src={logo || "/woop_logo.png"}
+            width={70}
+            height={50}
+          />
         </div>
 
         {/* Menu Selection */}
         <div className="flex items-center justify-center mt-2 mb-2 border border-gray-600 rounded-md overflow-hidden">
           {/* Receive Button */}
           <div
-            className={cx(
-              "flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 text-white bg-[#007BFF] transition-all"
-            )}
+            className={`flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 text-white bg-[#007BFF] transition-all`}
           >
             Receive
           </div>
 
           {/* Track Button */}
           <Link
-            href="/dashboard" // Replace with your dashboard route
-            className={cx(
-              "flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 text-black hover:bg-gray-300 transition-all"
-            )}
+            href="/dashboard"
+            className={`flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 ${
+              theme === "dark"
+                ? "text-gray-400 hover:bg-gray-700"
+                : "text-black hover:bg-gray-300"
+            } transition-all`}
           >
             Track
           </Link>
         </div>
 
         {/* Amount Input Section */}
-        <p className="font-sans text-base leading-snug font-medium text-slate-600 mt-2 mb-2 pl-2">
+        <p
+          className={`font-sans text-base leading-snug font-medium ${
+            theme === "dark" ? "text-gray-200" : "text-slate-600"
+          } mt-2 mb-2 pl-2`}
+        >
           <span>Select amount</span>
         </p>
 
-        <div className="relative border border-black rounded w-full mb-2 pb-4 pl-4 pr-4 pt-2">
-          {/* Row with Input and Token Selector */}
+        <div
+          className={`relative border rounded w-full mb-2 pb-4 pl-4 pr-4 pt-2 ${
+            theme === "dark" ? "border-gray-700" : "border-black"
+          }`}
+        >
           <div className="flex items-center justify-between space-x-4">
             {allowPayerSelectAmount ? (
               <div className="flex-grow">
                 <input
                   autoFocus={isConnected}
-                  className={cx(
-                    styles.mainInput,
-                    "border-none font-medium focus:outline-0 focus:border-gray-500 text-3xl text-gray-400 w-full h-20 bg-transparent placeholder-gray-400"
-                  )}
+                  className={`border-none font-medium focus:outline-0 text-3xl w-full h-20 bg-transparent placeholder-gray-400 ${
+                    theme === "dark" ? "text-gray-400" : "text-gray-600"
+                  }`}
                   placeholder="Open amount"
                   value={"Open amount"}
                   readOnly
@@ -300,7 +319,11 @@ export default function Payment(props: any) {
             ) : (
               <div className="flex items-center flex-grow">
                 {currencyPrefix && (
-                  <span className="text-3xl text-gray-500 flex items-center mr-2">
+                  <span
+                    className={`text-3xl flex items-center mr-2 ${
+                      theme === "dark" ? "text-gray-500" : "text-gray-400"
+                    }`}
+                  >
                     {currencyPrefix}
                   </span>
                 )}
@@ -308,7 +331,9 @@ export default function Payment(props: any) {
                   autoFocus={isConnected}
                   className={cx(
                     styles.mainInput,
-                    "border-none font-medium text-5xl text-slate-600 focus:outline-0 focus:border-gray-500 w-full h-20 bg-transparent placeholder-gray-400"
+                    `border-none font-medium text-5xl focus:outline-0 w-full h-20 bg-transparent placeholder-gray-400 ${
+                      theme === "dark" ? "text-gray-400" : "text-slate-600"
+                    }`
                   )}
                   type="number"
                   step="0.000000"
@@ -321,8 +346,12 @@ export default function Payment(props: any) {
 
             <button
               type="button"
-              className="flex items-center hover:bg-gray-300 border border-black px-2 rounded-full h-12"
-              style={{ width: "auto", minWidth: "110px" }}
+              className={`flex items-center border px-2 rounded-full h-12 ${
+                theme === "dark"
+                  ? "border-gray-600 hover:bg-gray-700"
+                  : "border-black hover:bg-gray-300"
+              }`}
+              style={{ width: "auto", minWidth: "120px" }}
               onClick={() => setSelectorVisibility(!selectorVisibility)}
             >
               {/* Token Icon */}
@@ -334,7 +363,11 @@ export default function Payment(props: any) {
                 className="flex-shrink-0"
               />
               {/* Token Label */}
-              <p className="ml-1 text-slate-600 font-medium text-base">
+              <p
+                className={`ml-2 font-medium text-base ${
+                  theme === "dark" ? "text-gray-300" : "text-slate-600"
+                }`}
+              >
                 {selectedToken.label}
               </p>
               {/* Down Arrow */}
@@ -356,8 +389,12 @@ export default function Payment(props: any) {
           {/* "Any amount" toggle below */}
           <div className="flex items-center mt-2">
             <div
-              className={`w-6 h-4 bg-gray-400 rounded-full cursor-pointer ${
-                allowPayerSelectAmount ? "bg-slate-600" : ""
+              className={`w-6 h-4 rounded-full cursor-pointer ${
+                allowPayerSelectAmount
+                  ? theme === "dark"
+                    ? "bg-slate-600"
+                    : "bg-slate-400"
+                  : "bg-gray-400"
               }`}
               onClick={() => setAllowPayerSelectAmount(!allowPayerSelectAmount)}
             >
@@ -367,87 +404,107 @@ export default function Payment(props: any) {
                 }`}
               ></div>
             </div>
-            <span className="ml-2 text-black font-sans text-sm leading-snug">
+            <span
+              className={`ml-2 font-sans text-sm leading-snug ${
+                theme === "dark" ? "text-gray-200" : "text-black"
+              }`}
+            >
               Any amount
             </span>
           </div>
         </div>
 
         {/* Recipient Section with chain name and address recipient */}
-        <>
-          <div className="mt-2 mb-2">
-            <div className="font-sans text-base leading-snug font-medium text-slate-600 mb-2 pl-2">
-              {`Receive funds on`}
+        <div className="mt-2 mb-2">
+          <div
+            className={`font-sans text-base leading-snug font-medium mb-2 pl-2 ${
+              theme === "dark" ? "text-gray-200" : "text-slate-600"
+            }`}
+          >
+            Receive funds on
+          </div>
+          <div className="flex items-center w-full">
+            <div
+              className={`flex items-center justify-center basis-1/3 h-12 border rounded bg-transparent font-medium ${
+                theme === "dark"
+                  ? "border-gray-700 text-gray-200"
+                  : "border-black text-slate-600"
+              }`}
+            >
+              <span className="font-medium">{chainId}</span>
             </div>
-            <div className="flex items-center w-full">
-              {/* Chain ID Section (1/3 of the width) */}
-              <div className="flex items-center justify-center basis-1/3 h-12 border border-black rounded bg-transparent text-slate-600">
-                <span className="font-medium">{chainId}</span>
-              </div>
 
-              {/* Space Between */}
-              <div className="mx-1"></div>
+            {/* Space Between */}
+            <div className="mx-1"></div>
 
-              {/* Address Section (2/3 of the width) */}
-              <div className="flex items-center justify-between basis-2/3 h-12 border border-black hover:bg-gray-300 rounded bg-transparent text-slate-600 px-4">
-                {!isEditingRecipient ? (
+            <div
+              className={`flex items-center justify-between basis-2/3 h-12 border rounded bg-transparent px-4 ${
+                theme === "dark"
+                  ? "border-gray-700 text-gray-200 hover:bg-gray-700"
+                  : "border-black text-slate-600 hover:bg-gray-300"
+              }`}
+            >
+              {!isEditingRecipient ? (
+                <button
+                  type="button"
+                  onClick={() => setIsEditingRecipient(true)}
+                  className="flex items-center justify-between w-full h-full text-left"
+                >
+                  <span className="font-medium">
+                    {hydrated
+                      ? `${recipientAddress.slice(
+                          0,
+                          6
+                        )}...${recipientAddress.slice(-6)}`
+                      : ""}
+                  </span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="ml-3 w-5 h-5 text-gray-500"
+                  >
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+              ) : (
+                <div className="flex items-center w-full">
+                  <input
+                    type="text"
+                    className={`w-full h-8 rounded-md bg-transparent text-center font-medium placeholder-gray ${
+                      theme === "dark" ? "text-gray-200" : "text-slate-600"
+                    }`}
+                    value={newAddress}
+                    onChange={handleNewAddressChange}
+                    placeholder="0x..."
+                  />
                   <button
                     type="button"
-                    onClick={() => setIsEditingRecipient(true)}
-                    className="flex items-center justify-between w-full h-full text-left"
+                    className={`ml-5 ${
+                      theme === "dark" ? "text-blue-500" : "text-blue-400"
+                    }`}
+                    onClick={saveNewAddress}
                   >
-                    {/* Recipient Address */}
-                    <span className="font-medium">
-                      {hydrated
-                        ? `${recipientAddress.slice(
-                            0,
-                            6
-                          )}...${recipientAddress.slice(-6)}`
-                        : ""}
-                    </span>
-
-                    {/* Down Arrow */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="ml-3 w-5 h-5 text-gray-500"
-                    >
-                      <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                    Save
                   </button>
-                ) : (
-                  <div className="flex items-center w-full">
-                    <input
-                      type="text"
-                      className="w-full h-8 rounded-md bg-transparent text-slate-600 text-center font-medium placeholder-gray"
-                      value={newAddress}
-                      onChange={handleNewAddressChange}
-                      placeholder="0x..."
-                    />
-                    <button
-                      type="button"
-                      className="ml-5 text-blue-400"
-                      onClick={saveNewAddress}
-                    >
-                      Save
-                    </button>
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
-        </>
+        </div>
 
         {/* Request Description Input Section */}
         <div>
-          <div className="font-sans text-base leading-snug font-medium text-slate-600 mt-2 mb-2 pl-2">
-            {`Message `}
-            <span className="text-sm font-sans">(optional)</span>
+          <div
+            className={`font-sans text-base leading-snug font-medium mt-2 mb-2 pl-2 ${
+              theme === "dark" ? "text-gray-200" : "text-slate-600"
+            }`}
+          >
+            Message <span className="text-sm font-sans">(optional)</span>
           </div>
 
           <div className="relative">
@@ -455,7 +512,11 @@ export default function Payment(props: any) {
               autoFocus={isConnected}
               className={cx(
                 styles.mainInput,
-                "border-black rounded border font-medium text-[22px] focus:outline-0 focus:black w-full h-12 mb-2 font-sans text-slate-600 bg-transparent pl-4"
+                `border rounded font-medium text-[22px] focus:outline-0 w-full h-12 mb-2 font-sans bg-transparent pl-4 ${
+                  theme === "dark"
+                    ? "text-gray-300 border-gray-700"
+                    : "text-slate-600 border-black"
+                }`
               )}
               type="text"
               placeholder="e.g. pizza 🍕"
@@ -463,7 +524,11 @@ export default function Payment(props: any) {
               onChange={handleDescriptionChange}
               maxLength={MAX_CHARACTER_LIMIT}
             />
-            <div className="absolute right-3 bottom-4 text-slate-600 text-[8px]">
+            <div
+              className={`absolute right-3 bottom-4 text-[8px] ${
+                theme === "dark" ? "text-gray-400" : "text-slate-600"
+              }`}
+            >
               {characterCount}
             </div>
           </div>
@@ -503,17 +568,6 @@ export default function Payment(props: any) {
         </button>
       </div>
 
-      <div className="flex justify-center items-center mt-2 mb-2">
-        <span className="text-xs text-gray-500 mr-1">powered by</span>
-        <Image
-          alt="Woop Logo"
-          src="/woop_logo.png"
-          width={45}
-          height={10}
-          className="inline-block"
-        />
-      </div>
-
       {isShareActive && (
         <section className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen z-30">
           <div
@@ -536,6 +590,23 @@ export default function Payment(props: any) {
           </div>
         </section>
       )}
+
+      <div className="flex justify-center items-center mt-5 mb-2">
+        <span
+          className={`text-xs mr-1 ${
+            theme === "dark" ? "text-gray-500" : "text-gray-400"
+          }`}
+        >
+          powered by
+        </span>
+        <Image
+          alt="Woop Logo"
+          src="/woop_logo.png"
+          width={45}
+          height={10}
+          className="inline-block"
+        />
+      </div>
     </>
   );
 }
