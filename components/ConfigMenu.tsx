@@ -1,10 +1,16 @@
 import React from "react";
+import Wallet from "./common/Wallet";
+import Image from "next/image";
+import woopLogo from "../public/woop_logo.png";
+import { tokensDetails } from "../utils/constants";
 
 interface ConfigMenuProps {
   theme: string;
   setTheme: (theme: string) => void;
   logo: string;
   setLogo: (logo: string) => void;
+  currencies: string[];
+  setCurrencies: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const ConfigMenu: React.FC<ConfigMenuProps> = ({
@@ -12,41 +18,65 @@ const ConfigMenu: React.FC<ConfigMenuProps> = ({
   setTheme,
   logo,
   setLogo,
+  currencies,
+  setCurrencies,
 }) => {
-  return (
-    <div className="w-2/5 h-screen bg-gray-100 p-6 border-r border-gray-300">
-      <h2 className="text-2xl font-bold mb-6">Customize</h2>
+  const handleCurrencyToggle = (currency: string) => {
+    setCurrencies((prev) =>
+      prev.includes(currency)
+        ? prev.filter((cur) => cur !== currency)
+        : [...prev, currency]
+    );
+  };
 
-      {/* Theme Selector */}
-      <div className="mb-8">
-        <h3 className="text-lg font-medium mb-3">Theme</h3>
-        <div className="flex gap-3">
+  return (
+    <div className="text-black">
+      {/* Woop Logo and Widget Button */}
+      <div className="flex items-center mb-4">
+        <Image alt="Woop Logo" src={woopLogo} width={100} height={80} />
+        <span className="bg-blue-500 text-white text-sm px-3 py-1 ml-2 rounded-full font-sans font-medium">
+          widget
+        </span>
+      </div>
+      <hr className="my-4" />
+
+      {/* Wallet */}
+      <div className="mb-6">
+        <Wallet />
+      </div>
+      <hr className="my-4" />
+
+      {/* Theme Selection */}
+      <div className="mb-6">
+        <h3 className="text-sm font-medium mb-2">Display Mode</h3>
+        <div className="flex gap-2">
           <button
-            onClick={() => setTheme("black")}
-            className={`w-full py-2 rounded-lg ${
-              theme === "black"
-                ? "bg-black text-white"
-                : "bg-gray-200 text-black"
+            onClick={() => setTheme("dark")}
+            className={`flex items-center justify-center w-full px-4 py-2 border rounded-lg text-sm font-medium font-sans ${
+              theme === "dark"
+                ? "bg-gray-900 text-white"
+                : "bg-white text-black"
             }`}
           >
-            Black
+            dark
           </button>
           <button
-            onClick={() => setTheme("white")}
-            className={`w-full py-2 rounded-lg ${
-              theme === "white"
-                ? "bg-white text-black border border-gray-300"
-                : "bg-gray-200 text-black"
+            onClick={() => setTheme("light")}
+            className={`flex items-center justify-center w-full px-4 py-2 border rounded-lg text-sm font-medium font-sans ${
+              theme === "light"
+                ? "bg-gray-900 text-white"
+                : "bg-white text-black"
             }`}
           >
-            White
+            light
           </button>
         </div>
       </div>
+      <hr className="my-4" />
 
       {/* Logo Upload */}
-      <div>
-        <h3 className="text-lg font-medium mb-3">Logo</h3>
+      <div className="mb-6">
+        <h3 className="text-sm font-medium mb-2">Logo</h3>
         <input
           type="file"
           accept="image/*"
@@ -57,13 +87,34 @@ const ConfigMenu: React.FC<ConfigMenuProps> = ({
           }}
           className="block w-full text-sm text-gray-500 border border-gray-300 rounded-lg p-2 cursor-pointer"
         />
-        {logo && (
-          <img
-            src={logo}
-            alt="Uploaded Logo"
-            className="mt-4 w-24 h-24 object-contain border border-gray-300"
-          />
-        )}
+      </div>
+      <hr className="my-4" />
+
+      {/* Currency Selection */}
+      <div>
+        <h3 className="text-sm font-medium mb-2">Currencies</h3>
+        <div className="grid grid-cols-2 gap-4">
+          {tokensDetails.map((token) => (
+            <div
+              key={token.label}
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={() => handleCurrencyToggle(token.label)}
+            >
+              <input
+                type="checkbox"
+                checked={currencies.includes(token.label)}
+                onChange={() => handleCurrencyToggle(token.label)}
+              />
+              <Image
+                src={token.logo}
+                alt={token.label}
+                width={24}
+                height={24}
+              />
+              <span className="text-sm">{token.label}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

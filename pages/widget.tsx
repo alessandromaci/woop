@@ -2,10 +2,14 @@ import React from "react";
 import SEO from "../components/common/Seo";
 import WidgetLayout from "../components/layout/WidgetLayout";
 import Payment from "../components/Payment/Payment";
+import { tokensDetails } from "../utils/constants";
 
 export default function WidgetPage() {
   const [theme, setTheme] = React.useState("white");
-  const [logo, setLogo] = React.useState("/default_logo.png");
+  const [logo, setLogo] = React.useState("");
+  const [currencies, setCurrencies] = React.useState(
+    tokensDetails.map((token) => token.label)
+  );
 
   return (
     <>
@@ -15,13 +19,11 @@ export default function WidgetPage() {
         setTheme={setTheme}
         logo={logo}
         setLogo={setLogo}
+        currencies={currencies}
+        setCurrencies={setCurrencies}
       >
-        <div
-          className={`h-full ${
-            theme === "black" ? "bg-black text-white" : "bg-white text-black"
-          }`}
-        >
-          <Payment />
+        <div className={`border border-black`}>
+          <Payment logo={logo} theme={theme} />
         </div>
       </WidgetLayout>
     </>
