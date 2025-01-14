@@ -6,7 +6,7 @@ import SEO from "../components/common/Seo";
 
 export default function Home() {
   const [theme, setTheme] = React.useState("white");
-  const [logo, setLogo] = React.useState("/default_logo.png");
+  const [logo, setLogo] = React.useState("");
 
   return (
     <>
@@ -15,7 +15,7 @@ export default function Home() {
         description="Woop is the easiest way to create, track, and receive cryptocurrency payment requests. Designed for both crypto natives and beginners."
       />
       <Layout>
-        <Payment />
+        <Payment logo={logo} theme={theme} />
       </Layout>
     </>
   );
