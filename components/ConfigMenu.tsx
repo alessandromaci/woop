@@ -2,6 +2,10 @@ import React from "react";
 import Wallet from "./common/Wallet";
 import Image from "next/image";
 import woopLogo from "../public/woop_logo.png";
+import sunDark from "../public/sun-dark.png";
+import sunWhite from "../public/sun-white.png";
+import moonDark from "../public/moon-dark.png";
+import moonWhite from "../public/moon-light.png";
 import { tokensDetails } from "../utils/constants";
 
 interface ConfigMenuProps {
@@ -50,6 +54,7 @@ const ConfigMenu: React.FC<ConfigMenuProps> = ({
       <div className="mb-6">
         <h3 className="text-sm font-medium mb-2">Display Mode</h3>
         <div className="flex gap-2">
+          {/* Dark Mode Button */}
           <button
             onClick={() => setTheme("dark")}
             className={`flex items-center justify-center w-full px-4 py-2 border rounded-lg text-sm font-medium font-sans ${
@@ -58,8 +63,14 @@ const ConfigMenu: React.FC<ConfigMenuProps> = ({
                 : "bg-white text-black"
             }`}
           >
-            dark
+            <Image
+              src={theme === "dark" ? moonWhite : moonDark}
+              alt="Dark Mode"
+              className="w-5 h-5"
+            />
           </button>
+
+          {/* Light Mode Button */}
           <button
             onClick={() => setTheme("light")}
             className={`flex items-center justify-center w-full px-4 py-2 border rounded-lg text-sm font-medium font-sans ${
@@ -68,7 +79,11 @@ const ConfigMenu: React.FC<ConfigMenuProps> = ({
                 : "bg-white text-black"
             }`}
           >
-            light
+            <Image
+              src={theme === "light" ? sunWhite : sunDark}
+              alt="Light Mode"
+              className="w-5 h-5"
+            />
           </button>
         </div>
       </div>

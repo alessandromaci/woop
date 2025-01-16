@@ -13,7 +13,7 @@ const WidgetLayout = ({
   return (
     <div className="flex h-screen">
       {/* Left Config Menu */}
-      <div className="w-5/12 md:w-fit h-screen bg-white p-4 border-r border-gray-300">
+      <div className="w-5/12 lg:w-1/4 md:w-fit h-screen bg-white p-4 border-r border-gray-300">
         <ConfigMenu
           theme={theme}
           setTheme={setTheme}
@@ -25,10 +25,8 @@ const WidgetLayout = ({
       </div>
 
       {/* Main Content */}
-      <div className="flex-grow bg-white p-4">
-        <div
-          className={`max-w-2xl mx-auto ${theme == "dark" ? "bg-black" : ""} `}
-        >
+      <div className="flex-grow bg-gray-200 flex items-center justify-center">
+        <div className={`w-full max-w-2xl md:max-w-lg sm:max-w-sm p-2`}>
           {children}
         </div>
       </div>

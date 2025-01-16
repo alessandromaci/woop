@@ -27,7 +27,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {/* Main Content */}
         <Container
           maxWidth="sm"
-          className="relative z-10 w-full max-w-md p-4 mt-8 md:mt-16"
+          className="relative z-10 w-full max-w-md p-2 mt-8 md:mt-16"
         >
           <Box
             component="form"

@@ -22,7 +22,11 @@ export default function WidgetPage() {
         currencies={currencies}
         setCurrencies={setCurrencies}
       >
-        <div className={`border border-black`}>
+        <div
+          className={`border rounded border-gray-400 ${
+            theme === "dark" ? "bg-black" : "bg-white"
+          }`}
+        >
           <Payment logo={logo} theme={theme} />
         </div>
       </WidgetLayout>
