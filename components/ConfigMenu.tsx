@@ -113,12 +113,13 @@ const ConfigMenu: React.FC<ConfigMenuProps> = ({
             <div
               key={token.label}
               className="flex items-center gap-2 cursor-pointer"
-              onClick={() => handleCurrencyToggle(token.label)}
             >
+              {/* Checkbox */}
               <input
                 type="checkbox"
                 checked={currencies.includes(token.label)}
                 onChange={() => handleCurrencyToggle(token.label)}
+                className="w-4 h-4 cursor-pointer accent-black"
               />
               <Image
                 src={token.logo}

@@ -27,7 +27,7 @@ export default function WidgetPage() {
             theme === "dark" ? "bg-black" : "bg-white"
           }`}
         >
-          <Payment logo={logo} theme={theme} />
+          <Payment logo={logo} theme={theme} currencies={currencies} />
         </div>
       </WidgetLayout>
     </>

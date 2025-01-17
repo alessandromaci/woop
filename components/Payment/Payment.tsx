@@ -23,7 +23,15 @@ import {
 import mixpanel from "mixpanel-browser";
 import { sendNotificationRequest } from "../../utils/push";
 
-export default function Payment({ theme, logo }: { theme: string; logo: any }) {
+export default function Payment({
+  theme,
+  logo,
+  currencies,
+}: {
+  theme: string;
+  logo: any;
+  currencies: any;
+}) {
   const [selectedToken, setSelectedToken] = React.useState<{
     label: string;
     logo: any;
@@ -210,11 +218,17 @@ export default function Payment({ theme, logo }: { theme: string; logo: any }) {
             </p>
             {tokensDetails
               .filter((token) => {
-                if (chainId == "Base") {
-                  if (token.label != "WBTC") return token;
-                } else {
-                  if (token.label != "cbBTC") return token;
-                }
+                // Default to showing all tokens if currencies is undefined or empty
+                const isCurrencySelected =
+                  !currencies ||
+                  currencies.length === 0 ||
+                  currencies.includes(token.label);
+
+                if (!isCurrencySelected) return false;
+                if (chainId === "Base" && token.label === "WBTC") return false;
+                if (chainId !== "Base" && token.label === "cbBTC") return false;
+
+                return true;
               })
               .map((token, i) => {
                 return (
