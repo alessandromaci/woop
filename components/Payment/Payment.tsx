@@ -19,6 +19,7 @@ import {
   selectTokenDecimals,
   tokensDetails,
   MAX_CHARACTER_LIMIT,
+  darkenColor,
 } from "../../utils/constants";
 import mixpanel from "mixpanel-browser";
 import { sendNotificationRequest } from "../../utils/push";
@@ -27,9 +28,11 @@ export default function Payment({
   theme,
   logo,
   currencies,
+  buttonColor,
 }: {
   theme: string;
   logo: any;
+  buttonColor: string;
   currencies: any;
 }) {
   const [selectedToken, setSelectedToken] = React.useState<{
@@ -285,7 +288,8 @@ export default function Payment({
         <div className="flex items-center justify-center mt-2 mb-2 border border-gray-600 rounded-md overflow-hidden">
           {/* Receive Button */}
           <div
-            className={`flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 text-white bg-[#007BFF] transition-all`}
+            className={`flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 text-white transition-all`}
+            style={{ backgroundColor: buttonColor ? buttonColor : "#007BFF" }}
           >
             Receive
           </div>
@@ -552,8 +556,20 @@ export default function Payment({
         <button
           type="button"
           className={cx(
-            "flex justify-center items-center border-black border font-sans font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white bg-[#007BFF] hover:bg-[#0056b3] hover:text-white hover:border-[#0056b3] mt-3"
+            "flex justify-center items-center border-black border font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white mt-3"
           )}
+          style={{
+            backgroundColor: buttonColor || "#007BFF",
+            borderColor: buttonColor || "#007BFF",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = buttonColor
+              ? darkenColor(buttonColor, 20) // Adjusts the hover color dynamically
+              : "#0056b3";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = buttonColor || "#007BFF";
+          }}
           onClick={isConnected ? createRequest : openConnectModal}
         >
           {ipfsLoading ? (

@@ -7,6 +7,8 @@ import { tokensDetails } from "../utils/constants";
 export default function WidgetPage() {
   const [theme, setTheme] = React.useState("white");
   const [logo, setLogo] = React.useState("");
+  const [buttonColor, setButtonColor] = React.useState("#007BFF");
+
   const [currencies, setCurrencies] = React.useState(
     tokensDetails.map((token) => token.label)
   );
@@ -19,6 +21,8 @@ export default function WidgetPage() {
         setTheme={setTheme}
         logo={logo}
         setLogo={setLogo}
+        buttonColor={buttonColor}
+        setButtonColor={setButtonColor}
         currencies={currencies}
         setCurrencies={setCurrencies}
       >
@@ -27,7 +31,12 @@ export default function WidgetPage() {
             theme === "dark" ? "bg-black" : "bg-white"
           }`}
         >
-          <Payment logo={logo} theme={theme} currencies={currencies} />
+          <Payment
+            logo={logo}
+            theme={theme}
+            buttonColor={buttonColor}
+            currencies={currencies}
+          />
         </div>
       </WidgetLayout>
     </>

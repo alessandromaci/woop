@@ -7,6 +7,8 @@ const WidgetLayout = ({
   setTheme,
   logo,
   setLogo,
+  buttonColor,
+  setButtonColor,
   currencies,
   setCurrencies,
 }: any) => {
@@ -19,6 +21,8 @@ const WidgetLayout = ({
           setTheme={setTheme}
           logo={logo}
           setLogo={setLogo}
+          buttonColor={buttonColor}
+          setButtonColor={setButtonColor}
           currencies={currencies}
           setCurrencies={setCurrencies}
         />
@@ -26,7 +30,7 @@ const WidgetLayout = ({
 
       {/* Main Content */}
       <div className="flex-grow bg-gray-200 flex items-center justify-center">
-        <div className={`w-full max-w-2xl md:max-w-lg sm:max-w-sm p-2`}>
+        <div className={`w-full max-w-2xl md:max-w-lg sm:max-w-sm p-4`}>
           {children}
         </div>
       </div>
