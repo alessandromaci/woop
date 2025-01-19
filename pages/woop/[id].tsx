@@ -1,13 +1,10 @@
 import * as React from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 import MenuItem from "@mui/material/MenuItem";
 import Confetti from "react-confetti";
 import useWindowSize from "./../../hooks/useWindowSize/useWindowSize";
-
 import {
   useSimulateContract,
   useWriteContract,
@@ -27,11 +24,8 @@ import { sendNotification } from "../../utils/push";
 import mixpanel from "mixpanel-browser";
 import { getEnsName } from "../../utils/ens";
 import { getCoinPrices } from "../../utils/quotes";
-
 import ERC20 from "../../abi/ERC20.abi.json";
-import Footer from "../../components/common/Footer";
 import { parseEther } from "ethers";
-import Header from "../../components/common/Header";
 import styles from "./woop.module.scss";
 import cx from "classnames";
 import Link from "next/link";
@@ -52,9 +46,6 @@ const Request = () => {
   const [request, setRequest] = React.useState<Request>();
   const [amount, setAmount] = React.useState<string>("0.01");
   const [amountPreviewToDisplay, setAmountPreviewToDisplay] = React.useState<
-    string | null
-  >(null);
-  const [amountPreviewToPay, setAmountPreviewToPay] = React.useState<
     string | null
   >(null);
   const [recipient, setRecipient] = React.useState<`0x${string}`>("0x");
@@ -93,6 +84,7 @@ const Request = () => {
   const { width, height } = useWindowSize();
   const MIXPANEL_ID = process.env.NEXT_PUBLIC_MIXPANEL_ID;
   const pinataURL = process.env.NEXT_PUBLIC_PINATA_URL;
+  const [hydrated, setHydrated] = React.useState(false);
 
   // initiate tracking activity
   if (MIXPANEL_ID) {
@@ -397,6 +389,10 @@ const Request = () => {
     }
   }, [selectedToken, request, networkName]);
 
+  React.useEffect(() => {
+    setHydrated(true);
+  }, []);
+
   const colors = [
     "rgba(16, 130, 178, 1)",
     "rgba(79, 76, 227, 1)",
@@ -427,30 +423,23 @@ const Request = () => {
         description={"You've been requested to send a payment through Woop"}
       />
       <Layout>
-        <div
-          className={cx(
-            styles.baseContainer,
-            "h-screen w-full flex justify-center items-center"
-          )}
-        >
-          <section
+        {hydrated ? (
+          <div
             className={cx(
-              styles.containerBase,
-              "h-screen w-full absolute top-0 z-0 flex opacity-50 items-center"
+              styles.baseContainer,
+              "h-screen w-full flex justify-center items-center"
             )}
-          ></section>
+          >
+            {isSuccess || isSuccessNative ? (
+              <Confetti
+                colors={colors}
+                className="z-10"
+                width={width}
+                height={height}
+              />
+            ) : null}
 
-          {isSuccess || isSuccessNative ? (
-            <Confetti
-              colors={colors}
-              className="z-10"
-              width={width}
-              height={height}
-            />
-          ) : null}
-
-          {/* CONTENT */}
-          <Container maxWidth="xs" className="">
+            {/* CONTENT */}
             {!badRequest ? (
               <div className={"mb-2 z-20"}>
                 <ErrorsUi errorMsg={woopBadRequest} errorNtk={woopBadNetwork} />
@@ -466,7 +455,7 @@ const Request = () => {
                 "rounded shadow-md w-full relative z-20"
               )}
             >
-              <section className="justify-items-left font-base text-slate-600">
+              <div className="justify-items-left font-base text-slate-600">
                 <div
                   className={cx(
                     styles.topContainer,
@@ -548,9 +537,7 @@ const Request = () => {
                     <div className="">
                       <button
                         type="button"
-                        className={cx(
-                          "flex justify-center items-center border-black border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded transition-all font-bold text-slate-600 capitalize hover:border-black hover:bg-[#007BFF] hover:text-white"
-                        )}
+                        className="flex justify-center items-center border-black border font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white mt-3 bg-[#007BFF] hover:bg-[#0067EB]"
                         onClick={openConnectModal}
                       >
                         Connect Wallet
@@ -591,11 +578,7 @@ const Request = () => {
                         </p>
                       </div>
                       <Link href="/">
-                        <button
-                          className={cx(
-                            "border-black border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded transition-all font-bold text-slate-600 capitalize hover:border-black hover:bg-[#007BFF] hover:text-white"
-                          )}
-                        >
+                        <button className="flex justify-center items-center border-black border font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white mt-3 bg-[#007BFF] hover:bg-[#0067EB]">
                           Close
                         </button>
                       </Link>
@@ -634,11 +617,7 @@ const Request = () => {
                         </p>
                       </div>
                       <Link href="/">
-                        <button
-                          className={cx(
-                            "border-black border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded transition-all font-bold text-slate-600 capitalize hover:border-black hover:bg-[#007BFF] hover:text-white"
-                          )}
-                        >
+                        <button className="flex justify-center items-center border-black border font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white mt-3 bg-[#007BFF] hover:bg-[#0067EB]">
                           Close
                         </button>
                       </Link>
@@ -690,9 +669,7 @@ const Request = () => {
                     <div className="">
                       <button
                         type="button"
-                        className={cx(
-                          "flex justify-center items-center border-black border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded transition-all font-bold text-slate-600 capitalize hover:border-black hover:bg-[#007BFF] hover:text-white"
-                        )}
+                        className="flex justify-center items-center border-black border font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white mt-3 bg-[#007BFF] hover:bg-[#0067EB]"
                         disabled={
                           (isNativeTx
                             ? !Boolean(dataNative) || isLoadingNative
@@ -801,7 +778,8 @@ const Request = () => {
                           </div>
                           <button
                             type="button"
-                            className="flex items-center justify-between bg-white border border-black px-3 h-14 rounded hover:bg-gray-200 hover:shadow-md transition"
+                            className="flex items-center justify-between bg-white border border-black px-2 h-12 rounded-full hover:bg-gray-300 hover:shadow-md transition"
+                            style={{ width: "auto", minWidth: "120px" }}
                             onClick={() =>
                               setSelectorVisibility(!selectorVisibility)
                             }
@@ -809,14 +787,25 @@ const Request = () => {
                             <Image
                               alt={selectedToken.label}
                               src={selectedToken.logo}
-                              className="mr-2"
-                              width={20}
-                              height={20}
+                              width={24}
+                              height={24}
                             />
-                            <p className="text-slate-600 font-medium mr-2">
+                            <p className="text-slate-600 font-medium text-base ml-2">
                               {selectedToken.label}
                             </p>
-                            <span className="text-slate-600 text-lg">▼</span>
+                            {/* Down Arrow */}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="ml-2 w-5 h-5 text-gray-500"
+                            >
+                              <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
                           </button>
                         </div>
 
@@ -873,9 +862,7 @@ const Request = () => {
                     <div className="">
                       <button
                         type="button"
-                        className={cx(
-                          "flex justify-center items-center border-black border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded transition-all font-bold text-slate-600 capitalize hover:border-black hover:bg-[#007BFF] hover:text-white"
-                        )}
+                        className="flex justify-center items-center border-black border font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white mt-3 bg-[#007BFF] hover:bg-[#0067EB]"
                         disabled={
                           (isNativeTx
                             ? !Boolean(dataNative) || isLoadingNative
@@ -973,9 +960,7 @@ const Request = () => {
                     <div className="">
                       <button
                         type="button"
-                        className={cx(
-                          "flex justify-center items-center border-black border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded transition-all font-bold text-slate-600 capitalize hover:border-black hover:bg-[#007BFF] hover:text-white"
-                        )}
+                        className="flex justify-center items-center border-black border font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white mt-3 bg-[#007BFF] hover:bg-[#0067EB]"
                         disabled={
                           (isNativeTx
                             ? !Boolean(dataNative) || isLoadingNative
@@ -1039,7 +1024,7 @@ const Request = () => {
                     </div>
                   </div>
                 )}
-              </section>
+              </div>
               <div className="flex justify-center items-center mt-5 mb-3">
                 <span className="text-xs text-gray-500 mr-1">powered by</span>
                 <Image
@@ -1051,8 +1036,10 @@ const Request = () => {
                 />
               </div>
             </Box>
-          </Container>
-        </div>
+          </div>
+        ) : (
+          <></>
+        )}
       </Layout>
     </>
   );

@@ -364,7 +364,7 @@ export default function Payment({
 
             <button
               type="button"
-              className={`flex items-center border px-2 rounded-full h-12 ${
+              className={`flex items-center justify-between border px-2 rounded-full h-12 ${
                 theme === "dark"
                   ? "border-gray-600 hover:bg-gray-700"
                   : "border-black hover:bg-gray-300"

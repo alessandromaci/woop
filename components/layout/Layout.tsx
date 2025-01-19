@@ -1,6 +1,5 @@
 import React from "react";
 import Header from "../common/Header";
-import Footer from "../common/Footer";
 import styles from "../../pages/index.module.scss";
 import cx from "classnames";
 import Box from "@mui/material/Box";
@@ -31,10 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         >
           <Box
             component="form"
-            className={cx(
-              styles.containerBox,
-              "rounded-lg shadow-md p-3 bg-white"
-            )}
+            className={cx(styles.containerBox, "rounded-lg")}
             style={{ height: "fit-content" }}
           >
             {children}
