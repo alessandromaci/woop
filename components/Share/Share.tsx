@@ -1,4 +1,5 @@
 import * as React from "react";
+import Image from "next/image";
 import {
   WhatsappShareButton,
   WhatsappIcon,
@@ -7,11 +8,11 @@ import {
   TwitterShareButton,
   TwitterIcon,
 } from "next-share";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import CheckIcon from "@mui/icons-material/Check";
 import { baseUrl } from "../../utils/constants";
 import { useEffect, useRef, useState } from "react";
-
-import cx from "classnames";
-import styles from "./share.module.scss";
 import useWindowSize from "../../hooks/useWindowSize/useWindowSize";
 
 export const Share: React.FC<{
@@ -19,9 +20,12 @@ export const Share: React.FC<{
   amount: string;
   description: string;
   token: any;
+  network: any;
+  address: string;
   visibility: any;
 }> = (props) => {
-  const { amount, description, path, token, visibility } = props;
+  const { amount, description, path, token, network, visibility, address } =
+    props;
   const [copySuccess, setCopySuccess] = React.useState(false);
 
   const qrContainer = useRef<any>();
@@ -79,76 +83,111 @@ export const Share: React.FC<{
   }, [qrCode, baseUrl, path, width]);
 
   return (
-    <div className="flex flex-col p-4 max-w-sm mx-auto bg-white rounded">
+    <div className="flex flex-col p-4 max-w-lg mx-auto bg-white rounded">
+      {/* Back Button */}
+      <button
+        className="flex items-center text-black text-sm mb-3"
+        onClick={() => visibility(false)}
+      >
+        <ArrowBackIcon />
+      </button>
       {path ? (
         <div>
+          {/* Payment Details */}
+          <div className="mb-1">
+            <div className="flex items-center space-x-2">
+              {/* Title */}
+              <h3 className="text-2xl font-extrabold font-sans tracking-wide text-gray-800">
+                {description || "Receive Details"}
+              </h3>
+              <span className="bg-blue-500 text-white text-sm px-2 py-0.5 rounded-full font-sans font-medium">
+                not paid
+              </span>
+            </div>
+
+            {/* Amount */}
+            <div className="flex items-center mt-2">
+              <span className="text-base font-medium font-sans text-gray-600">
+                Amount:{" "}
+                <span className="text-lg font-semibold text-gray-800">
+                  {amount || "N/A"} {token.label}
+                </span>
+              </span>
+              <span className="ml-4 text-base font-medium font-sans text-gray-600">
+                Network:{" "}
+                <span className="text-lg font-semibold text-gray-800">
+                  {network || "N/A"}
+                </span>
+              </span>
+            </div>
+
+            {/* Address */}
+            <p className="text-base font-sans font-medium text-gray-600">
+              Send to:{" "}
+              <span className="text-gray-800 font-semibold">
+                {`${address.slice(0, 6)}...${address.slice(-6)}`}
+              </span>
+            </p>
+          </div>
+
           {/* QR Code Section */}
-          <div className="flex justify-center">
+          <div className="flex justify-center bg-white mt-3">
             <div ref={qrContainer}></div>
           </div>
 
-          {/* Payment Request Section */}
-          <p className="font-base text-base font-medium text-slate-700 mt-4">
-            Send this payment request:
-          </p>
-          <div className="mt-4 flex gap-4">
-            {/* Back Button */}
-            <button
-              onClick={() => visibility(false)}
-              className="w-full h-12 rounded-lg bg-gray-100 hover:bg-gray-200 text-slate-700 font-medium transition flex items-center justify-center"
+          {/* Share Section */}
+          <div className="flex justify-between mx-8 mt-3">
+            {/* WhatsApp Share */}
+            <WhatsappShareButton
+              url={`${baseUrl}${path}`}
+              title={`Hey, can you please send me ${
+                amount === "allowPayerSelectAmount" ? "some" : amount
+              } ${token.label} ${description ? `for ${description}` : ``} at`}
+              className="shadow"
             >
-              Back
-            </button>
+              <WhatsappIcon size={60} round />
+            </WhatsappShareButton>
 
-            {/* Copy Link Button */}
+            {/* Telegram Share */}
+            <TelegramShareButton
+              url={`${baseUrl}${path}`}
+              title={`Hey, can you please send me ${
+                amount === "allowPayerSelectAmount" ? "some" : amount
+              } ${token.label} ${description ? `for ${description}` : ``} at`}
+              className="shadow"
+            >
+              <TelegramIcon size={60} round />
+            </TelegramShareButton>
+
+            {/* Twitter Share */}
+            <TwitterShareButton
+              url={`${baseUrl}${path}`}
+              title={`Hey, can you please send me ${
+                amount === "allowPayerSelectAmount" ? "some" : amount
+              } ${token.label} ${description ? `for ${description}` : ``} at`}
+              className="shadow"
+            >
+              <TwitterIcon size={60} round />
+            </TwitterShareButton>
+
+            {/* Copy Link */}
+            {/* Copy Link */}
             <button
               type="button"
               onClick={() => {
                 navigator.clipboard.writeText(`${baseUrl}${path}`);
                 setCopySuccess(true);
+                setTimeout(() => setCopySuccess(false), 2000); // Reset after 2 seconds
               }}
-              className="w-full h-12 rounded-lg bg-gray-100 hover:bg-gray-200 text-slate-700 font-medium transition flex items-center justify-center"
+              className="w-14 h-14 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full transition border border-slate-400"
+              title="Copy Link"
             >
-              {copySuccess ? "Copied!" : "Copy Link"}
+              {copySuccess ? (
+                <CheckIcon className="text-green-600" fontSize="medium" />
+              ) : (
+                <ContentCopyIcon className="text-gray-600" fontSize="medium" />
+              )}
             </button>
-          </div>
-
-          {/* Share Section */}
-          <div className="flex items-center mt-6">
-            <p className="font-base text-base font-medium text-slate-700 mr-2">
-              Share:
-            </p>
-            <div className="flex gap-2">
-              {/* WhatsApp Share */}
-              <WhatsappShareButton
-                url={`${baseUrl}${path}`}
-                title={`Hey, can you please send me ${
-                  amount == "allowPayerSelectAmount" ? "some" : amount
-                } ${token.label} ${description ? `for ${description}` : ``} at`}
-              >
-                <WhatsappIcon size={32} round />
-              </WhatsappShareButton>
-
-              {/* Telegram Share */}
-              <TelegramShareButton
-                url={`${baseUrl}${path}`}
-                title={`Hey, can you please send me ${
-                  amount == "allowPayerSelectAmount" ? "some" : amount
-                } ${token.label} ${description ? `for ${description}` : ``} at`}
-              >
-                <TelegramIcon size={32} round />
-              </TelegramShareButton>
-
-              {/* Twitter Share */}
-              <TwitterShareButton
-                url={`${baseUrl}${path}`}
-                title={`Hey, can you please send me ${
-                  amount == "allowPayerSelectAmount" ? "some" : amount
-                } ${token.label} ${description ? `for ${description}` : ``} at`}
-              >
-                <TwitterIcon size={32} round />
-              </TwitterShareButton>
-            </div>
           </div>
         </div>
       ) : (

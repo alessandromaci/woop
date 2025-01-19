@@ -616,6 +616,8 @@ export default function Payment({
               amount={amount}
               description={description}
               token={selectedToken}
+              network={chainId}
+              address={recipientAddress}
             />
           </div>
         </section>
