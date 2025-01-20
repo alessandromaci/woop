@@ -1,5 +1,5 @@
 import * as React from "react";
-import Image from "next/image";
+import Link from "next/link";
 import {
   WhatsappShareButton,
   WhatsappIcon,
@@ -14,6 +14,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import { baseUrl } from "../../utils/constants";
 import { useEffect, useRef, useState } from "react";
 import useWindowSize from "../../hooks/useWindowSize/useWindowSize";
+import { retrieveNotifications } from "../../utils/push";
 
 export const Share: React.FC<{
   path: string;
@@ -27,11 +28,16 @@ export const Share: React.FC<{
   const { amount, description, path, token, network, visibility, address } =
     props;
   const [copySuccess, setCopySuccess] = React.useState(false);
-
+  const [notifications, setNotifications] = React.useState<any>([]);
   const qrContainer = useRef<any>();
   const { width, height } = useWindowSize();
-
   const [qrCode, setqrCode] = useState<any>(null);
+
+  const retrieveData = async () => {
+    const data = await retrieveNotifications(address);
+    console.log("Notifications => ", data);
+    setNotifications(data);
+  };
 
   useEffect(() => {
     const initQR = async () => {
@@ -82,6 +88,12 @@ export const Share: React.FC<{
       });
   }, [qrCode, baseUrl, path, width]);
 
+  React.useEffect(() => {
+    if (path) {
+      retrieveData();
+    }
+  }, [path]);
+
   return (
     <div className="flex flex-col p-4 max-w-lg mx-auto bg-white rounded">
       {/* Back Button */}
@@ -101,7 +113,13 @@ export const Share: React.FC<{
                 {description || "Receive Details"}
               </h3>
               <span className="bg-blue-500 text-white text-sm px-2 py-0.5 rounded-full font-sans font-medium">
-                not paid
+                {notifications.filter(
+                  (notification: any) =>
+                    notification?.title === "Woop Payment Received" &&
+                    notification?.notification.body === `${path}`
+                ).length > 0
+                  ? "paid"
+                  : "not paid"}
               </span>
             </div>
 
@@ -110,7 +128,7 @@ export const Share: React.FC<{
               <span className="text-base font-medium font-sans text-gray-600">
                 Amount:{" "}
                 <span className="text-lg font-semibold text-gray-800">
-                  {amount || "N/A"} {token.label}
+                  {amount || "N/A"} {token}
                 </span>
               </span>
               <span className="ml-4 text-base font-medium font-sans text-gray-600">
@@ -128,6 +146,26 @@ export const Share: React.FC<{
                 {`${address.slice(0, 6)}...${address.slice(-6)}`}
               </span>
             </p>
+
+            {notifications ? (
+              notifications
+                .filter(
+                  (notification: any) =>
+                    notification?.title === "Woop Payment Received" &&
+                    notification?.notification.body === `${path}`
+                )
+                .map((notification: any, index: any) => (
+                  <Link
+                    href={notification?.cta}
+                    key={index}
+                    className="flex w-full font-base text-sm rounded-lg transition-colors cursor-pointer text-green-700 font-medium font-sans mt-3 px-1"
+                  >
+                    View transaction 🔎
+                  </Link>
+                ))
+            ) : (
+              <></>
+            )}
           </div>
 
           {/* QR Code Section */}
@@ -142,7 +180,7 @@ export const Share: React.FC<{
               url={`${baseUrl}${path}`}
               title={`Hey, can you please send me ${
                 amount === "allowPayerSelectAmount" ? "some" : amount
-              } ${token.label} ${description ? `for ${description}` : ``} at`}
+              } ${token} ${description ? `for ${description}` : ``} at`}
               className="shadow"
             >
               <WhatsappIcon size={60} round />
@@ -153,7 +191,7 @@ export const Share: React.FC<{
               url={`${baseUrl}${path}`}
               title={`Hey, can you please send me ${
                 amount === "allowPayerSelectAmount" ? "some" : amount
-              } ${token.label} ${description ? `for ${description}` : ``} at`}
+              } ${token} ${description ? `for ${description}` : ``} at`}
               className="shadow"
             >
               <TelegramIcon size={60} round />
@@ -164,7 +202,7 @@ export const Share: React.FC<{
               url={`${baseUrl}${path}`}
               title={`Hey, can you please send me ${
                 amount === "allowPayerSelectAmount" ? "some" : amount
-              } ${token.label} ${description ? `for ${description}` : ``} at`}
+              } ${token} ${description ? `for ${description}` : ``} at`}
               className="shadow"
             >
               <TwitterIcon size={60} round />

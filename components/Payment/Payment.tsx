@@ -615,7 +615,7 @@ export default function Payment({
               path={path}
               amount={amount}
               description={description}
-              token={selectedToken}
+              token={selectedToken.label}
               network={chainId}
               address={recipientAddress}
             />
