@@ -5,7 +5,6 @@ import styles from "./dashboard.module.scss";
 import cx from "classnames";
 import Box from "@mui/material/Box";
 import SEO from "../../components/common/Seo";
-import Notification from "../../components/Notification/Notification";
 import Layout from "../../components/layout/Layout";
 import { Share } from "../../components/Share/Share";
 import Link from "next/link";
@@ -90,7 +89,9 @@ const Dashboard = () => {
           }}
         >
           {filteredNotifications.length === 0 ? (
-            <p className="m-2 text-center">😞 No woops found</p>
+            <p className="m-2 text-center font-sans font-base">
+              😞 No recent woops
+            </p>
           ) : (
             notifications
               .filter(

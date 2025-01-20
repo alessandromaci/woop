@@ -118,7 +118,13 @@ export const Share: React.FC<{
                     notification?.title === "Woop Payment Received" &&
                     notification?.notification.body === `${path}`
                 ).length > 0
-                  ? "paid"
+                  ? `paid ${
+                      notifications.filter(
+                        (notification: any) =>
+                          notification?.title === "Woop Payment Received" &&
+                          notification?.notification.body === `${path}`
+                      ).length
+                    }x`
                   : "not paid"}
               </span>
             </div>
@@ -158,7 +164,7 @@ export const Share: React.FC<{
                   <Link
                     href={notification?.cta}
                     key={index}
-                    className="flex w-full font-base text-sm rounded-lg transition-colors cursor-pointer text-green-700 font-medium font-sans mt-3 px-1"
+                    className="flex w-full font-base text-sm rounded-lg transition-colors cursor-pointer text-green-700 font-medium font-sans mt-3"
                   >
                     View transaction 🔎
                   </Link>
