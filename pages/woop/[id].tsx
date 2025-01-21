@@ -1,13 +1,10 @@
 import * as React from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 import MenuItem from "@mui/material/MenuItem";
 import Confetti from "react-confetti";
 import useWindowSize from "./../../hooks/useWindowSize/useWindowSize";
-
 import {
   useSimulateContract,
   useWriteContract,
@@ -27,16 +24,14 @@ import { sendNotification } from "../../utils/push";
 import mixpanel from "mixpanel-browser";
 import { getEnsName } from "../../utils/ens";
 import { getCoinPrices } from "../../utils/quotes";
-
 import ERC20 from "../../abi/ERC20.abi.json";
-import Footer from "../../components/Footer";
 import { parseEther } from "ethers";
-import Header from "../../components/Heading";
 import styles from "./woop.module.scss";
 import cx from "classnames";
 import Link from "next/link";
 import ErrorsUi from "../../components/ErrorsUi/ErrorsUi";
-import SEO from "../../components/Seo";
+import SEO from "../../components/common/Seo";
+import Layout from "../../components/layout/LayoutPayment";
 
 interface Request {
   version: string;
@@ -51,9 +46,6 @@ const Request = () => {
   const [request, setRequest] = React.useState<Request>();
   const [amount, setAmount] = React.useState<string>("0.01");
   const [amountPreviewToDisplay, setAmountPreviewToDisplay] = React.useState<
-    string | null
-  >(null);
-  const [amountPreviewToPay, setAmountPreviewToPay] = React.useState<
     string | null
   >(null);
   const [recipient, setRecipient] = React.useState<`0x${string}`>("0x");
@@ -92,6 +84,7 @@ const Request = () => {
   const { width, height } = useWindowSize();
   const MIXPANEL_ID = process.env.NEXT_PUBLIC_MIXPANEL_ID;
   const pinataURL = process.env.NEXT_PUBLIC_PINATA_URL;
+  const [hydrated, setHydrated] = React.useState(false);
 
   // initiate tracking activity
   if (MIXPANEL_ID) {
@@ -362,7 +355,11 @@ const Request = () => {
             setTokenAddress(tokenAddress);
 
             // Calculate the amount to pay in tokens
-            const fiatValue = parseFloat(request?.value || "0"); // Ensure fiatValue is a number
+            const fiatValue = parseFloat(
+              request?.value == "allowPayerSelectAmount"
+                ? "1"
+                : request?.value || ""
+            ); // Ensure fiatValue is a number
             const amountToPayInToken = fiatValue / exchangeRate;
             const amountToPayInTokenFixed = amountToPayInToken.toFixed(4);
 
@@ -396,6 +393,10 @@ const Request = () => {
     }
   }, [selectedToken, request, networkName]);
 
+  React.useEffect(() => {
+    setHydrated(true);
+  }, []);
+
   const colors = [
     "rgba(16, 130, 178, 1)",
     "rgba(79, 76, 227, 1)",
@@ -419,643 +420,635 @@ const Request = () => {
   };
 
   return (
-    <div>
+    <>
       <SEO
-        title={"Woop Pay | Payment Request"}
-        rrssImg="./RRSS.png"
-        description={"You've been requested to send a payment through Woop Pay"}
+        title={"Woop | Payment Request"}
+        rrssImg="./RRSS.jpg"
+        description={"You've been requested to send a crypto payment"}
       />
-
-      <Header />
-
-      <article
-        className={cx(
-          styles.baseContainer,
-          "h-screen w-full flex justify-center items-center"
-        )}
-      >
-        <section
-          className={cx(
-            styles.containerBase,
-            "h-screen w-full absolute top-0 z-0 flex opacity-50 items-center"
-          )}
-        ></section>
-
-        {isSuccess || isSuccessNative ? (
-          <Confetti
-            colors={colors}
-            className="z-10"
-            width={width}
-            height={height}
-          />
-        ) : null}
-
-        {/* CONTENT */}
-        <Container maxWidth="xs" className="">
-          {!badRequest ? (
-            <div className={"mb-2 z-20"}>
-              <ErrorsUi errorMsg={woopBadRequest} errorNtk={woopBadNetwork} />
-            </div>
-          ) : (
-            <></>
-          )}
-
-          <Box
-            component="form"
+      <Layout>
+        {hydrated ? (
+          <div
             className={cx(
-              styles.containerBox,
-              "rounded-3xl shadow-md w-full relative z-20"
+              styles.baseContainer,
+              "h-screen w-full flex justify-center items-center"
             )}
           >
-            <section className="justify-items-left font-base text-white">
-              <div
-                className={cx(
-                  styles.topContainer,
-                  "mb-2 pl-4 pr-4 pt-4 pb-3 w-full flex justify-between items-center"
-                )}
-              >
-                <p className="font-base font-bold text-xl">
-                  {badRequest
-                    ? "No Woop to pay here"
-                    : isNativeTx
-                    ? isSuccessNative
-                      ? "Woop sent!"
+            {isSuccess || isSuccessNative ? (
+              <Confetti
+                colors={colors}
+                className="z-10"
+                width={width}
+                height={height}
+              />
+            ) : null}
+
+            <Box
+              component="form"
+              className={cx(
+                styles.containerBox,
+                "rounded shadow-md w-full relative z-20"
+              )}
+            >
+              <div className="justify-items-left font-base text-slate-600">
+                <div
+                  className={cx(
+                    styles.topContainer,
+                    "mb-2 pl-4 pr-4 pt-4 pb-3 w-full flex justify-between items-center"
+                  )}
+                >
+                  <p className="font-base font-bold text-xl">
+                    {badRequest
+                      ? "No Woop to pay here"
+                      : isNativeTx
+                      ? isSuccessNative
+                        ? "Payment sent!"
+                        : description
+                        ? `${
+                            description.charAt(0).toUpperCase() +
+                            description.slice(1)
+                          }`
+                        : "Payment requested!"
+                      : isSuccess
+                      ? "Payment sent!"
                       : description
                       ? `${
                           description.charAt(0).toUpperCase() +
                           description.slice(1)
                         }`
-                      : "Payment requested!"
-                    : isSuccess
-                    ? "Woop sent!"
-                    : description
-                    ? `${
-                        description.charAt(0).toUpperCase() +
-                        description.slice(1)
-                      }`
-                    : "Payment requested!"}
-                </p>
-                <p className="text-3xl ml-2">
-                  {badRequest
-                    ? "⚠️"
-                    : isSuccess
-                    ? "💸"
-                    : isSuccessNative
-                    ? "💸"
-                    : "✨"}
-                </p>
-              </div>
-              {badRequest ? (
-                <>
-                  <div className="px-4 pb-4 pt-1">
-                    <div className="mt-6"></div>
-                    <Link href="/">
-                      <button
-                        className={cx(
-                          "border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white capitalize hover:border-white hover:bg-white hover:text-slate-700"
-                        )}
-                      >
-                        Go back
-                      </button>
-                    </Link>
-                  </div>
-                </>
-              ) : !isConnected ? (
-                <div className="px-4 pb-4 pt-1 relative">
+                      : "Payment requested!"}
+                  </p>
+                </div>
+                {badRequest ? (
                   <>
-                    <div className="absolute top-0 right-3 p-1">
-                      {request && findIcon(request?.tokenName)}
-                    </div>
-                    <p className="text-xs text-slate-300 mb-2 flex items-center">
-                      <a
-                        className="underline underline-offset-4"
-                        href={`${setEtherscanAddress(network, request?.from)}`}
-                      >
-                        {ensName ? (
-                          <p className="flex items-center">
-                            <span className="mr-1 font-bold">{ensName}</span>
-                            {/* <Image
-                              alt="ens"
-                              src={ens}
-                              className=""
-                              width={20}
-                              height={20}
-                            /> */}
-                          </p>
-                        ) : (
-                          <span className="font-bold">
-                            {request?.from.slice(0, 4)}...
-                            {request?.from.slice(-4)}
-                          </span>
-                        )}
-                      </a>
-                      <span className="ml-1">{"requested:"}</span>
-                    </p>
-                    <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
-                      {request?.value == "allowPayerSelectAmount"
-                        ? "..."
-                        : request?.value}{" "}
-                      {request?.tokenName}
+                    <div className="px-4 pb-4 pt-1">
+                      <div className="mt-6"></div>
+                      <Link href="/">
+                        <button
+                          className={cx(
+                            "border-black border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded transition-all font-bold text-slate-600 capitalize hover:border-black hover:bg-[#007BFF] hover:text-white"
+                          )}
+                        >
+                          Go back
+                        </button>
+                      </Link>
                     </div>
                   </>
+                ) : !isConnected ? (
+                  <div className="px-4 pb-4 pt-1 relative">
+                    <>
+                      <div className="absolute top-0 right-3 p-1">
+                        {request && findIcon(request?.tokenName)}
+                      </div>
+                      <p className="font-medium font-base text-sm text-slate-600 mb-2 flex items-center">
+                        <a
+                          className="underline underline-offset-4"
+                          href={`${setEtherscanAddress(
+                            network,
+                            request?.from
+                          )}`}
+                        >
+                          {ensName ? (
+                            <p className="flex items-center">
+                              <span className="mr-1 font-bold">{ensName}</span>
+                            </p>
+                          ) : (
+                            <span className="font-bold">
+                              {request?.from.slice(0, 4)}...
+                              {request?.from.slice(-4)}
+                            </span>
+                          )}
+                        </a>
+                        <span className="ml-1">{"requested:"}</span>
+                      </p>
+                      <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
+                        {request?.value == "allowPayerSelectAmount"
+                          ? "..."
+                          : request?.value}{" "}
+                        {request?.tokenName}
+                      </div>
+                    </>
 
-                  <div className="">
-                    <button
-                      type="button"
-                      className={cx(
-                        "flex justify-center items-center border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white capitalize hover:border-white hover:bg-white hover:text-slate-700"
-                      )}
-                      onClick={openConnectModal}
-                    >
-                      Connect Wallet
-                    </button>
-                  </div>
-                </div>
-              ) : isSuccess ? (
-                <>
-                  <div className="px-4 pb-4 pt-1">
-                    <div className="mt-3 text-center w-full my-6">
-                      <p className="font-bold md:text-5xl text-4xl mb-2">
-                        {`${
-                          isFiatTx
-                            ? request?.value
-                            : request?.decimals === 18
-                            ? amount
-                            : Number(amount) * 10 ** 12
-                        } ${request?.tokenName}`}
-                      </p>
-                      <p className="text-xs text-slate-300 mb-2 text-center">
-                        <a
-                          className="underline underline-offset-4 mr-1"
-                          href={`${setEtherscanBase(networkName, hash)}`}
-                        >
-                          sent
-                        </a>
-                        <span className="mr-1">{"to"}</span>
-                        {ensName ? (
-                          <a>
-                            <span className="mr-1 font-bold">{ensName}</span>
-                          </a>
-                        ) : (
-                          <span className="font-bold">
-                            {request?.from.slice(0, 4)}...
-                            {request?.from.slice(-4)}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    <Link href="/">
+                    <div className="">
                       <button
-                        className={cx(
-                          "border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white capitalize hover:border-white hover:bg-white hover:text-slate-700"
-                        )}
+                        type="button"
+                        className="flex justify-center items-center border-black border font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white mt-3 bg-[#007BFF] hover:bg-[#0067EB]"
+                        onClick={openConnectModal}
                       >
-                        Close
+                        Connect Wallet
                       </button>
-                    </Link>
-                  </div>
-                </>
-              ) : isSuccessNative ? (
-                <>
-                  <div className="px-4 pb-4 pt-1">
-                    <div className="mt-3 text-center w-full my-6">
-                      <p className="font-bold md:text-5xl text-4xl mb-2">
-                        {`${isFiatTx ? request?.value : amount} ${
-                          request?.tokenName
-                        }`}
-                      </p>
-                      <p className="text-xs text-slate-300 mb-2 text-center">
-                        <a
-                          className="underline underline-offset-4 mr-1"
-                          href={`${setEtherscanBase(networkName, hashNative)}`}
-                        >
-                          sent
-                        </a>
-                        <span className="mr-1">{"to"}</span>
-                        {ensName ? (
-                          <a>
-                            <span className="mr-1 font-bold">{ensName}</span>
-                          </a>
-                        ) : (
-                          <span className="font-bold">
-                            {request?.from.slice(0, 4)}...
-                            {request?.from.slice(-4)}
-                          </span>
-                        )}
-                      </p>
                     </div>
-                    <Link href="/">
-                      <button
-                        className={cx(
-                          "border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white capitalize hover:border-white hover:bg-white hover:text-slate-700"
-                        )}
-                      >
-                        Close
-                      </button>
-                    </Link>
                   </div>
-                </>
-              ) : allowPayerSelectAmount ? (
-                <div className="px-4 pb-4 pt-1 relative">
+                ) : isSuccess ? (
                   <>
-                    <div className="absolute top-0 right-3 p-1">
-                      {request && findIcon(request?.tokenName)}
-                    </div>
-                    <div className="text-xs text-slate-300 mb-2 flex items-center">
-                      <a
-                        className="underline underline-offset-4"
-                        href={`${setEtherscanAddress(network, request?.from)}`}
-                      >
-                        {ensName ? (
-                          <p className="flex items-center">
-                            <span className="font-bold">{ensName}</span>
-                          </p>
-                        ) : (
-                          <span className="font-bold">
-                            {request?.from.slice(0, 4)}...
-                            {request?.from.slice(-4)}
-                          </span>
-                        )}
-                      </a>
-                      <span className="ml-1">
-                        {"requested to set an amount:"}
-                      </span>
-                    </div>
-                    <div className="mt-3 md:text-6xl text-5xl font-bold my-6 text-center items-center">
-                      <input
-                        className="bg-transparent text-white text-center focus:outline-none mr-1"
-                        type="number"
-                        placeholder="0.001"
-                        onChange={handleAmountChange}
-                        style={{ maxWidth: "100%" }}
-                      />
-                      <div className="flex-shrink-0">{request?.tokenName}</div>
+                    <div className="px-4 pb-4 pt-1">
+                      <div className="mt-3 text-center w-full my-6">
+                        <p className="font-bold md:text-5xl text-4xl mb-2">
+                          {`${
+                            isFiatTx
+                              ? request?.value
+                              : request?.decimals === 18
+                              ? amount
+                              : Number(amount) * 10 ** 12
+                          } ${request?.tokenName}`}
+                        </p>
+                        <p className="font-medium font-base text-sm text-slate-600 mb-2 text-center">
+                          <a
+                            className="underline underline-offset-4 mr-1"
+                            href={`${setEtherscanBase(networkName, hash)}`}
+                          >
+                            sent
+                          </a>
+                          <span className="mr-1">{"to"}</span>
+                          {ensName ? (
+                            <a>
+                              <span className="mr-1 font-bold">{ensName}</span>
+                            </a>
+                          ) : (
+                            <span className="font-bold">
+                              {request?.from.slice(0, 4)}...
+                              {request?.from.slice(-4)}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                      <Link href="/">
+                        <button className="flex justify-center items-center border-black border font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white mt-3 bg-[#007BFF] hover:bg-[#0067EB]">
+                          Close
+                        </button>
+                      </Link>
                     </div>
                   </>
-
-                  <div className="">
-                    <button
-                      type="button"
-                      className={cx(
-                        "flex justify-center items-center border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white capitalize hover:border-white hover:bg-white hover:text-slate-700"
-                      )}
-                      disabled={
-                        (isNativeTx
-                          ? !Boolean(dataNative) || isLoadingNative
-                          : !Boolean(data?.request) || isLoading) ||
-                        wrongNetwork
-                      }
-                      onClick={
-                        isNativeTx
-                          ? () =>
-                              sendTransaction({
-                                to: recipient,
-                                value: amount
-                                  ? BigInt(parseEther(amount).toString())
-                                  : undefined,
-                              })
-                          : () => writeContract(data!.request)
-                      }
-                    >
-                      {isNativeTx ? (
-                        isLoadingNative ? (
-                          <svg
-                            className="animate-spin rounded-full w-5 h-5 mr-3 bg-white-500"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              strokeWidth="4"
-                              stroke="currentColor"
-                              strokeDasharray="32"
-                              strokeLinecap="round"
-                              fill="transparent"
-                            />
-                          </svg>
-                        ) : (
-                          "Pay Woop"
-                        )
-                      ) : isLoading ? (
-                        <>
-                          <svg
-                            className="animate-spin rounded-full w-5 h-5 mr-3 bg-white-500"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              strokeWidth="4"
-                              stroke="currentColor"
-                              strokeDasharray="32"
-                              strokeLinecap="round"
-                              fill="transparent"
-                            />
-                          </svg>
-                        </>
-                      ) : (
-                        "Pay Woop"
-                      )}
-                    </button>
-                  </div>
-                </div>
-              ) : isFiatTx ? (
-                <div className="px-4 pb-4 pt-1 relative">
+                ) : isSuccessNative ? (
                   <>
-                    <div className="absolute top-0 right-3 p-1">
-                      {request && findIcon(request?.tokenName)}
+                    <div className="px-4 pb-4 pt-1">
+                      <div className="mt-3 text-center w-full my-6">
+                        <p className="font-bold md:text-5xl text-4xl mb-2">
+                          {`${isFiatTx ? request?.value : amount} ${
+                            request?.tokenName
+                          }`}
+                        </p>
+                        <p className="font-medium font-base text-sm text-slate-600 mb-2 text-center">
+                          <a
+                            className="underline underline-offset-4 mr-1"
+                            href={`${setEtherscanBase(
+                              networkName,
+                              hashNative
+                            )}`}
+                          >
+                            sent
+                          </a>
+                          <span className="mr-1">{"to"}</span>
+                          {ensName ? (
+                            <a>
+                              <span className="mr-1 font-bold">{ensName}</span>
+                            </a>
+                          ) : (
+                            <span className="font-bold">
+                              {request?.from.slice(0, 4)}...
+                              {request?.from.slice(-4)}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                      <Link href="/">
+                        <button className="flex justify-center items-center border-black border font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white mt-3 bg-[#007BFF] hover:bg-[#0067EB]">
+                          Close
+                        </button>
+                      </Link>
                     </div>
-                    <p className="text-xs text-slate-300 mb-2 flex items-center">
-                      <a
-                        className="underline underline-offset-4"
-                        href={`${setEtherscanAddress(network, request?.from)}`}
-                      >
-                        {ensName ? (
-                          <p className="flex items-center">
-                            <span className="font-bold">{ensName}</span>
-                          </p>
-                        ) : (
-                          <span className="font-bold">
-                            {request?.from.slice(0, 4)}...
-                            {request?.from.slice(-4)}
-                          </span>
-                        )}
-                      </a>
-                      <span className="ml-1">{"requested:"}</span>
-                    </p>
-                    <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
-                      {request?.value} {request?.tokenName}
-                    </div>
-                    <p className="text-xs text-slate-300 mb-2 flex items-center">
-                      <span className="ml-1">{"Select token to pay:"}</span>
-                    </p>
-                    <button
-                      type="button"
-                      style={{
-                        width: 110,
-                        height: 38,
-                        position: "absolute",
-                        top: 142,
-                        right: 16,
-                      }}
-                      className="bg-white shadow-md rounded-xl text-slate-900 hover:shadow-xl hover:bg-white"
-                      onClick={() => setSelectorVisibility(!selectorVisibility)}
-                    >
-                      <div className="flex items-center w-full ml-1">
-                        <Image
-                          alt={selectedToken.label}
-                          src={selectedToken.logo}
-                          className="pr-1 ml-1"
-                          width={30}
-                          height={30}
-                        />
-                        <span className="ml-1 text-slate-700 font-base font-semibold">
-                          {selectedToken.label}
+                  </>
+                ) : allowPayerSelectAmount ? (
+                  <div className="px-4 pb-4 pt-1 relative">
+                    <>
+                      <div className="absolute top-0 right-3 p-1">
+                        {request && findIcon(request?.tokenName)}
+                      </div>
+                      <div className="font-medium font-base text-sm text-slate-600 mb-2 flex items-center">
+                        <a
+                          className="underline underline-offset-4"
+                          href={`${setEtherscanAddress(
+                            network,
+                            request?.from
+                          )}`}
+                        >
+                          {ensName ? (
+                            <p className="flex items-center">
+                              <span className="font-bold">{ensName}</span>
+                            </p>
+                          ) : (
+                            <span className="font-bold">
+                              {request?.from.slice(0, 4)}...
+                              {request?.from.slice(-4)}
+                            </span>
+                          )}
+                        </a>
+                        <span className="ml-1">
+                          {"requested to set an amount:"}
                         </span>
                       </div>
-                    </button>
+                      <div className="mt-3 md:text-6xl text-5xl font-bold my-6 text-center items-center">
+                        <input
+                          className="bg-transparent text-slate-600 text-center focus:outline-none mr-1"
+                          type="number"
+                          placeholder="0.001"
+                          onChange={handleAmountChange}
+                          style={{ maxWidth: "100%" }}
+                        />
+                        <div className="flex-shrink-0">
+                          {request?.tokenName}
+                        </div>
+                      </div>
+                    </>
 
-                    {selectorVisibility && (
-                      <section className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen z-30">
-                        <div
-                          onClick={() =>
-                            setSelectorVisibility(!selectorVisibility)
-                          }
-                          className="fixed top-0 left-0 w-screen h-screen bg-slate-900 opacity-30"
-                        ></div>
-                        <div className="z-20 bg-white rounded-xl shadow-xl py-2 px-2 md:w-80 w-full m-5">
-                          <p className="font-base font-semibold text-slate-700 pl-4 pb-3 pt-2 border-b mb-3">
-                            Select currency
+                    <div className="">
+                      <button
+                        type="button"
+                        className="flex justify-center items-center border-black border font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white mt-3 bg-[#007BFF] hover:bg-[#0067EB]"
+                        disabled={
+                          (isNativeTx
+                            ? !Boolean(dataNative) || isLoadingNative
+                            : !Boolean(data?.request) || isLoading) ||
+                          wrongNetwork
+                        }
+                        onClick={
+                          isNativeTx
+                            ? () =>
+                                sendTransaction({
+                                  to: recipient,
+                                  value: amount
+                                    ? BigInt(parseEther(amount).toString())
+                                    : undefined,
+                                })
+                            : () => writeContract(data!.request)
+                        }
+                      >
+                        {isNativeTx ? (
+                          isLoadingNative ? (
+                            <svg
+                              className="animate-spin rounded-full w-5 h-5 mr-3 bg-white-500"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                strokeWidth="4"
+                                stroke="currentColor"
+                                strokeDasharray="32"
+                                strokeLinecap="round"
+                                fill="transparent"
+                              />
+                            </svg>
+                          ) : (
+                            "Pay now"
+                          )
+                        ) : isLoading ? (
+                          <>
+                            <svg
+                              className="animate-spin rounded-full w-5 h-5 mr-3 bg-white-500"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                strokeWidth="4"
+                                stroke="currentColor"
+                                strokeDasharray="32"
+                                strokeLinecap="round"
+                                fill="transparent"
+                              />
+                            </svg>
+                          </>
+                        ) : (
+                          "Pay now"
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                ) : isFiatTx ? (
+                  <div className="px-4 pb-4 pt-1 relative">
+                    <>
+                      <div className="absolute top-0 right-3 p-1">
+                        {request && findIcon(request?.tokenName)}
+                      </div>
+                      <p className="font-medium font-base text-sm text-slate-600 mb-2 flex items-center">
+                        <a
+                          className="underline underline-offset-4"
+                          href={`${setEtherscanAddress(
+                            network,
+                            request?.from
+                          )}`}
+                        >
+                          {ensName ? (
+                            <p className="flex items-center">
+                              <span className="font-bold">{ensName}</span>
+                            </p>
+                          ) : (
+                            <span className="font-bold">
+                              {request?.from.slice(0, 4)}...
+                              {request?.from.slice(-4)}
+                            </span>
+                          )}
+                        </a>
+                        <span className="ml-1">{"requested:"}</span>
+                      </p>
+                      <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
+                        {request?.value} {request?.tokenName}
+                      </div>
+
+                      <div className="pb-4 pt-1 relative">
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium font-base text-sm text-slate-600">
+                            {"Select token to pay:"}
                           </p>
-                          {tokensDetails
-                            .filter((token) => {
-                              if (
-                                token.label === "USD" ||
-                                token.label === "EURO"
-                              ) {
-                                return false; // Exclude USD and EURO
+                        </div>
+
+                        <div className="flex items-center justify-between mt-3">
+                          <div className="md:text-6xl text-5xl font-bold text-slate-600">
+                            {amountPreviewToDisplay
+                              ? amountPreviewToDisplay
+                              : "..."}
+                          </div>
+                          <button
+                            type="button"
+                            className="flex items-center justify-between bg-white border border-black px-2 h-12 rounded-full hover:bg-gray-300 hover:shadow-md transition"
+                            style={{ width: "auto", minWidth: "120px" }}
+                            onClick={() =>
+                              setSelectorVisibility(!selectorVisibility)
+                            }
+                          >
+                            <Image
+                              alt={selectedToken.label}
+                              src={selectedToken.logo}
+                              width={24}
+                              height={24}
+                            />
+                            <p className="text-slate-600 font-medium text-base ml-2">
+                              {selectedToken.label}
+                            </p>
+                            {/* Down Arrow */}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="ml-2 w-5 h-5 text-gray-500"
+                            >
+                              <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                          </button>
+                        </div>
+
+                        {selectorVisibility && (
+                          <section className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen z-30">
+                            <div
+                              onClick={() =>
+                                setSelectorVisibility(!selectorVisibility)
                               }
-                              if (chainId === "Base") {
-                                return token.label !== "WBTC"; // Exclude WBTC for Base
-                              } else {
-                                return token.label !== "cbBTC"; // Exclude cbBTC for other chains
-                              }
-                            })
-                            .map((token, i) => {
-                              return (
-                                <MenuItem
-                                  key={token.label}
-                                  onClick={() => {
-                                    setSelectedToken(token);
-                                    setSelectorVisibility(!selectorVisibility);
-                                  }}
-                                  value={token.label}
-                                  sx={{
-                                    marginBottom:
-                                      tokensDetails.length - 1 === i ? 0 : 1,
-                                  }}
-                                  className="cursor-pointer hover:bg-slate-200 rounded-xl p-1"
-                                >
-                                  <div className="flex items-center">
+                              className="fixed top-0 left-0 w-screen h-screen bg-slate-900 opacity-30"
+                            ></div>
+                            <div className="z-20 bg-white rounded shadow-xl py-4 px-6 md:w-80 w-full m-5">
+                              <p className="font-base font-semibold text-slate-700 pb-3 border-b mb-3">
+                                Select currency
+                              </p>
+                              {tokensDetails
+                                .filter((token) => {
+                                  if (["USD", "EURO"].includes(token.label))
+                                    return false;
+                                  if (chainId === "Base")
+                                    return token.label !== "WBTC";
+                                  return token.label !== "cbBTC";
+                                })
+                                .map((token, i) => (
+                                  <MenuItem
+                                    key={token.label}
+                                    onClick={() => {
+                                      setSelectedToken(token);
+                                      setSelectorVisibility(
+                                        !selectorVisibility
+                                      );
+                                    }}
+                                    value={token.label}
+                                    className="cursor-pointer hover:bg-gray-100 px-4 py-2 rounded-md flex items-center"
+                                  >
                                     <Image
                                       alt={token.label}
                                       src={token.logo}
-                                      className="p-1"
-                                      width={40}
-                                      height={40}
+                                      className="mr-3"
+                                      width={30}
+                                      height={30}
                                     />
-                                    <span className="ml-3 text-slate-700 font-base font-semibold">
+                                    <span className="text-gray-800 font-medium">
                                       {token.label}
                                     </span>
-                                  </div>
-                                </MenuItem>
-                              );
-                            })}
-                        </div>
-                      </section>
-                    )}
-                    <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
-                      {amountPreviewToDisplay ? amountPreviewToDisplay : "..."}
-                    </div>
-                  </>
+                                  </MenuItem>
+                                ))}
+                            </div>
+                          </section>
+                        )}
+                      </div>
+                    </>
 
-                  <div className="">
-                    <button
-                      type="button"
-                      className={cx(
-                        "flex justify-center items-center border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white capitalize hover:border-white hover:bg-white hover:text-slate-700"
-                      )}
-                      disabled={
-                        (isNativeTx
-                          ? !Boolean(dataNative) || isLoadingNative
-                          : !Boolean(data?.request) || isLoading) ||
-                        wrongNetwork
-                      }
-                      onClick={
-                        isNativeTx
-                          ? () =>
-                              sendTransaction({
-                                to: recipient,
-                                value: amount
-                                  ? BigInt(parseEther(amount).toString())
-                                  : undefined,
-                              })
-                          : () => writeContract(data!.request)
-                      }
-                    >
-                      {isNativeTx ? (
-                        isLoadingNative ? (
-                          <svg
-                            className="animate-spin rounded-full w-5 h-5 mr-3 bg-white-500"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              strokeWidth="4"
-                              stroke="currentColor"
-                              strokeDasharray="32"
-                              strokeLinecap="round"
-                              fill="transparent"
-                            />
-                          </svg>
+                    <div className="">
+                      <button
+                        type="button"
+                        className="flex justify-center items-center border-black border font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white mt-3 bg-[#007BFF] hover:bg-[#0067EB]"
+                        disabled={
+                          (isNativeTx
+                            ? !Boolean(dataNative) || isLoadingNative
+                            : !Boolean(data?.request) || isLoading) ||
+                          wrongNetwork
+                        }
+                        onClick={
+                          isNativeTx
+                            ? () =>
+                                sendTransaction({
+                                  to: recipient,
+                                  value: amount
+                                    ? BigInt(parseEther(amount).toString())
+                                    : undefined,
+                                })
+                            : () => writeContract(data!.request)
+                        }
+                      >
+                        {isNativeTx ? (
+                          isLoadingNative ? (
+                            <svg
+                              className="animate-spin rounded-full w-5 h-5 mr-3 bg-white-500"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                strokeWidth="4"
+                                stroke="currentColor"
+                                strokeDasharray="32"
+                                strokeLinecap="round"
+                                fill="transparent"
+                              />
+                            </svg>
+                          ) : (
+                            "Pay now"
+                          )
+                        ) : isLoading ? (
+                          <>
+                            <svg
+                              className="animate-spin rounded-full w-5 h-5 mr-3 bg-white-500"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                strokeWidth="4"
+                                stroke="currentColor"
+                                strokeDasharray="32"
+                                strokeLinecap="round"
+                                fill="transparent"
+                              />
+                            </svg>
+                          </>
                         ) : (
-                          "Pay Woop"
-                        )
-                      ) : isLoading ? (
-                        <>
-                          <svg
-                            className="animate-spin rounded-full w-5 h-5 mr-3 bg-white-500"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              strokeWidth="4"
-                              stroke="currentColor"
-                              strokeDasharray="32"
-                              strokeLinecap="round"
-                              fill="transparent"
-                            />
-                          </svg>
-                        </>
-                      ) : (
-                        "Pay Woop"
-                      )}
-                    </button>
+                          "Pay now"
+                        )}
+                      </button>
+                    </div>
                   </div>
+                ) : (
+                  <div className="px-4 pb-4 pt-1 relative">
+                    <>
+                      <div className="absolute top-0 right-3 p-1">
+                        {request && findIcon(request?.tokenName)}
+                      </div>
+                      <p className="font-medium font-base text-sm text-slate-600 mb-2 flex items-center">
+                        <a
+                          className="underline underline-offset-4"
+                          href={`${setEtherscanAddress(
+                            network,
+                            request?.from
+                          )}`}
+                        >
+                          {ensName ? (
+                            <p className="flex items-center">
+                              <span className="font-bold">{ensName}</span>
+                            </p>
+                          ) : (
+                            <span className="font-bold">
+                              {request?.from.slice(0, 4)}...
+                              {request?.from.slice(-4)}
+                            </span>
+                          )}
+                        </a>
+                        <span className="ml-1">{"requested:"}</span>
+                      </p>
+                      <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
+                        {request?.value} {request?.tokenName}
+                      </div>
+                    </>
+
+                    <div className="">
+                      <button
+                        type="button"
+                        className="flex justify-center items-center border-black border font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white mt-3 bg-[#007BFF] hover:bg-[#0067EB]"
+                        disabled={
+                          (isNativeTx
+                            ? !Boolean(dataNative) || isLoadingNative
+                            : !Boolean(data?.request) || isLoading) ||
+                          wrongNetwork
+                        }
+                        onClick={
+                          isNativeTx
+                            ? () =>
+                                sendTransaction({
+                                  to: recipient,
+                                  value: amount
+                                    ? BigInt(parseEther(amount).toString())
+                                    : undefined,
+                                })
+                            : () => writeContract(data!.request)
+                        }
+                      >
+                        {isNativeTx ? (
+                          isLoadingNative ? (
+                            <svg
+                              className="animate-spin rounded-full w-5 h-5 mr-3 bg-white-500"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                strokeWidth="4"
+                                stroke="currentColor"
+                                strokeDasharray="32"
+                                strokeLinecap="round"
+                                fill="transparent"
+                              />
+                            </svg>
+                          ) : (
+                            "Pay now"
+                          )
+                        ) : isLoading ? (
+                          <>
+                            <svg
+                              className="animate-spin rounded-full w-5 h-5 mr-3 bg-white-500"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                strokeWidth="4"
+                                stroke="currentColor"
+                                strokeDasharray="32"
+                                strokeLinecap="round"
+                                fill="transparent"
+                              />
+                            </svg>
+                          </>
+                        ) : (
+                          "Pay now"
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {!badRequest ? (
+                <div className={"mb-2"}>
+                  <ErrorsUi
+                    errorMsg={woopBadRequest}
+                    errorNtk={woopBadNetwork}
+                  />
                 </div>
               ) : (
-                <div className="px-4 pb-4 pt-1 relative">
-                  <>
-                    <div className="absolute top-0 right-3 p-1">
-                      {request && findIcon(request?.tokenName)}
-                    </div>
-                    <p className="text-xs text-slate-300 mb-2 flex items-center">
-                      <a
-                        className="underline underline-offset-4"
-                        href={`${setEtherscanAddress(network, request?.from)}`}
-                      >
-                        {ensName ? (
-                          <p className="flex items-center">
-                            <span className="font-bold">{ensName}</span>
-                          </p>
-                        ) : (
-                          <span className="font-bold">
-                            {request?.from.slice(0, 4)}...
-                            {request?.from.slice(-4)}
-                          </span>
-                        )}
-                      </a>
-                      <span className="ml-1">{"requested:"}</span>
-                    </p>
-                    <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
-                      {request?.value} {request?.tokenName}
-                    </div>
-                  </>
-
-                  <div className="">
-                    <button
-                      type="button"
-                      className={cx(
-                        "flex justify-center items-center border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white capitalize hover:border-white hover:bg-white hover:text-slate-700"
-                      )}
-                      disabled={
-                        (isNativeTx
-                          ? !Boolean(dataNative) || isLoadingNative
-                          : !Boolean(data?.request) || isLoading) ||
-                        wrongNetwork
-                      }
-                      onClick={
-                        isNativeTx
-                          ? () =>
-                              sendTransaction({
-                                to: recipient,
-                                value: amount
-                                  ? BigInt(parseEther(amount).toString())
-                                  : undefined,
-                              })
-                          : () => writeContract(data!.request)
-                      }
-                    >
-                      {isNativeTx ? (
-                        isLoadingNative ? (
-                          <svg
-                            className="animate-spin rounded-full w-5 h-5 mr-3 bg-white-500"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              strokeWidth="4"
-                              stroke="currentColor"
-                              strokeDasharray="32"
-                              strokeLinecap="round"
-                              fill="transparent"
-                            />
-                          </svg>
-                        ) : (
-                          "Pay Woop"
-                        )
-                      ) : isLoading ? (
-                        <>
-                          <svg
-                            className="animate-spin rounded-full w-5 h-5 mr-3 bg-white-500"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              strokeWidth="4"
-                              stroke="currentColor"
-                              strokeDasharray="32"
-                              strokeLinecap="round"
-                              fill="transparent"
-                            />
-                          </svg>
-                        </>
-                      ) : (
-                        "Pay Woop"
-                      )}
-                    </button>
-                  </div>
-                </div>
+                <></>
               )}
-            </section>
-          </Box>
-        </Container>
-      </article>
 
-      <div className="absolute bottom-0 left-0 w-full">
-        <Footer />
-      </div>
-    </div>
+              <div className="flex justify-center items-center mt-5 mb-3">
+                <span className="text-xs text-gray-500 mr-1">powered by</span>
+                <Image
+                  alt="Woop Logo"
+                  src="/woop_logo.png"
+                  width={45}
+                  height={10}
+                  className="inline-block"
+                />
+              </div>
+            </Box>
+          </div>
+        ) : (
+          <></>
+        )}
+      </Layout>
+    </>
   );
 };
 

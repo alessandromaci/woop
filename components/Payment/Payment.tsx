@@ -1,28 +1,41 @@
 import * as React from "react";
 import { useState } from "react";
 import Image from "next/image";
-
+import Link from "next/link";
 import { Share } from "../Share/Share";
 import ErrorsUi from "../ErrorsUi/ErrorsUi";
 import MenuItem from "@mui/material/MenuItem";
 import styles from "./payment.module.scss";
 import cx from "classnames";
-
 import { useAccount } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { isAddress } from "viem";
-
 import { uploadIpfs } from "../../utils/ipfs";
 import {
   selectToken,
   selectTokenDecimals,
   tokensDetails,
   MAX_CHARACTER_LIMIT,
+  darkenColor,
 } from "../../utils/constants";
 import mixpanel from "mixpanel-browser";
 import { sendNotificationRequest } from "../../utils/push";
+import ethLogo from "../../public/ethereum.svg";
+import baseLogo from "../../public/base.png";
+import arbitrumLogo from "../../public/arbitrum.png";
+import optimismLogo from "../../public/optimism.png";
 
-export default function Payment(props: any) {
+export default function Payment({
+  theme,
+  logo,
+  currencies,
+  buttonColor,
+}: {
+  theme: string;
+  logo: any;
+  buttonColor: string;
+  currencies: any;
+}) {
   const [selectedToken, setSelectedToken] = React.useState<{
     label: string;
     logo: any;
@@ -34,6 +47,7 @@ export default function Payment(props: any) {
     Base: string | null;
   }>(tokensDetails[0]);
   const [amount, setAmount] = React.useState<string>("");
+  const [currencyPrefix, setCurrencyPrefix] = React.useState<string>("");
   const [description, setDescription] = React.useState<string>("");
   const [characterCount, setCharacterCount] = useState(MAX_CHARACTER_LIMIT);
   const [path, setPath] = React.useState<string>("");
@@ -51,7 +65,6 @@ export default function Payment(props: any) {
   const [newAddress, setNewAddress] = React.useState<string>(address || "");
   const { chain } = useAccount();
   const { openConnectModal } = useConnectModal();
-
   const [selectorVisibility, setSelectorVisibility] =
     React.useState<boolean>(false);
   const [isShareActive, setIsShareActive] = useState<boolean>(false);
@@ -62,6 +75,18 @@ export default function Payment(props: any) {
   // start tracking activity
   if (MIXPANEL_ID) {
     mixpanel.init(MIXPANEL_ID);
+  }
+
+  const chainLogos: Record<string, string | any> = {
+    Ethereum: ethLogo,
+    Base: baseLogo,
+    Arbitrum: arbitrumLogo,
+    Optimism: optimismLogo,
+    Sepolia: ethLogo,
+  };
+
+  function getLogo(chainId: string): string | any {
+    return chainLogos[chainId] || "";
   }
 
   //event handlers
@@ -136,7 +161,6 @@ export default function Payment(props: any) {
           selectedToken.label,
           path
         );
-        console.log(path);
         setPath(path);
 
         setIsShareActive(true);
@@ -166,10 +190,19 @@ export default function Payment(props: any) {
   }, [allowPayerSelectAmount]);
 
   React.useEffect(() => {
+    if (selectedToken.label === "USD") {
+      setCurrencyPrefix("$");
+    } else if (selectedToken.label === "EURO") {
+      setCurrencyPrefix("€");
+    } else {
+      setCurrencyPrefix(""); // No prefix for crypto assets
+    }
+  }, [selectedToken]);
+
+  React.useEffect(() => {
     if (chain) {
       setSelectedToken(tokensDetails[0]);
       setChainId(chain.name);
-      console.log(chain.name);
     }
   }, [chain]);
 
@@ -183,19 +216,35 @@ export default function Payment(props: any) {
         <section className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen z-30">
           <div
             onClick={() => setSelectorVisibility(!selectorVisibility)}
-            className="fixed top-0 left-0 w-screen h-screen bg-slate-900 opacity-30"
+            className={`fixed top-0 left-0 w-screen h-screen ${
+              theme === "dark" ? "bg-slate-900" : "bg-slate-100"
+            } opacity-30`}
           ></div>
-          <div className="z-20 bg-white rounded-xl shadow-xl py-2 px-2 md:w-80 w-full m-5">
-            <p className="font-base font-semibold text-slate-700 pl-4 pb-3 pt-2 border-b mb-3">
+          <div
+            className={`z-20 ${
+              theme === "dark" ? "bg-gray-800" : "bg-white"
+            } rounded shadow-xl py-4 px-6 md:w-80 w-full m-5`}
+          >
+            <p
+              className={`font-base font-semibold ${
+                theme === "dark" ? "text-gray-200" : "text-slate-700"
+              } pb-3 border-b mb-2`}
+            >
               Select currency
             </p>
             {tokensDetails
               .filter((token) => {
-                if (chainId == "Base") {
-                  if (token.label != "WBTC") return token;
-                } else {
-                  if (token.label != "cbBTC") return token;
-                }
+                // Default to showing all tokens if currencies is undefined or empty
+                const isCurrencySelected =
+                  !currencies ||
+                  currencies.length === 0 ||
+                  currencies.includes(token.label);
+
+                if (!isCurrencySelected) return false;
+                if (chainId === "Base" && token.label === "WBTC") return false;
+                if (chainId !== "Base" && token.label === "cbBTC") return false;
+
+                return true;
               })
               .map((token, i) => {
                 return (
@@ -209,20 +258,23 @@ export default function Payment(props: any) {
                     sx={{
                       marginBottom: tokensDetails.length - 1 === i ? 0 : 1,
                     }}
-                    className="cursor-pointer hover:bg-slate-200 rounded-xl p-1"
+                    className={`cursor-pointer hover:$
+                      {theme === "dark" ? "bg-gray-700" : "bg-gray-300"} px-4 py-2 rounded-md flex items-center`}
                   >
-                    <div className="flex items-center">
-                      <Image
-                        alt={token.label}
-                        src={token.logo}
-                        className="p-1"
-                        width={40}
-                        height={40}
-                      />
-                      <span className="ml-3 text-slate-700 font-base font-semibold">
-                        {token.label}
-                      </span>
-                    </div>
+                    <Image
+                      alt={token.label}
+                      src={token.logo}
+                      className="mr-3"
+                      width={30}
+                      height={30}
+                    />
+                    <span
+                      className={`${
+                        theme === "dark" ? "text-gray-300" : "text-gray-800"
+                      } font-medium`}
+                    >
+                      {token.label}
+                    </span>
                   </MenuItem>
                 );
               })}
@@ -231,150 +283,246 @@ export default function Payment(props: any) {
       )}
 
       <div className="p-2 flex flex-col w-full relative">
-        <div className="absolute left-2 -top-16 mb-2">
-          <ErrorsUi errorMsg={badRequest} errorNtk={""} />
+        {/*Logo*/}
+        <div className="flex justify-center items-center mt-2 mb-2">
+          <Image
+            alt="Logo"
+            src={logo || "/woop_logo.png"}
+            width={70}
+            height={50}
+          />
         </div>
 
-        <p className="font-medium font-base text-sm text-white mb-2 pl-2">
-          <span className="md:block hidden">Select amount to request</span>
-          <span className="md:hidden">Requesting</span>
+        {/* Menu Selection */}
+        <div className="flex items-center justify-center mt-2 mb-2 border border-gray-600 rounded-md overflow-hidden">
+          {/* Receive Button */}
+          <div
+            className={`flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 text-white transition-all`}
+            style={{ backgroundColor: buttonColor ? buttonColor : "#007BFF" }}
+          >
+            Receive
+          </div>
+
+          {/* Track Button */}
+          <Link
+            href="/dashboard"
+            className={`flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 ${
+              theme === "dark"
+                ? "text-gray-400 hover:bg-gray-700"
+                : "text-black hover:bg-gray-300"
+            } transition-all`}
+          >
+            Track
+          </Link>
+        </div>
+
+        {/* Amount Input Section */}
+        <p
+          className={`font-sans text-base leading-snug font-medium ${
+            theme === "dark" ? "text-gray-200" : "text-slate-600"
+          } mt-2 mb-2 pl-2`}
+        >
+          <span>Select amount</span>
         </p>
 
-        <div className="relative">
-          {allowPayerSelectAmount ? (
-            <input
-              autoFocus={isConnected}
-              className={cx(
-                styles.mainInput,
-                "border-white rounded-xl border font-medium text-3l focus:outline-0 focus:white w-full h-16 mb-2 font-sans text-white bg-transparent pl-4"
-              )}
-              placeholder="Payer sets an amount"
-              value={"Payer sets an amount"}
-              readOnly
-            ></input>
-          ) : (
-            <input
-              autoFocus={isConnected}
-              className={cx(
-                styles.mainInput,
-                "border-white rounded-xl border font-medium text-3xl focus:outline-0 focus:white w-full h-16 mb-2 font-sans text-white bg-transparent pl-4"
-              )}
-              type="number"
-              step="0.000000"
-              placeholder="0.00"
-              value={amount}
-              onChange={handleAmountChange}
-            ></input>
-          )}
+        <div
+          className={`relative border rounded w-full mb-2 pb-4 pl-4 pr-4 pt-2 ${
+            theme === "dark" ? "border-gray-700" : "border-black"
+          }`}
+        >
+          <div className="flex items-center justify-between space-x-4">
+            {allowPayerSelectAmount ? (
+              <div className="flex-grow">
+                <input
+                  autoFocus={isConnected}
+                  className={`border-none font-medium focus:outline-0 text-3xl w-full h-20 bg-transparent placeholder-gray-400 ${
+                    theme === "dark" ? "text-gray-400" : "text-gray-600"
+                  }`}
+                  placeholder="Open amount"
+                  value={"Open amount"}
+                  readOnly
+                />
+              </div>
+            ) : (
+              <div className="flex items-center flex-grow">
+                {currencyPrefix && (
+                  <span
+                    className={`text-3xl flex items-center mr-2 ${
+                      theme === "dark" ? "text-gray-500" : "text-gray-400"
+                    }`}
+                  >
+                    {currencyPrefix}
+                  </span>
+                )}
+                <input
+                  autoFocus={isConnected}
+                  className={cx(
+                    styles.mainInput,
+                    `border-none font-medium text-5xl focus:outline-0 w-full h-20 bg-transparent placeholder-gray-400 ${
+                      theme === "dark" ? "text-gray-400" : "text-slate-600"
+                    }`
+                  )}
+                  type="number"
+                  step="0.000000"
+                  placeholder="0.00"
+                  value={amount}
+                  onChange={handleAmountChange}
+                />
+              </div>
+            )}
 
-          <button
-            type="button"
-            style={{
-              width: 110,
-              height: 38,
-              position: "absolute",
-              top: -20,
-              right: 25,
-            }}
-            className="bg-white shadow-md rounded-xl text-slate-900 hover:shadow-xl hover:bg-white"
-            onClick={() => setSelectorVisibility(!selectorVisibility)}
-          >
-            <div className="flex items-center w-full ml-1">
+            <button
+              type="button"
+              className={`flex items-center justify-between border px-2 rounded-full h-12 ${
+                theme === "dark"
+                  ? "border-gray-600 hover:bg-gray-700"
+                  : "border-black hover:bg-gray-300"
+              }`}
+              style={{ width: "auto", minWidth: "120px" }}
+              onClick={() => setSelectorVisibility(!selectorVisibility)}
+            >
+              {/* Token Icon */}
               <Image
                 alt={selectedToken.label}
                 src={selectedToken.logo}
-                className="pr-1 ml-1"
-                width={30}
-                height={30}
+                width={24}
+                height={24}
+                className="flex-shrink-0"
               />
-              <span className="ml-1 text-slate-700 font-base font-semibold">
+              {/* Token Label */}
+              <p
+                className={`ml-2 font-medium text-base ${
+                  theme === "dark" ? "text-gray-300" : "text-slate-600"
+                }`}
+              >
                 {selectedToken.label}
-              </span>
-            </div>
-          </button>
+              </p>
+              {/* Down Arrow */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="ml-2 w-5 h-5 text-gray-500"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+          </div>
 
-          <label className="flex items-center font-base text-sm text-white pl-2">
-            <span className="mr-3 ">Let payer choose the amount</span>
+          {/* "Any amount" toggle below */}
+          <div className="flex items-center mt-2">
             <div
-              className={`w-8 h-4 bg-gray-400 rounded-full cursor-pointer ${
-                allowPayerSelectAmount ? "bg-green-500" : ""
+              className={`w-6 h-4 rounded-full cursor-pointer ${
+                allowPayerSelectAmount
+                  ? theme === "dark"
+                    ? "bg-slate-600"
+                    : "bg-slate-400"
+                  : "bg-gray-400"
               }`}
               onClick={() => setAllowPayerSelectAmount(!allowPayerSelectAmount)}
             >
               <div
                 className={`w-4 h-4 bg-white rounded-full shadow-md transform duration-300 ease-in-out ${
-                  allowPayerSelectAmount ? "translate-x-4" : ""
+                  allowPayerSelectAmount ? "translate-x-2" : ""
                 }`}
               ></div>
             </div>
-          </label>
-
-          <div className="font-medium font-base text-sm text-white mt-12 mb-2 pl-2">
-            {`What's this for?`}
-          </div>
-
-          <div className="relative">
-            <input
-              autoFocus={isConnected}
-              className={cx(
-                styles.mainInput,
-                "border-white rounded-xl border font-medium text-[22px] focus:outline-0 focus:white w-full h-16 mb-3 font-sans text-white bg-transparent pl-4"
-              )}
-              type="text"
-              placeholder="coffee ☕"
-              value={description}
-              onChange={handleDescriptionChange}
-              maxLength={MAX_CHARACTER_LIMIT}
-            />
-            <div className="absolute right-3 bottom-4 text-white text-[8px]">
-              {characterCount}
-            </div>
+            <span
+              className={`ml-2 font-sans text-sm leading-snug ${
+                theme === "dark" ? "text-gray-200" : "text-black"
+              }`}
+            >
+              Any amount
+            </span>
           </div>
         </div>
 
-        <div className="mt-4">
-          <div className="font-medium font-base text-sm text-white mb-2 pl-2">
-            {`Recipient`}
+        {/* Recipient Section with chain name and address recipient */}
+        <div className="mt-2 mb-2">
+          <div
+            className={`font-sans text-base leading-snug font-medium mb-2 pl-2 ${
+              theme === "dark" ? "text-gray-200" : "text-slate-600"
+            }`}
+          >
+            Receive funds on
           </div>
-          <div className="flex justify-between items-center w-full">
-            <div className="flex items-center justify-center flex-1 h-10 border border-white rounded-xl bg-transparent text-white mx-1">
+          <div className="flex items-center w-full">
+            <div
+              className={`flex items-center justify-center basis-1/3 h-12 border rounded bg-transparent font-medium ${
+                theme === "dark"
+                  ? "border-gray-700 text-gray-200"
+                  : "border-black text-slate-600"
+              }`}
+            >
+              {/* Display logo next to chain name */}
+              <Image
+                src={getLogo(chainId)}
+                alt={`${chainId} logo`}
+                className="h-7 w-7 mr-2"
+              />
               <span className="font-medium">{chainId}</span>
             </div>
 
-            <div className="flex items-center justify-between flex-1 h-10 border border-white rounded-xl bg-transparent text-white px-4 mx-1">
+            {/* Space Between */}
+            <div className="mx-1"></div>
+
+            <div
+              className={`flex items-center justify-between basis-2/3 h-12 border rounded bg-transparent px-4 ${
+                theme === "dark"
+                  ? "border-gray-700 text-gray-200 hover:bg-gray-700"
+                  : "border-black text-slate-600 hover:bg-gray-300"
+              }`}
+            >
               {!isEditingRecipient ? (
-                <>
-                  <div className="font-medium">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingRecipient(true)}
+                  className="flex items-center justify-between w-full h-full text-left"
+                >
+                  <span className="font-medium">
                     {hydrated
                       ? `${recipientAddress.slice(
                           0,
-                          4
-                        )}...${recipientAddress.slice(-4)}`
+                          6
+                        )}...${recipientAddress.slice(-6)}`
                       : ""}
-                  </div>
-                  <button
-                    type="button"
-                    className="text-white text-lg"
-                    onClick={() => setIsEditingRecipient(true)}
+                  </span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="ml-3 w-5 h-5 text-gray-500"
                   >
-                    ▼
-                  </button>
-                </>
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
               ) : (
                 <div className="flex items-center w-full">
                   <input
                     type="text"
-                    className="w-full h-8 rounded-md bg-transparent text-white text-center font-medium"
+                    className={`w-full h-8 rounded-md bg-transparent text-center font-medium placeholder-gray ${
+                      theme === "dark" ? "text-gray-200" : "text-slate-600"
+                    }`}
                     value={newAddress}
                     onChange={handleNewAddressChange}
                     placeholder="0x..."
                   />
                   <button
                     type="button"
-                    className="ml-2 text-blue-400"
+                    className={`ml-5 ${
+                      theme === "dark" ? "text-blue-500" : "text-blue-400"
+                    }`}
                     onClick={saveNewAddress}
                   >
-                    Change
+                    Save
                   </button>
                 </div>
               )}
@@ -382,17 +530,67 @@ export default function Payment(props: any) {
           </div>
         </div>
 
+        {/* Request Description Input Section */}
+        <div>
+          <div
+            className={`font-sans text-base leading-snug font-medium mt-2 mb-2 pl-2 ${
+              theme === "dark" ? "text-gray-200" : "text-slate-600"
+            }`}
+          >
+            Message <span className="text-sm font-sans">(optional)</span>
+          </div>
+
+          <div className="relative">
+            <input
+              autoFocus={isConnected}
+              className={cx(
+                styles.mainInput,
+                `border rounded font-medium text-[22px] focus:outline-0 w-full h-12 mb-2 font-sans bg-transparent pl-4 ${
+                  theme === "dark"
+                    ? "text-gray-300 border-gray-700"
+                    : "text-slate-600 border-black"
+                }`
+              )}
+              type="text"
+              placeholder="e.g. pizza 🍕"
+              value={description}
+              onChange={handleDescriptionChange}
+              maxLength={MAX_CHARACTER_LIMIT}
+            />
+            <div
+              className={`absolute right-3 bottom-4 text-[8px] ${
+                theme === "dark" ? "text-gray-400" : "text-slate-600"
+              }`}
+            >
+              {characterCount}
+            </div>
+          </div>
+        </div>
+
+        {/* Create Payment Request with link and qr code*/}
         <button
           type="button"
           className={cx(
-            "flex justify-center items-center border-white border font-base text-lg focus:outline-0 focus:text-slate-700 w-full h-16 rounded-xl transition-all font-bold text-white hover:border-white hover:bg-white hover:text-slate-700 mt-12"
+            "flex justify-center items-center border-black border font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white mt-3"
           )}
+          style={{
+            backgroundColor: buttonColor || "#007BFF",
+            borderColor: buttonColor || "#007BFF",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = buttonColor
+              ? darkenColor(buttonColor, 20) // Adjusts the hover color dynamically
+              : "#0056b3";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = buttonColor || "#007BFF";
+          }}
           onClick={isConnected ? createRequest : openConnectModal}
         >
           {ipfsLoading ? (
             <>
               <svg
-                className="animate-spin rounded-full w-5 h-5 mr-3 bg-white-500"
+                className="animate-spin rounded-full w-5 h-5 mr-3 bg-black-500"
                 viewBox="0 0 24 24"
               >
                 <circle
@@ -408,11 +606,15 @@ export default function Payment(props: any) {
               </svg>
             </>
           ) : isConnected ? (
-            "Create Woop"
+            "Continue"
           ) : (
             "Connect Wallet"
           )}
         </button>
+      </div>
+
+      <div className="mb-2">
+        <ErrorsUi errorMsg={badRequest} errorNtk={""} />
       </div>
 
       {isShareActive && (
@@ -424,7 +626,7 @@ export default function Payment(props: any) {
           <div
             className={cx(
               styles.shareBackground,
-              "z-20 rounded-3xl shadow-xl py-2 px-2 md:w-96 w-full m-5"
+              "z-20 rounded-3xl shadow-xl py-2 px-2 md:w-96 m-5"
             )}
           >
             <Share
@@ -432,11 +634,30 @@ export default function Payment(props: any) {
               path={path}
               amount={amount}
               description={description}
-              token={selectedToken}
+              token={selectedToken.label}
+              network={chainId}
+              address={recipientAddress}
             />
           </div>
         </section>
       )}
+
+      <div className="flex justify-center items-center mt-5 mb-2">
+        <span
+          className={`text-xs mr-1 ${
+            theme === "dark" ? "text-gray-500" : "text-gray-400"
+          }`}
+        >
+          powered by
+        </span>
+        <Image
+          alt="Woop Logo"
+          src="/woop_logo.png"
+          width={45}
+          height={10}
+          className="inline-block"
+        />
+      </div>
     </>
   );
 }

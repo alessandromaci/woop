@@ -21,9 +21,9 @@ interface SEO_Props {
 const defaultProps = {};
 
 const SEO: React.FC<SEO_Props> = (props) => {
-  let { title, description, rrssImg = "https://www.wooppay.xyz/" } = props;
+  let { title, description, rrssImg = "https://www.woop.ink/" } = props;
 
-  let url = "https://www.wooppay.xyz/";
+  let url = "https://www.woop.ink/";
 
   const twitterHandler = "@woop_pay";
 
@@ -31,7 +31,7 @@ const SEO: React.FC<SEO_Props> = (props) => {
     <Head>
       {/* <html lang="en" /> */}
       {props.children}
-      <link rel="icon" href="../icon.svg" />
+      <link rel="icon" href="../woop_logo_64x.svg" />
       {title && buildMetaTitle(title)}
       {description && buildMetaDescription(description)}
       <link rel="canonical" href={url} />

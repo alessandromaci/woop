@@ -1,23 +1,31 @@
 import * as React from "react";
-import { useRouter } from "next/router";
-import Homepage from "../components/Home/Homepage";
-import Layout from "../components/Layout";
-import SEO from "../components/Seo";
+import Layout from "../components/layout/LayoutReceive";
+import Payment from "../components/Payment/Payment";
+import SEO from "../components/common/Seo";
+import { tokensDetails } from "../utils/constants";
 
 export default function Home() {
-  const router = useRouter();
+  const [theme] = React.useState("white");
+  const [logo] = React.useState("");
+  const [buttonColor] = React.useState("#007BFF");
+
+  const [currencies] = React.useState(
+    tokensDetails.map((token) => token.label)
+  );
 
   return (
     <>
       <SEO
-        title="Woop Pay | Create Cryptocurrency Payment Requests"
-        description="Woop Pay is a web application that simplifies cryptocurrency payment requests. You can connect your wallet to create a payment request and share it. Woop Pay supports native tokens ETHER and MATIC, and popular ERC20 tokens such as DAI, USDC, TETHER, WETH, and WBTC. It also supports multiple networks within the Ethereum ecosystem: Mainnet, Goerli, Arbitrum, Optimism, and Polygon."
-        rrssImg="./RRSS.png"
+        title="Woop | Create Cryptocurrency Payment Requests Easily"
+        description="Woop is the easiest way to create, track, and receive cryptocurrency payment requests. Designed for both crypto natives and beginners."
+        rrssImg="./RRSS.jpg"
       />
       <Layout>
-        <Homepage
-          onNavigateToPaymentRequest={() => router.push("/request")}
-          onNavigateToGenerateButton={() => router.push("/customize")}
+        <Payment
+          logo={logo}
+          theme={theme}
+          buttonColor={buttonColor}
+          currencies={currencies}
         />
       </Layout>
     </>

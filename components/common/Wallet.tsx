@@ -4,6 +4,7 @@ export default function Wallet() {
   return (
     <div className="">
       <ConnectButton
+        chainStatus="icon"
         accountStatus={{
           smallScreen: "avatar",
           largeScreen: "full",

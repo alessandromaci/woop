@@ -1,4 +1,4 @@
-import ethLogo from "../public/eth.png";
+import ethLogo from "../public/ethereum.svg";
 import wbtcLogo from "../public/wbtc.png";
 import cbbtcLogo from "../public/cbbtc.png";
 import usdcLogo from "../public/usdc.png";
@@ -115,7 +115,7 @@ export const setEtherscanAddress = (
   if (network == "Arbitrum") {
     return `https://arbiscan.io/address/${address}`;
   } else if (network == "Sepolia") {
-    return `https://goerli.etherscan.io/address/${address}`;
+    return `https://sepolia.etherscan.io/address/${address}`;
   } else if (network == "Optimism") {
     return `https://optimistic.etherscan.io/address/${address}`;
   } else if (network == "Ethereum") {
@@ -127,7 +127,9 @@ export const setEtherscanAddress = (
   }
 };
 
-export const baseUrl: string = "https://wooppay.xyz/woop/";
+export const baseUrl: string = "https://app.woop.ink/woop/";
+
+export const telegramLink: string = "https://t.me/woop_pay";
 
 export const pushUrl: string = "https://staging.push.org/#/inbox";
 
@@ -191,4 +193,12 @@ export const selectTokenDecimals = (token: any): number | undefined => {
   } else {
     return undefined;
   }
+};
+
+export const darkenColor = (color: string, amount: number): string => {
+  const num = parseInt(color.slice(1), 16);
+  const r = Math.max(0, (num >> 16) - amount);
+  const g = Math.max(0, ((num >> 8) & 0x00ff) - amount);
+  const b = Math.max(0, (num & 0x0000ff) - amount);
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
 };
