@@ -134,7 +134,10 @@ export const Share: React.FC<{
               <span className="text-base font-medium font-sans text-gray-600">
                 Amount:{" "}
                 <span className="text-lg font-semibold text-gray-800">
-                  {amount || "N/A"} {token}
+                  {amount === "allowPayerSelectAmount"
+                    ? "any"
+                    : amount || "N/A"}{" "}
+                  {token}
                 </span>
               </span>
               <span className="ml-4 text-base font-medium font-sans text-gray-600">
