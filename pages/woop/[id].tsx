@@ -439,15 +439,6 @@ const Request = () => {
               />
             ) : null}
 
-            {/* CONTENT */}
-            {!badRequest ? (
-              <div className={"mb-2 z-20"}>
-                <ErrorsUi errorMsg={woopBadRequest} errorNtk={woopBadNetwork} />
-              </div>
-            ) : (
-              <></>
-            )}
-
             <Box
               component="form"
               className={cx(
@@ -1025,6 +1016,18 @@ const Request = () => {
                   </div>
                 )}
               </div>
+
+              {!badRequest ? (
+                <div className={"mb-2"}>
+                  <ErrorsUi
+                    errorMsg={woopBadRequest}
+                    errorNtk={woopBadNetwork}
+                  />
+                </div>
+              ) : (
+                <></>
+              )}
+
               <div className="flex justify-center items-center mt-5 mb-3">
                 <span className="text-xs text-gray-500 mr-1">powered by</span>
                 <Image

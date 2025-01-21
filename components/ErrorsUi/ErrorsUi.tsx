@@ -11,24 +11,14 @@ const ErrorsUi: React.FC<IErrorsUiProps> = (props) => {
   const { errorMsg, errorNtk } = props;
 
   return errorMsg ? (
-    <div
-      style={{ backgroundColor: "rgba(255,255,255, 0.3)" }}
-      className="border-white border rounded-xl"
-    >
-      <div className="px-4 py-2 font-base text-sm">
-        {"⚠️ "}
-        {errorMsg}
-      </div>
+    <div className="px-2 font-medium font-sans text-xs text-red-600">
+      {"⚠️ "}
+      {errorMsg}
     </div>
   ) : errorNtk ? (
-    <div
-      style={{ backgroundColor: "rgba(255,255,255, 0.3)" }}
-      className="border-white border rounded-xl"
-    >
-      <div className="px-4 py-2 font-base text-sm">
-        {"⚠️ "}
-        {errorNtk}
-      </div>
+    <div className="px-2 font-medium font-sans text-xs text-red-600">
+      {"⚠️ "}
+      {errorNtk}
     </div>
   ) : null;
 };

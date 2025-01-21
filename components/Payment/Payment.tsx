@@ -270,10 +270,6 @@ export default function Payment({
       )}
 
       <div className="p-2 flex flex-col w-full relative">
-        <div className="absolute left-2 -top-16 mb-2">
-          <ErrorsUi errorMsg={badRequest} errorNtk={""} />
-        </div>
-
         {/*Logo*/}
         <div className="flex justify-center items-center mt-2 mb-2">
           <Image
@@ -596,6 +592,10 @@ export default function Payment({
             "Connect Wallet"
           )}
         </button>
+      </div>
+
+      <div className="mb-2">
+        <ErrorsUi errorMsg={badRequest} errorNtk={""} />
       </div>
 
       {isShareActive && (
