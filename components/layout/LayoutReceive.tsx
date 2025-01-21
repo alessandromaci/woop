@@ -11,7 +11,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <div
         className={cx(
           styles.baseContainer,
-          "min-h-screen w-full flex justify-center items-center"
+          "min-h-screen flex justify-center items-center"
         )}
       >
         {/* Background Section */}
