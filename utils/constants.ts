@@ -1,4 +1,4 @@
-import ethLogo from "../public/eth.png";
+import ethLogo from "../public/ethereum.svg";
 import wbtcLogo from "../public/wbtc.png";
 import cbbtcLogo from "../public/cbbtc.png";
 import usdcLogo from "../public/usdc.png";

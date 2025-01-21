@@ -2,17 +2,14 @@ import * as React from "react";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-
 import { Share } from "../Share/Share";
 import ErrorsUi from "../ErrorsUi/ErrorsUi";
 import MenuItem from "@mui/material/MenuItem";
 import styles from "./payment.module.scss";
 import cx from "classnames";
-
 import { useAccount } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { isAddress } from "viem";
-
 import { uploadIpfs } from "../../utils/ipfs";
 import {
   selectToken,
@@ -23,6 +20,10 @@ import {
 } from "../../utils/constants";
 import mixpanel from "mixpanel-browser";
 import { sendNotificationRequest } from "../../utils/push";
+import ethLogo from "../../public/ethereum.svg";
+import baseLogo from "../../public/base.png";
+import arbitrumLogo from "../../public/arbitrum.png";
+import optimismLogo from "../../public/optimism.png";
 
 export default function Payment({
   theme,
@@ -74,6 +75,18 @@ export default function Payment({
   // start tracking activity
   if (MIXPANEL_ID) {
     mixpanel.init(MIXPANEL_ID);
+  }
+
+  const chainLogos: Record<string, string | any> = {
+    Ethereum: ethLogo,
+    Base: baseLogo,
+    Arbitrum: arbitrumLogo,
+    Optimism: optimismLogo,
+    Sepolia: ethLogo,
+  };
+
+  function getLogo(chainId: string): string | any {
+    return chainLogos[chainId] || "";
   }
 
   //event handlers
@@ -445,6 +458,12 @@ export default function Payment({
                   : "border-black text-slate-600"
               }`}
             >
+              {/* Display logo next to chain name */}
+              <Image
+                src={getLogo(chainId)}
+                alt={`${chainId} logo`}
+                className="h-7 w-7 mr-2"
+              />
               <span className="font-medium">{chainId}</span>
             </div>
 
