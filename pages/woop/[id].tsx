@@ -423,8 +423,8 @@ const Request = () => {
     <>
       <SEO
         title={"Woop | Payment Request"}
-        rrssImg="./RRSS.png"
-        description={"You've been requested to send a payment through Woop"}
+        rrssImg="./RRSS.jpg"
+        description={"You've been requested to send a crypto payment"}
       />
       <Layout>
         {hydrated ? (

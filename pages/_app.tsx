@@ -20,7 +20,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
 const config = getDefaultConfig({
-  appName: "Woop Pay",
+  appName: "Woop",
   projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_ID!,
   chains: [mainnet, sepolia, base, optimism, arbitrum],
   transports: {

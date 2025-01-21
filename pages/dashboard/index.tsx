@@ -53,6 +53,7 @@ const Dashboard = () => {
       <SEO
         title={"Woop | My Woops"}
         description={"View your payments requested and manage them."}
+        rrssImg="./RRSS.jpg"
       />
       <Layout>
         {/* Header Section */}
