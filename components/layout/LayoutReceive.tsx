@@ -2,7 +2,6 @@ import React from "react";
 import Header from "../common/Header";
 import styles from "../../pages/index.module.scss";
 import cx from "classnames";
-import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -24,17 +23,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         ></section>
 
         {/* Main Content */}
-        <Container
-          maxWidth="sm"
-          className="relative z-10 w-full max-w-md p-2 mt-8 md:mt-16 bg-white rounded-lg"
-        >
-          <Box
-            component="form"
-            className={cx(styles.containerBox, "rounded-lg")}
-            style={{ height: "fit-content" }}
-          >
-            {children}
-          </Box>
+        <Container className="relative z-10 max-w-screen-sm md:max-w-screen-md p-2 mt-8 md:mt-16 bg-white rounded-lg">
+          {children}
         </Container>
       </div>
     </>
