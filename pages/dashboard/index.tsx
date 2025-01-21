@@ -124,7 +124,9 @@ const Dashboard = () => {
                     </div>
                     {/* Content */}
                     <div className="flex flex-col flex-1">
-                      <p className="font-bold text-lg mb-1">{description}</p>
+                      <p className="font-bold text-lg mb-1">
+                        {description ? description : "new request"}
+                      </p>
                       <div className="flex items-center text-sm text-slate-500">
                         <button
                           type="button"
@@ -138,7 +140,8 @@ const Dashboard = () => {
                             setIsShareActive(true);
                           }}
                         >
-                          {amount} {tokenName} on {networkName}
+                          {amount == "allowPayerSelectAmount" ? "any" : amount}{" "}
+                          {tokenName} on {networkName}
                         </button>
                       </div>
                     </div>
