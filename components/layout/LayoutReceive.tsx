@@ -23,7 +23,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         ></section>
 
         {/* Main Content */}
-        <Container className="relative z-10 max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg p-2 mt-8 md:mt-16 bg-white rounded-lg">
+        <Container className="relative z-10 max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl p-2 mt-8 md:mt-16 bg-white rounded-lg">
           {children}
         </Container>
       </div>
