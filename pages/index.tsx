@@ -1,5 +1,5 @@
 import * as React from "react";
-import Layout from "../components/layout/Layout";
+import Layout from "../components/layout/LayoutReceive";
 import Payment from "../components/Payment/Payment";
 import SEO from "../components/common/Seo";
 import { tokensDetails } from "../utils/constants";

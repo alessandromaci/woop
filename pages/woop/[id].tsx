@@ -31,7 +31,7 @@ import cx from "classnames";
 import Link from "next/link";
 import ErrorsUi from "../../components/ErrorsUi/ErrorsUi";
 import SEO from "../../components/common/Seo";
-import Layout from "../../components/layout/Layout";
+import Layout from "../../components/layout/LayoutPayment";
 
 interface Request {
   version: string;
