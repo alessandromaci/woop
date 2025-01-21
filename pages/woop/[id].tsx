@@ -355,7 +355,11 @@ const Request = () => {
             setTokenAddress(tokenAddress);
 
             // Calculate the amount to pay in tokens
-            const fiatValue = parseFloat(request?.value || "0"); // Ensure fiatValue is a number
+            const fiatValue = parseFloat(
+              request?.value == "allowPayerSelectAmount"
+                ? "1"
+                : request?.value || ""
+            ); // Ensure fiatValue is a number
             const amountToPayInToken = fiatValue / exchangeRate;
             const amountToPayInTokenFixed = amountToPayInToken.toFixed(4);
 
