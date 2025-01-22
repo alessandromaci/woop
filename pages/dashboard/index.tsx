@@ -60,7 +60,7 @@ const Dashboard = () => {
 
   const formatDate = (dateString: string) => {
     const [day, month] = dateString.split(" ");
-    return `${day} ${month}`;
+    return `${day} ${month.slice(0, 3)}`;
   };
 
   return (

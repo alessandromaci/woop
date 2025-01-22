@@ -155,7 +155,7 @@ const ConfigMenu: React.FC<ConfigMenuProps> = ({
               setLogo(URL.createObjectURL(e.target.files[0]));
             }
           }}
-          className="block w-full text-sm text-gray-500 border border-gray-300 rounded-lg p-2 cursor-pointer"
+          className="block w-full h-10 text-sm text-gray-500 border border-gray-300 rounded-lg p-2 cursor-pointer"
         />
       </div>
 
@@ -207,7 +207,7 @@ Telegram: ${leadDetails.telegram}
 Thanks!`
             )}`;
           }}
-          className="space-y-4"
+          className="space-y-3"
         >
           <div className="flex gap-3">
             {/* Company Name Input */}
@@ -231,7 +231,7 @@ Thanks!`
           {/* Deploy Button */}
           <button
             type="submit"
-            className="w-full mt-4 bg-blue-500 text-white text-sm px-4 py-2 rounded-full font-sans font-medium hover:bg-blue-600"
+            className="w-full bg-blue-500 text-white text-sm py-2 rounded-full font-sans font-medium hover:bg-blue-600"
           >
             Deploy
           </button>
