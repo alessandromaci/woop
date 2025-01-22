@@ -428,12 +428,7 @@ const Request = () => {
       />
       <Layout>
         {hydrated ? (
-          <div
-            className={cx(
-              styles.baseContainer,
-              "h-screen w-full flex justify-center items-center"
-            )}
-          >
+          <div className={"w-full flex justify-center items-center"}>
             {isSuccess || isSuccessNative ? (
               <Confetti
                 colors={colors}
@@ -445,16 +440,13 @@ const Request = () => {
 
             <Box
               component="form"
-              className={cx(
-                styles.containerBox,
-                "rounded shadow-md w-full relative z-20"
-              )}
+              className={cx(styles.containerBox, "rounded z-20")}
             >
               <div className="justify-items-left font-base text-slate-600">
                 <div
                   className={cx(
                     styles.topContainer,
-                    "mb-2 pl-4 pr-4 pt-4 pb-3 w-full flex justify-between items-center"
+                    "pl-4 pr-4 pt-2 pb-2 mb-2 w-full flex justify-between items-center"
                   )}
                 >
                   <p className="font-base font-bold text-xl">
@@ -1032,7 +1024,7 @@ const Request = () => {
                 <></>
               )}
 
-              <div className="flex justify-center items-center mt-5 mb-3">
+              <div className="flex justify-center items-center mt-5">
                 <span className="text-xs text-gray-500 mr-1">powered by</span>
                 <Image
                   alt="Woop Logo"

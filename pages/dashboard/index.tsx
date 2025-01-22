@@ -77,9 +77,6 @@ const Dashboard = () => {
               Track
             </div>
           </div>
-
-          {/* Title */}
-          <div className="text-left text-lg font-bold">Recent Woops</div>
         </div>
 
         {/* Main Dashboard Section */}
