@@ -1,6 +1,6 @@
 import * as React from "react";
-import { retrieveNotifications } from "../../utils/push";
-import { useAccount } from "wagmi";
+import { retrieveNotifications, optIn } from "../../utils/push";
+import { useAccount, useWalletClient } from "wagmi";
 import styles from "./dashboard.module.scss";
 import cx from "classnames";
 import Box from "@mui/material/Box";
@@ -19,8 +19,10 @@ const Dashboard = () => {
     React.useState<string>("");
   const [currentAmount, setCurrentAmount] = React.useState<string>("");
   const [currentToken, setCurrentToken] = React.useState<string>("");
-  const { address } = useAccount();
-
+  const { address, chain } = useAccount();
+  const { data: signer } = useWalletClient();
+  const [chainId, setChainId] = React.useState<string>("");
+  const [isSubscribed, setIsSubscribed] = React.useState<boolean>(false);
   const [isShareActive, setIsShareActive] = React.useState<boolean>(false);
   const [notifications, setNotifications] = React.useState<any>([]);
 
@@ -33,6 +35,13 @@ const Dashboard = () => {
     (notification: any) => notification?.title === "Woop Payment Requested"
   );
 
+  const activateNotifications = async () => {
+    const res: any = await optIn(address, signer);
+    if (res) {
+      setIsSubscribed(true);
+    }
+  };
+
   React.useEffect(() => {
     retrieveData();
   }, []);
@@ -42,6 +51,12 @@ const Dashboard = () => {
       retrieveData();
     }
   }, [address]);
+
+  React.useEffect(() => {
+    if (chain) {
+      setChainId(chain.name);
+    }
+  }, [chain]);
 
   const formatDate = (dateString: string) => {
     const [day, month] = dateString.split(" ");
@@ -87,9 +102,31 @@ const Dashboard = () => {
           }}
         >
           {filteredNotifications.length === 0 ? (
-            <p className="m-2 text-center font-sans font-base">
-              😞 No recent woops
-            </p>
+            <div className="flex flex-col items-center justify-center text-center p-4">
+              <p className="m-2 font-sans font-base text-gray-600">
+                😞 You don’t have any recent Woops yet.
+              </p>
+              <p className="mb-4 font-sans text-sm text-gray-600">
+                Create your first Woop by going to the{" "}
+                <Link href="/" className="text-blue-600 underline">
+                  home page
+                </Link>{" "}
+                or enable the dashboard to track your received payments.
+              </p>
+              {chainId == "Ethereum" ? (
+                <button
+                  type="button"
+                  onClick={activateNotifications}
+                  className="px-4 py-2 bg-blue-500 text-white font-bold rounded-md hover:bg-blue-600 transition-all"
+                >
+                  📢 Enable Dashboard
+                </button>
+              ) : (
+                <p className="text-sm text-gray-500">
+                  Please switch to the Mainnet network to enable the dashboard.
+                </p>
+              )}
+            </div>
           ) : (
             notifications
               .filter(
