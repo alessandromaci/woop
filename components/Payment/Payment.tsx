@@ -452,7 +452,7 @@ export default function Payment({
           </div>
           <div className="flex items-center w-full">
             <div
-              className={`flex items-center justify-center basis-1/3 h-12 border rounded bg-transparent font-medium ${
+              className={`flex items-center justify-center basis-2/5 h-12 border rounded bg-transparent font-medium ${
                 theme === "dark"
                   ? "border-gray-700 text-gray-200"
                   : "border-black text-slate-600"
@@ -471,7 +471,7 @@ export default function Payment({
             <div className="mx-1"></div>
 
             <div
-              className={`flex items-center justify-between basis-2/3 h-12 border rounded bg-transparent px-4 ${
+              className={`flex items-center justify-between basis-3/5 h-12 border rounded bg-transparent px-4 ${
                 theme === "dark"
                   ? "border-gray-700 text-gray-200 hover:bg-gray-700"
                   : "border-black text-slate-600 hover:bg-gray-300"

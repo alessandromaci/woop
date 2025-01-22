@@ -94,6 +94,9 @@ const Dashboard = () => {
           </div>
         </div>
 
+        <p className="ml-2 text-left font-sans font-medium">My woops</p>
+        <hr className="my-1 border-2 border-gray-400" />
+
         {/* Main Dashboard Section */}
         <div
           className="overflow-y-scroll px-2"

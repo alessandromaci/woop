@@ -53,12 +53,12 @@ const ConfigMenu: React.FC<ConfigMenuProps> = ({
       <hr className="my-4" />
 
       {/* Wallet */}
-      <div className="mb-6">
+      <div className="mb-3">
         <Wallet />
       </div>
 
       {/* Light/Dark Mode Selection */}
-      <div className="mb-6">
+      <div className="mb-3">
         <h3 className="text-sm font-medium mb-2">Display Mode</h3>
         <div className="flex gap-2">
           {/* Light Mode Button */}
@@ -96,7 +96,7 @@ const ConfigMenu: React.FC<ConfigMenuProps> = ({
       </div>
 
       {/* Colour Selection */}
-      <div className="mb-6">
+      <div className="mb-3">
         <h3 className="text-sm font-medium mb-2">Color Theme</h3>
         <div className="flex gap-2">
           {/* Predefined Color Options */}
@@ -145,7 +145,7 @@ const ConfigMenu: React.FC<ConfigMenuProps> = ({
       </div>
 
       {/* Logo Upload */}
-      <div className="mb-6">
+      <div className="mb-3">
         <h3 className="text-sm font-medium mb-2">Logo</h3>
         <input
           type="file"
@@ -187,7 +187,7 @@ const ConfigMenu: React.FC<ConfigMenuProps> = ({
         </div>
       </div>
 
-      <hr className="my-4" />
+      <hr className="my-3" />
       {/* Deploy Section */}
       <div>
         <form
