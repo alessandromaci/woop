@@ -57,36 +57,36 @@ const Dashboard = () => {
       />
       <Layout>
         {/* Header Section */}
-        <div className="flex flex-col items-center">
-          {/* Logo */}
-          <div className="flex justify-center items-center mt-4 mb-4">
+        <div className="p-2 flex flex-col w-full">
+          {/*Logo*/}
+          <div className="flex justify-center items-center mt-2 mb-2">
             <Image alt="Logo" src={"/woop_logo.png"} width={70} height={50} />
           </div>
 
           {/* Menu Selection */}
-          <div className="flex items-center justify-center mb-4">
+          <div className="flex items-center justify-center mt-2 mb-3 border border-gray-600 rounded-md overflow-hidden">
             {/* Receive Button */}
             <Link
               href="/"
-              className="flex justify-center items-center font-sans text-sm leading-snug font-medium w-52 h-7 text-black border border-gray-600 rounded-l-md hover:bg-gray-300"
+              className="flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 text-black hover:bg-gray-300 transition-all"
             >
               Receive
             </Link>
             {/* Track Button */}
-            <div className="flex justify-center items-center font-sans text-sm leading-snug font-medium w-52 h-7 text-white bg-[#007BFF] border border-gray-600 rounded-r-md">
+            <div className="flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 text-white bg-[#007BFF]">
               Track
             </div>
           </div>
 
           {/* Title */}
-          <div className="text-center text-xl font-bold mb-2">Recent Woops</div>
+          <div className="text-left text-lg font-bold">Recent Woops</div>
         </div>
 
         {/* Main Dashboard Section */}
         <div
-          className="overflow-y-scroll px-3"
+          className="overflow-y-scroll px-2"
           style={{
-            height: `calc(100vh - 280px)`,
+            height: `calc(100vh - 300px)`,
           }}
         >
           {filteredNotifications.length === 0 ? (

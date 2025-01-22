@@ -282,7 +282,7 @@ export default function Payment({
         </section>
       )}
 
-      <div className="p-3 w-full">
+      <div className="p-2 flex flex-col w-full">
         {/*Logo*/}
         <div className="flex justify-center items-center mt-2 mb-2">
           <Image

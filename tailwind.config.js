@@ -10,10 +10,8 @@ module.exports = {
         base: ["Work Sans", "ui-sans-serif", "system-ui"],
       },
       screens: {
-        sm: "380px",
-        md: "450px",
-        lg: "450px",
-        xl: "450px",
+        mobile: "380px",
+        tablet: "640px",
       },
     },
   },
