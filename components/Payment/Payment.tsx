@@ -24,6 +24,7 @@ import ethLogo from "../../public/ethereum.svg";
 import baseLogo from "../../public/base.png";
 import arbitrumLogo from "../../public/arbitrum.png";
 import optimismLogo from "../../public/optimism.png";
+import allChainsLogo from "../../public/allChains.png";
 
 export default function Payment({
   theme,
@@ -53,6 +54,7 @@ export default function Payment({
   const [path, setPath] = React.useState<string>("");
   const [ipfsLoading, setIpfsLoading] = React.useState<boolean>(false);
   const [chainId, setChainId] = React.useState<string>("");
+  const [isEditingChain, setIsEditingChain] = React.useState(false);
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
   const [allowPayerSelectAmount, setAllowPayerSelectAmount] =
     React.useState<boolean>(false);
@@ -79,19 +81,66 @@ export default function Payment({
 
   const chainLogos: Record<string, string | any> = {
     Ethereum: ethLogo,
-    Base: baseLogo,
-    Arbitrum: arbitrumLogo,
-    Optimism: optimismLogo,
     Sepolia: ethLogo,
+    Base: baseLogo,
+    Optimism: optimismLogo,
+    Arbitrum: arbitrumLogo,
+    Any_Chain: allChainsLogo,
   };
 
   function getLogo(chainId: string): string | any {
     return chainLogos[chainId] || "";
   }
 
+  const chainSelectionMenu = (
+    <section className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen z-30">
+      <div
+        className={`fixed top-0 left-0 w-screen h-screen ${
+          theme === "dark" ? "bg-slate-900" : "bg-slate-100"
+        } opacity-30`}
+      ></div>
+      <div
+        className={`z-20 ${
+          theme === "dark" ? "bg-gray-800" : "bg-white"
+        } rounded shadow-xl py-4 px-6 md:w-80 w-full m-5`}
+      >
+        <p
+          className={`font-base font-semibold ${
+            theme === "dark" ? "text-gray-200" : "text-slate-700"
+          } pb-3 border-b mb-2`}
+        >
+          Select chain
+        </p>
+        {Object.keys(chainLogos).map((chainName) => (
+          <button
+            key={chainName}
+            type="button"
+            className={`flex items-center w-full px-4 py-3 hover:bg-gray-200 ${
+              theme === "dark" ? "hover:bg-gray-700" : ""
+            }`}
+            onClick={() => handleChainChange(chainName)}
+          >
+            <Image
+              src={getLogo(chainName)}
+              alt={`${chainName} logo`}
+              className="h-7 w-7 mr-2"
+            />
+            <span className="font-medium">{chainName}</span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+
   //event handlers
   const handleAmountChange = (event: any) => {
     setAmount(event.target.value as string);
+  };
+
+  // Function to handle chain selection
+  const handleChainChange = (selectedChain: string) => {
+    setChainId(selectedChain);
+    setIsEditingChain(false);
   };
 
   const handleDescriptionChange = (event: any) => {
@@ -442,130 +491,158 @@ export default function Payment({
         </div>
 
         {/* Recipient Section with chain name and address recipient */}
-        <div className="mt-2 mb-2">
-          <div
-            className={`font-sans text-base leading-snug font-medium mb-2 pl-2 ${
-              theme === "dark" ? "text-gray-200" : "text-slate-600"
-            }`}
-          >
-            Receive funds on
-          </div>
-          <div className="flex items-center w-full">
+        {isConnected ? (
+          <div className="mt-2 mb-2">
             <div
-              className={`flex items-center justify-center basis-2/5 h-12 border rounded bg-transparent font-medium ${
-                theme === "dark"
-                  ? "border-gray-700 text-gray-200"
-                  : "border-black text-slate-600"
+              className={`font-sans text-base leading-snug font-medium mb-2 pl-2 ${
+                theme === "dark" ? "text-gray-200" : "text-slate-600"
               }`}
             >
-              {/* Display logo next to chain name */}
-              <Image
-                src={getLogo(chainId)}
-                alt={`${chainId} logo`}
-                className="h-7 w-7 mr-2"
-              />
-              <span className="font-medium">{chainId}</span>
+              Receive funds on
             </div>
-
-            {/* Space Between */}
-            <div className="mx-1"></div>
-
-            <div
-              className={`flex items-center justify-between basis-3/5 h-12 border rounded bg-transparent px-4 ${
-                theme === "dark"
-                  ? "border-gray-700 text-gray-200 hover:bg-gray-700"
-                  : "border-black text-slate-600 hover:bg-gray-300"
-              }`}
-            >
-              {!isEditingRecipient ? (
-                <button
-                  type="button"
-                  onClick={() => setIsEditingRecipient(true)}
-                  className="flex items-center justify-between w-full h-full text-left"
-                >
-                  <span className="font-medium">
-                    {hydrated
-                      ? `${recipientAddress.slice(
-                          0,
-                          6
-                        )}...${recipientAddress.slice(-6)}`
-                      : ""}
-                  </span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="ml-3 w-5 h-5 text-gray-500"
-                  >
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                  </svg>
-                </button>
-              ) : (
-                <div className="flex items-center w-full">
-                  <input
-                    type="text"
-                    className={`w-full h-8 rounded-md bg-transparent text-center font-medium placeholder-gray ${
-                      theme === "dark" ? "text-gray-200" : "text-slate-600"
-                    }`}
-                    value={newAddress}
-                    onChange={handleNewAddressChange}
-                    placeholder="0x..."
+            <div className="relative flex items-center w-full">
+              {/* Chain */}
+              <div
+                className={`flex items-center justify-between text-left basis-1/2 h-12 border rounded bg-transparent font-medium cursor-pointer px-2 ${
+                  theme === "dark"
+                    ? "border-gray-700 text-gray-200 hover:bg-gray-700"
+                    : "border-black text-slate-600 hover:bg-gray-300"
+                }`}
+                onClick={() => setIsEditingChain(!isEditingChain)}
+              >
+                <div className="flex items-center">
+                  {/* Display logo next to chain name */}
+                  <Image
+                    src={getLogo(chainId)}
+                    alt={`${chainId} logo`}
+                    className="h-7 w-7 mr-2"
                   />
+                  <span className="font-medium">
+                    {chainId || "Select Chain"}
+                  </span>
+                </div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="ml-1 w-5 h-5 text-gray-500"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+              {isEditingChain && chainSelectionMenu}
+
+              {/* Space Between */}
+              <div className="mx-1"></div>
+
+              {/* Address */}
+              <div
+                className={`flex items-center justify-between basis-1/2 h-12 border rounded bg-transparent px-2 ${
+                  theme === "dark"
+                    ? "border-gray-700 text-gray-200 hover:bg-gray-700"
+                    : "border-black text-slate-600 hover:bg-gray-300"
+                }`}
+              >
+                {!isEditingRecipient ? (
                   <button
                     type="button"
-                    className={`ml-5 ${
-                      theme === "dark" ? "text-blue-500" : "text-blue-400"
-                    }`}
-                    onClick={saveNewAddress}
+                    onClick={() => setIsEditingRecipient(true)}
+                    className="flex items-center justify-between w-full h-full text-left"
                   >
-                    Save
+                    <span className="font-medium">
+                      {hydrated
+                        ? `${recipientAddress.slice(
+                            0,
+                            5
+                          )}...${recipientAddress.slice(-5)}`
+                        : ""}
+                    </span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="ml-3 w-5 h-5 text-gray-500"
+                    >
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
                   </button>
-                </div>
-              )}
+                ) : (
+                  <div className="flex items-center w-full">
+                    <input
+                      type="text"
+                      className={`w-full h-8 rounded-md bg-transparent text-center font-medium placeholder-gray ${
+                        theme === "dark" ? "text-gray-200" : "text-slate-600"
+                      }`}
+                      value={newAddress}
+                      onChange={handleNewAddressChange}
+                      placeholder="0x..."
+                    />
+                    <button
+                      type="button"
+                      className={`ml-5 ${
+                        theme === "dark" ? "text-blue-500" : "text-blue-400"
+                      }`}
+                      onClick={saveNewAddress}
+                    >
+                      Save
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <></>
+        )}
 
         {/* Request Description Input Section */}
-        <div>
-          <div
-            className={`font-sans text-base leading-snug font-medium mt-2 mb-2 pl-2 ${
-              theme === "dark" ? "text-gray-200" : "text-slate-600"
-            }`}
-          >
-            Message <span className="text-sm font-sans">(optional)</span>
-          </div>
-
-          <div className="relative">
-            <input
-              autoFocus={isConnected}
-              className={cx(
-                styles.mainInput,
-                `border rounded font-medium text-[22px] focus:outline-0 w-full h-12 mb-2 font-sans bg-transparent pl-4 ${
-                  theme === "dark"
-                    ? "text-gray-300 border-gray-700"
-                    : "text-slate-600 border-black"
-                }`
-              )}
-              type="text"
-              placeholder="e.g. pizza 🍕"
-              value={description}
-              onChange={handleDescriptionChange}
-              maxLength={MAX_CHARACTER_LIMIT}
-            />
+        {isConnected ? (
+          <div>
             <div
-              className={`absolute right-3 bottom-4 text-[8px] ${
-                theme === "dark" ? "text-gray-400" : "text-slate-600"
+              className={`font-sans text-base leading-snug font-medium mt-2 mb-2 pl-2 ${
+                theme === "dark" ? "text-gray-200" : "text-slate-600"
               }`}
             >
-              {characterCount}
+              Message <span className="text-sm font-sans">(optional)</span>
+            </div>
+
+            <div className="relative">
+              <input
+                autoFocus={isConnected}
+                className={cx(
+                  styles.mainInput,
+                  `border rounded font-medium text-[22px] focus:outline-0 w-full h-12 mb-2 font-sans bg-transparent pl-4 ${
+                    theme === "dark"
+                      ? "text-gray-300 border-gray-700"
+                      : "text-slate-600 border-black"
+                  }`
+                )}
+                type="text"
+                placeholder="e.g. pizza 🍕"
+                value={description}
+                onChange={handleDescriptionChange}
+                maxLength={MAX_CHARACTER_LIMIT}
+              />
+              <div
+                className={`absolute right-3 bottom-4 text-[8px] ${
+                  theme === "dark" ? "text-gray-400" : "text-slate-600"
+                }`}
+              >
+                {characterCount}
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <></>
+        )}
 
         {/* Create Payment Request with link and qr code*/}
         <button
@@ -611,6 +688,15 @@ export default function Payment({
             "Connect Wallet"
           )}
         </button>
+
+        {!isConnected && !isEditingRecipient && (
+          <div
+            className="m-2 text-xs font-sans font-medium text-slate-700 text-center cursor-pointer underline"
+            onClick={() => setIsEditingRecipient(true)}
+          >
+            Enter Address Manually
+          </div>
+        )}
       </div>
 
       <div className="mb-2">
