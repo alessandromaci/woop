@@ -128,7 +128,9 @@ export default function Payment({
               alt={`${chainName} logo`}
               className="h-7 w-7 mr-2"
             />
-            <span className="font-medium">{chainName}</span>
+            <span className="font-medium">
+              {chainName === "Any_Chain" ? "Any Network" : chainName}
+            </span>
           </button>
         ))}
       </div>
@@ -148,6 +150,7 @@ export default function Payment({
       Optimism: { id: 10, name: "OP Mainnet" },
       Arbitrum: { id: 42161, name: "Arbitrum One" },
       Sepolia: { id: 11155111, name: "Sepolia" },
+      Any_Chain: { id: 0, name: "Any" },
     };
 
     const selectedChain = chainData[selectedChainName];
@@ -540,7 +543,11 @@ export default function Payment({
                     className="h-7 w-7 mr-2"
                   />
                   <span className="font-medium">
-                    {chainId || "Select Network"}
+                    {!chainId
+                      ? "Select Network"
+                      : chainId === "Any_Chain"
+                      ? "Any Network"
+                      : chainId}
                   </span>
                 </div>
                 <svg
