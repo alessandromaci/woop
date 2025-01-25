@@ -64,8 +64,11 @@ export default function Payment({
   );
   const [isEditingRecipient, setIsEditingRecipient] =
     React.useState<boolean>(false);
+  const [isEditingManualRequest, setIsEditingManualRequest] =
+    React.useState<boolean>(false);
   const [newAddress, setNewAddress] = React.useState<string>(address || "");
   const { chain } = useAccount();
+  const [recipientChain, setRecipientChain] = React.useState<any>(chain || "");
   const { openConnectModal } = useConnectModal();
   const [selectorVisibility, setSelectorVisibility] =
     React.useState<boolean>(false);
@@ -138,9 +141,27 @@ export default function Payment({
   };
 
   // Function to handle chain selection
-  const handleChainChange = (selectedChain: string) => {
-    setChainId(selectedChain);
-    setIsEditingChain(false);
+  const handleChainChange = (selectedChainName: string) => {
+    const chainData: Record<string, { id: number; name: string }> = {
+      Ethereum: { id: 1, name: "Ethereum" },
+      Base: { id: 8453, name: "Base" },
+      Optimism: { id: 10, name: "OP Mainnet" },
+      Arbitrum: { id: 42161, name: "Arbitrum One" },
+      Sepolia: { id: 11155111, name: "Sepolia" },
+    };
+
+    const selectedChain = chainData[selectedChainName];
+
+    if (selectedChain) {
+      setChainId(selectedChainName);
+      setRecipientChain({
+        id: selectedChain.id,
+        name: selectedChain.name,
+      });
+      setIsEditingChain(false);
+    } else {
+      setBadRequest("Invalid chain selected");
+    }
   };
 
   const handleDescriptionChange = (event: any) => {
@@ -167,7 +188,7 @@ export default function Payment({
     setNewAddress(event.target.value);
   };
 
-  //main functions
+  //Create woop request and save it on IPFS
   const createRequest = async () => {
     setBadRequest("");
 
@@ -186,8 +207,8 @@ export default function Payment({
           value: amount,
           description: description,
           decimals: selectTokenDecimals(selectedToken.label),
-          network: chain?.id,
-          networkName: chain?.name,
+          network: recipientChain.id,
+          networkName: recipientChain.name,
           tokenName: selectedToken.label,
           tokenAddress: selectToken(selectedToken.label, chain?.name),
         };
@@ -252,6 +273,7 @@ export default function Payment({
     if (chain) {
       setSelectedToken(tokensDetails[0]);
       setChainId(chain.name);
+      setRecipientChain(chain);
     }
   }, [chain]);
 
@@ -491,7 +513,7 @@ export default function Payment({
         </div>
 
         {/* Recipient Section with chain name and address recipient */}
-        {isConnected ? (
+        {(isConnected || isEditingManualRequest) && (
           <div className="mt-2 mb-2">
             <div
               className={`font-sans text-base leading-snug font-medium mb-2 pl-2 ${
@@ -513,12 +535,12 @@ export default function Payment({
                 <div className="flex items-center">
                   {/* Display logo next to chain name */}
                   <Image
-                    src={getLogo(chainId)}
+                    src={getLogo(chainId) || allChainsLogo}
                     alt={`${chainId} logo`}
                     className="h-7 w-7 mr-2"
                   />
                   <span className="font-medium">
-                    {chainId || "Select Chain"}
+                    {chainId || "Select Network"}
                   </span>
                 </div>
                 <svg
@@ -583,7 +605,7 @@ export default function Payment({
                       }`}
                       value={newAddress}
                       onChange={handleNewAddressChange}
-                      placeholder="0x..."
+                      placeholder="0x7bAc7a7..."
                     />
                     <button
                       type="button"
@@ -599,12 +621,10 @@ export default function Payment({
               </div>
             </div>
           </div>
-        ) : (
-          <></>
         )}
 
         {/* Request Description Input Section */}
-        {isConnected ? (
+        {(isConnected || isEditingManualRequest) && (
           <div>
             <div
               className={`font-sans text-base leading-snug font-medium mt-2 mb-2 pl-2 ${
@@ -640,8 +660,6 @@ export default function Payment({
               </div>
             </div>
           </div>
-        ) : (
-          <></>
         )}
 
         {/* Create Payment Request with link and qr code*/}
@@ -662,7 +680,15 @@ export default function Payment({
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = buttonColor || "#007BFF";
           }}
-          onClick={isConnected ? createRequest : openConnectModal}
+          onClick={() => {
+            if (isConnected || isEditingManualRequest) {
+              createRequest();
+            } else if (openConnectModal) {
+              openConnectModal();
+            } else {
+              setBadRequest("Error connecting wallet. Try again.");
+            }
+          }}
         >
           {ipfsLoading ? (
             <>
@@ -682,17 +708,17 @@ export default function Payment({
                 />
               </svg>
             </>
-          ) : isConnected ? (
+          ) : isConnected || isEditingManualRequest ? (
             "Continue"
           ) : (
             "Connect Wallet"
           )}
         </button>
 
-        {!isConnected && !isEditingRecipient && (
+        {!isConnected && !isEditingManualRequest && (
           <div
             className="m-2 text-xs font-sans font-medium text-slate-700 text-center cursor-pointer underline"
-            onClick={() => setIsEditingRecipient(true)}
+            onClick={() => setIsEditingManualRequest(true)}
           >
             Enter Address Manually
           </div>
