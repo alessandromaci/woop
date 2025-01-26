@@ -109,10 +109,20 @@ export const Share: React.FC<{
           <div className="mb-1">
             <div className="flex items-center space-x-2">
               {/* Title */}
-              <h3 className="text-2xl font-extrabold font-sans tracking-wide text-gray-800">
+              <h3
+                className={`text-2xl font-extrabold font-sans tracking-wide text-gray-800 break-words ${
+                  description && description.length > 30 ? "w-3/4" : "w-auto"
+                }`}
+              >
                 {description || "Receive Details"}
               </h3>
-              <span className="bg-blue-500 text-white text-sm px-2 py-0.5 rounded-full font-sans font-medium">
+
+              {/* Badge */}
+              <span
+                className={`${
+                  description && description.length > 30 ? "ml-auto" : ""
+                } bg-blue-500 text-white text-sm px-2 py-0.5 rounded-full font-sans font-medium whitespace-nowrap`}
+              >
                 {notifications.filter(
                   (notification: any) =>
                     notification?.title === "Woop Payment Received" &&
@@ -143,7 +153,7 @@ export const Share: React.FC<{
               <span className="ml-4 text-base font-medium font-sans text-gray-600">
                 Network:{" "}
                 <span className="text-lg font-semibold text-gray-800">
-                  {network || "N/A"}
+                  {network === "Any_Chain" ? "Any" : network}
                 </span>
               </span>
             </div>

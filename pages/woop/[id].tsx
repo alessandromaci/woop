@@ -76,6 +76,7 @@ const Request = () => {
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
   const [selectorVisibility, setSelectorVisibility] =
     React.useState<boolean>(false);
+  const [copiedReceipt, setCopiedReceipt] = React.useState<boolean>(false);
   const router = useRouter();
   const { id } = router.query;
   const { isConnected: connected, address } = useAccount();
@@ -167,7 +168,12 @@ const Request = () => {
   };
 
   const checkAndUpdateNetwork = (result: any) => {
-    if (result?.network != chain?.id) {
+    if (result?.networkName === "Any") {
+      // If "Any" is selected, don't check for network mismatch
+      setWrongNetwork(false);
+      setWoopBadNetwork("");
+    } else if (result?.network !== chain?.id) {
+      // Mismatch logic applies only when networkName is not "Any"
       setWrongNetwork(true);
       setWoopBadNetwork(
         `Wrong network. Please connect to ${result?.networkName}`
@@ -449,12 +455,12 @@ const Request = () => {
                     "pl-4 pr-4 pt-2 pb-2 mb-2 w-full flex justify-between items-center"
                   )}
                 >
-                  <p className="font-base font-bold text-xl">
+                  <p className="font-base font-bold text-2xl">
                     {badRequest
                       ? "No Woop to pay here"
                       : isNativeTx
                       ? isSuccessNative
-                        ? "Payment sent!"
+                        ? "Paid successfully!"
                         : description
                         ? `${
                             description.charAt(0).toUpperCase() +
@@ -462,7 +468,7 @@ const Request = () => {
                           }`
                         : "Payment requested!"
                       : isSuccess
-                      ? "Payment sent!"
+                      ? "Paid successfully!"
                       : description
                       ? `${
                           description.charAt(0).toUpperCase() +
@@ -517,7 +523,8 @@ const Request = () => {
                         {request?.value == "allowPayerSelectAmount"
                           ? "..."
                           : request?.value}{" "}
-                        {request?.tokenName}
+                        {request?.tokenName}{" "}
+                        {<p className="ml-1 text-lg">on {networkName}</p>}
                       </div>
                     </>
 
@@ -535,7 +542,7 @@ const Request = () => {
                   <>
                     <div className="px-4 pb-4 pt-1">
                       <div className="mt-3 text-center w-full my-6">
-                        <p className="font-bold md:text-5xl text-4xl mb-2">
+                        <p className="font-bold text-5xl mb-2">
                           {`${
                             isFiatTx
                               ? request?.value
@@ -544,14 +551,8 @@ const Request = () => {
                               : Number(amount) * 10 ** 12
                           } ${request?.tokenName}`}
                         </p>
-                        <p className="font-medium font-base text-sm text-slate-600 mb-2 text-center">
-                          <a
-                            className="underline underline-offset-4 mr-1"
-                            href={`${setEtherscanBase(networkName, hash)}`}
-                          >
-                            sent
-                          </a>
-                          <span className="mr-1">{"to"}</span>
+                        <p className="font-medium font-base text-base text-slate-600 mb-2 text-center">
+                          <span className="mr-1">{"To:"}</span>
                           {ensName ? (
                             <a>
                               <span className="mr-1 font-bold">{ensName}</span>
@@ -563,10 +564,26 @@ const Request = () => {
                             </span>
                           )}
                         </p>
+                        <p className="font-medium font-base text-base text-slate-600 mb-2 text-center">
+                          <span className="mr-1">{"Receipt:"}</span>
+                          <button
+                            className="underline underline-offset-4 mr-1 text-slate-600"
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(
+                                `${setEtherscanBase(networkName, hashNative)}`
+                              );
+                              setCopiedReceipt(true); // Set the copied state to true
+                              setTimeout(() => setCopiedReceipt(false), 2000); // Reset after 2 seconds
+                            }}
+                          >
+                            {copiedReceipt ? "copied" : "copy link"}
+                          </button>
+                        </p>
                       </div>
                       <Link href="/">
                         <button className="flex justify-center items-center border-black border font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white mt-3 bg-[#007BFF] hover:bg-[#0067EB]">
-                          Close
+                          New request
                         </button>
                       </Link>
                     </div>
@@ -575,22 +592,13 @@ const Request = () => {
                   <>
                     <div className="px-4 pb-4 pt-1">
                       <div className="mt-3 text-center w-full my-6">
-                        <p className="font-bold md:text-5xl text-4xl mb-2">
+                        <p className="font-bold text-5xl mb-2">
                           {`${isFiatTx ? request?.value : amount} ${
                             request?.tokenName
                           }`}
                         </p>
-                        <p className="font-medium font-base text-sm text-slate-600 mb-2 text-center">
-                          <a
-                            className="underline underline-offset-4 mr-1"
-                            href={`${setEtherscanBase(
-                              networkName,
-                              hashNative
-                            )}`}
-                          >
-                            sent
-                          </a>
-                          <span className="mr-1">{"to"}</span>
+                        <p className="font-medium font-base text-base text-slate-600 mb-2 text-center">
+                          <span className="mr-1">{"To:"}</span>
                           {ensName ? (
                             <a>
                               <span className="mr-1 font-bold">{ensName}</span>
@@ -602,10 +610,26 @@ const Request = () => {
                             </span>
                           )}
                         </p>
+                        <p className="font-medium font-base text-base text-slate-600 mb-2 text-center">
+                          <span className="mr-1">{"Receipt:"}</span>
+                          <button
+                            className="underline underline-offset-4 mr-1 text-slate-600"
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(
+                                `${setEtherscanBase(networkName, hashNative)}`
+                              );
+                              setCopiedReceipt(true); // Set the copied state to true
+                              setTimeout(() => setCopiedReceipt(false), 2000); // Reset after 2 seconds
+                            }}
+                          >
+                            {copiedReceipt ? "copied" : "copy link"}
+                          </button>
+                        </p>
                       </div>
                       <Link href="/">
                         <button className="flex justify-center items-center border-black border font-sans leading-snug font-medium text-lg focus:outline-0 w-full h-14 rounded transition-all font-bold text-white mt-3 bg-[#007BFF] hover:bg-[#0067EB]">
-                          Close
+                          New request
                         </button>
                       </Link>
                     </div>
@@ -648,7 +672,15 @@ const Request = () => {
                           style={{ maxWidth: "100%" }}
                         />
                         <div className="flex-shrink-0">
-                          {request?.tokenName}
+                          {request?.tokenName}{" "}
+                          {
+                            <p className="ml-1 text-lg">
+                              on{" "}
+                              {networkName === "Any"
+                                ? "any network"
+                                : networkName}
+                            </p>
+                          }
                         </div>
                       </div>
                     </>
@@ -747,7 +779,15 @@ const Request = () => {
                         <span className="ml-1">{"requested:"}</span>
                       </p>
                       <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
-                        {request?.value} {request?.tokenName}
+                        {request?.value} {request?.tokenName}{" "}
+                        {
+                          <p className="ml-1 text-lg">
+                            on{" "}
+                            {networkName === "Any"
+                              ? "any network"
+                              : networkName}
+                          </p>
+                        }
                       </div>
 
                       <div className="pb-4 pt-1 relative">
@@ -940,7 +980,15 @@ const Request = () => {
                         <span className="ml-1">{"requested:"}</span>
                       </p>
                       <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
-                        {request?.value} {request?.tokenName}
+                        {request?.value} {request?.tokenName}{" "}
+                        {
+                          <p className="ml-1 text-lg">
+                            on{" "}
+                            {networkName === "Any"
+                              ? "any network"
+                              : networkName}
+                          </p>
+                        }
                       </div>
                     </>
 
