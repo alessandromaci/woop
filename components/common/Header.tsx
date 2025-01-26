@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
-import Logo from "../../public/woop_logo.png";
+import Logo from "../../public/woop_logo_beta.svg";
 import Wallet from "./Wallet";
 import { useRouter } from "next/router";
 import { telegramLink } from "../../utils/constants";
@@ -30,12 +30,12 @@ const Header = () => {
       <div className="relative" ref={menuRef}>
         {/* Logo */}
         <div className="flex items-center">
-          <Image alt="woop" src={Logo} width={80} height={60} />
+          <Image alt="woop" src={Logo} width={120} height={100} />
 
           {/* Dropdown Button */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="ml-2 flex items-center focus:outline-none"
+            className="ml-0.5 flex items-center focus:outline-none"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

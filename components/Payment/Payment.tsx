@@ -251,6 +251,7 @@ export default function Payment({
       mixpanel.track("visit_woop_create_request", {
         Address: address,
       });
+      setRecipientAddress(address as string);
     } else {
       setIsConnected(false);
     }

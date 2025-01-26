@@ -114,7 +114,7 @@ export const Share: React.FC<{
                   description && description.length > 30 ? "w-3/4" : "w-auto"
                 }`}
               >
-                {description || "Receive Details"}
+                {description || "Request details"}
               </h3>
 
               {/* Badge */}
@@ -193,7 +193,7 @@ export const Share: React.FC<{
           </div>
 
           {/* Share Section */}
-          <div className="flex justify-between mx-8 mt-3">
+          <div className="flex justify-between items-center mx-8 mt-3">
             {/* WhatsApp Share */}
             <WhatsappShareButton
               url={`${baseUrl}${path}`}
@@ -202,7 +202,7 @@ export const Share: React.FC<{
               } ${token} ${description ? `for ${description}` : ``} at`}
               className="shadow"
             >
-              <WhatsappIcon size={60} round />
+              <WhatsappIcon size={57} round />
             </WhatsappShareButton>
 
             {/* Telegram Share */}
@@ -213,7 +213,7 @@ export const Share: React.FC<{
               } ${token} ${description ? `for ${description}` : ``} at`}
               className="shadow"
             >
-              <TelegramIcon size={60} round />
+              <TelegramIcon size={57} round />
             </TelegramShareButton>
 
             {/* Twitter Share */}
@@ -224,10 +224,9 @@ export const Share: React.FC<{
               } ${token} ${description ? `for ${description}` : ``} at`}
               className="shadow"
             >
-              <TwitterIcon size={60} round />
+              <TwitterIcon size={57} round />
             </TwitterShareButton>
 
-            {/* Copy Link */}
             {/* Copy Link */}
             <button
               type="button"
