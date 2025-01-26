@@ -727,7 +727,7 @@ export default function Payment({
             className="m-2 text-xs font-sans font-medium text-slate-700 text-center cursor-pointer underline"
             onClick={() => setIsEditingManualRequest(true)}
           >
-            Enter Address Manually
+            Or, add an address manually
           </div>
         )}
       </div>
