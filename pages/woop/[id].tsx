@@ -517,7 +517,8 @@ const Request = () => {
                         {request?.value == "allowPayerSelectAmount"
                           ? "..."
                           : request?.value}{" "}
-                        {request?.tokenName}
+                        {request?.tokenName}{" "}
+                        {<p className="ml-1 text-lg">on {networkName}</p>}
                       </div>
                     </>
 
@@ -648,7 +649,8 @@ const Request = () => {
                           style={{ maxWidth: "100%" }}
                         />
                         <div className="flex-shrink-0">
-                          {request?.tokenName}
+                          {request?.tokenName}{" "}
+                          {<p className="ml-1 text-lg">on {networkName}</p>}
                         </div>
                       </div>
                     </>
@@ -747,7 +749,8 @@ const Request = () => {
                         <span className="ml-1">{"requested:"}</span>
                       </p>
                       <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
-                        {request?.value} {request?.tokenName}
+                        {request?.value} {request?.tokenName}{" "}
+                        {<p className="ml-1 text-lg">on {networkName}</p>}
                       </div>
 
                       <div className="pb-4 pt-1 relative">
@@ -940,7 +943,8 @@ const Request = () => {
                         <span className="ml-1">{"requested:"}</span>
                       </p>
                       <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
-                        {request?.value} {request?.tokenName}
+                        {request?.value} {request?.tokenName}{" "}
+                        {<p className="ml-1 text-lg">on {networkName}</p>}
                       </div>
                     </>
 
