@@ -153,7 +153,7 @@ export const Share: React.FC<{
               <span className="ml-4 text-base font-medium font-sans text-gray-600">
                 Network:{" "}
                 <span className="text-lg font-semibold text-gray-800">
-                  {network || "N/A"}
+                  {network === "Any_Chain" ? "Any" : network}
                 </span>
               </span>
             </div>

@@ -168,7 +168,12 @@ const Request = () => {
   };
 
   const checkAndUpdateNetwork = (result: any) => {
-    if (result?.network != chain?.id) {
+    if (result?.networkName === "Any") {
+      // If "Any" is selected, don't check for network mismatch
+      setWrongNetwork(false);
+      setWoopBadNetwork("");
+    } else if (result?.network !== chain?.id) {
+      // Mismatch logic applies only when networkName is not "Any"
       setWrongNetwork(true);
       setWoopBadNetwork(
         `Wrong network. Please connect to ${result?.networkName}`
@@ -668,7 +673,14 @@ const Request = () => {
                         />
                         <div className="flex-shrink-0">
                           {request?.tokenName}{" "}
-                          {<p className="ml-1 text-lg">on {networkName}</p>}
+                          {
+                            <p className="ml-1 text-lg">
+                              on{" "}
+                              {networkName === "Any"
+                                ? "any network"
+                                : networkName}
+                            </p>
+                          }
                         </div>
                       </div>
                     </>
@@ -768,7 +780,14 @@ const Request = () => {
                       </p>
                       <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
                         {request?.value} {request?.tokenName}{" "}
-                        {<p className="ml-1 text-lg">on {networkName}</p>}
+                        {
+                          <p className="ml-1 text-lg">
+                            on{" "}
+                            {networkName === "Any"
+                              ? "any network"
+                              : networkName}
+                          </p>
+                        }
                       </div>
 
                       <div className="pb-4 pt-1 relative">
@@ -962,7 +981,14 @@ const Request = () => {
                       </p>
                       <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
                         {request?.value} {request?.tokenName}{" "}
-                        {<p className="ml-1 text-lg">on {networkName}</p>}
+                        {
+                          <p className="ml-1 text-lg">
+                            on{" "}
+                            {networkName === "Any"
+                              ? "any network"
+                              : networkName}
+                          </p>
+                        }
                       </div>
                     </>
 
