@@ -48,6 +48,39 @@ input[type="number"]::-webkit-outer-spin-button {
   font-size: 20px; /* Adjust the font size as needed */
 }
 
+/* Custom Transak Styles */
+#transakRoot {
+  position: fixed !important;
+  top: 50% !important; /* Center vertically */
+  left: 50% !important; /* Center horizontally */
+  transform: translate(-50%, -50%) !important; /* Ensure proper centering */
+  width: 400px !important; /* Adjust modal width */
+  height: auto !important; /* Allow modal to adapt to content */
+  max-height: 90vh !important; /* Ensure it doesn't overflow the viewport */
+  z-index: 10000 !important; /* Ensure it's above all elements */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Add subtle shadow for depth */
+  border-radius: 12px !important; /* Make the modal corners rounded */
+  background: white !important; /* Ensure the modal background is clean */
+}
+
+/* Modal Content */
+#transakModal {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 20px !important; /* Add padding for better spacing */
+  box-sizing: border-box;
+}
+
+/* Close Icon */
+#transakRoot svg#transakCloseIcon {
+  position: absolute !important;
+  top: 15px !important; /* Fine-tune vertical position */
+  right: 15px !important; /* Fine-tune horizontal position */
+  width: 20px !important; /* Adjust icon size */
+  height: 20px !important;
+  cursor: pointer; /* Indicate it is clickable */
+}
+
 /* @layer utilities {
   .custom-height {
     height: calc(100vh - 6rem);

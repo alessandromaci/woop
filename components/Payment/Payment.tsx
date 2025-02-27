@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Share } from "../Share/Share";
 import ErrorsUi from "../ErrorsUi/ErrorsUi";
+import InstantOffRampEventsSDK from "../transak";
 import MenuItem from "@mui/material/MenuItem";
 import styles from "./payment.module.scss";
 import cx from "classnames";
@@ -630,6 +631,8 @@ export default function Payment({
             </div>
           </div>
         )}
+
+        <InstantOffRampEventsSDK />
 
         {/* Request Description Input Section */}
         {(isConnected || isEditingManualRequest) && (
