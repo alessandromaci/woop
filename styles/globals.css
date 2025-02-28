@@ -54,8 +54,8 @@ input[type="number"]::-webkit-outer-spin-button {
   top: 50% !important; /* Center vertically */
   left: 50% !important; /* Center horizontally */
   transform: translate(-50%, -50%) !important; /* Ensure proper centering */
-  width: 400px !important; /* Adjust modal width */
-  height: auto !important; /* Allow modal to adapt to content */
+  width: 500px !important; /* Adjust modal width */
+  height: 650px !important; /* Allow modal to adapt to content */
   max-height: 90vh !important; /* Ensure it doesn't overflow the viewport */
   z-index: 10000 !important; /* Ensure it's above all elements */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Add subtle shadow for depth */
