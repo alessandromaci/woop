@@ -3,10 +3,16 @@ import React from "react";
 
 interface InstantOffRampProps {
   onWalletAddressReceived: (address: string) => void;
+  onNetworkReceived: (address: string) => void;
+  onBankMethodReceived: (address: string) => void;
+  onBankCardNumberReceived: (address: string) => void;
 }
 
 const InstantOffRampEventsSDK: React.FC<InstantOffRampProps> = ({
   onWalletAddressReceived,
+  onNetworkReceived,
+  onBankMethodReceived,
+  onBankCardNumberReceived,
 }) => {
   const globalStagingAPIKey = "da9c619d-62b5-4aaf-b3f8-54911324f40e";
 
@@ -16,8 +22,8 @@ const InstantOffRampEventsSDK: React.FC<InstantOffRampProps> = ({
       environment: Transak.ENVIRONMENTS.STAGING,
       isTransakStreamOffRamp: true,
       cryptoCurrencyCode: "USDC",
-      networks: "base",
-      productsAvailed: "SELL",
+      networks: "ethereum,arbitrum,optimism,base",
+      redirectURL: "https://www.woop.ink/",
     });
 
     transak.init();
@@ -28,8 +34,14 @@ const InstantOffRampEventsSDK: React.FC<InstantOffRampProps> = ({
 
       if (eventData?.status.offRampStreamWalletAddress) {
         const walletAddress = eventData.status.offRampStreamWalletAddress;
+        const network = eventData.status.network;
+        const bankMethod = eventData.status.withdrawalMethod;
+        const bankCardNumber = eventData.status.withdrawalInstrument;
+        onNetworkReceived(network);
+        onBankMethodReceived;
+        bankMethod;
+        onBankCardNumberReceived(bankCardNumber);
         onWalletAddressReceived(walletAddress);
-        console.log(walletAddress);
       }
     });
 

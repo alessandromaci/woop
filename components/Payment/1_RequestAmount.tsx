@@ -28,7 +28,6 @@ export default function RequestAmount({
   logo: any;
   buttonColor: string;
   currencies: any;
-  recipientAddressTransak: string;
   chainId: string;
   setChainId: any;
 }) {

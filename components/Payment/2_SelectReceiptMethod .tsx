@@ -22,9 +22,11 @@ import baseLogo from "../../public/base.png";
 import arbitrumLogo from "../../public/arbitrum.png";
 import optimismLogo from "../../public/optimism.png";
 import allChainsLogo from "../../public/allChains.png";
+import transak from "../../public/transak-logo.png";
 import bankCard from "../../public/bank_card.png";
 import { QrCode } from "@mui/icons-material";
 import { TelegramIcon } from "next-share";
+import InstantOffRampEventsSDK from "../Transak";
 
 export default function SelectReceiptMethod({
   onBack,
@@ -34,7 +36,6 @@ export default function SelectReceiptMethod({
   theme,
   logo,
   buttonColor,
-  recipientAddressTransak,
   chainId,
   setChainId,
 }: {
@@ -46,7 +47,6 @@ export default function SelectReceiptMethod({
   logo: any;
   buttonColor: string;
   currencies: any;
-  recipientAddressTransak: string;
   chainId: string;
   setChainId: any;
 }) {
@@ -61,6 +61,15 @@ export default function SelectReceiptMethod({
   const [recipientAddress, setRecipientAddress] = React.useState<string>(
     address || ""
   );
+  const [recipientAddressTransak, setRecipientAddressTransak] =
+    React.useState("");
+  const [recipientNetworkTransak, setRecipientNetworkTransak] =
+    React.useState("");
+  const [recipientBankMethodTransak, setRecipientBankMethodTransak] =
+    React.useState("");
+  const [recipientBankCardNumberTransak, setRecipientBankCardNumberTransak] =
+    React.useState("");
+
   const [loadingButton, setLoadingButton] = React.useState(null);
   const [paymentRequest, setPaymentRequest] = React.useState("");
   const [isEditingRecipient, setIsEditingRecipient] =
@@ -285,6 +294,15 @@ export default function SelectReceiptMethod({
   }, [recipientAddressTransak]);
 
   React.useEffect(() => {
+    if (recipientNetworkTransak) {
+      const formattedChainName =
+        recipientNetworkTransak.charAt(0).toUpperCase() +
+        recipientNetworkTransak.slice(1);
+      handleChainChange(formattedChainName);
+    }
+  }, [recipientNetworkTransak]);
+
+  React.useEffect(() => {
     if (chain) {
       setChainId(chain.name);
       setRecipientChain(chain);
@@ -324,15 +342,9 @@ export default function SelectReceiptMethod({
           </div>
         </div>
 
-        <div className="flex bg-[#e6e7e9] mt-4">
+        <div className="flex bg-gray-100 mt-4">
           {/* Payment Details */}
-          <div
-            className="rounded-3xl relative p-4 w-4/5 items-center"
-            style={{
-              backgroundColor: "#e6e7e9",
-              borderColor: "#e6e7e9",
-            }}
-          >
+          <div className="rounded-3xl relative p-4 w-4/5 items-center bg-gray-100">
             {/* Amount */}
             <div className="flex items-center whitespace-nowrap">
               <span className="font-sans font-semibold text-lg text-gray-500">
@@ -563,120 +575,313 @@ export default function SelectReceiptMethod({
           </div>
         )}
 
-        {/* Create Payment Requests*/}
-        <div className="flex w-full mt-3 gap-2">
-          {/* Telegram Button */}
-          <button
-            type="button"
-            className="flex justify-center items-center w-2/3 border-black border font-medium text-lg h-12 rounded-full transition-all font-bold text-white"
-            style={{
-              backgroundColor: buttonColor || "#007BFF",
-              borderColor: buttonColor || "#007BFF",
-              opacity: isCryptoPaymentMethod && recipientAddress ? 1 : 0.5,
-            }}
-            disabled={!isCryptoPaymentMethod || !recipientAddress}
-            onClick={() => handleButtonClick("telegram")}
-          >
-            {loadingButton === "telegram" ? (
-              <>
-                <svg
-                  className="animate-spin rounded-full w-5 h-5 mr-3 bg-black-500"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    strokeWidth="4"
-                    stroke="currentColor"
-                    strokeDasharray="32"
-                    strokeLinecap="round"
-                    fill="transparent"
+        {isBankPaymentMethod && (
+          <InstantOffRampEventsSDK
+            onWalletAddressReceived={setRecipientAddressTransak}
+            onBankCardNumberReceived={setRecipientBankCardNumberTransak}
+            onBankMethodReceived={setRecipientBankMethodTransak}
+            onNetworkReceived={setRecipientNetworkTransak}
+          />
+        )}
+
+        {isBankPaymentMethod ? (
+          recipientAddressTransak &&
+          recipientBankCardNumberTransak && (
+            <div className="border rounded-lg p-4 bg-gray-100 mt-2">
+              {/* Section Title */}
+              <div className="flex justify-between mb-4">
+                <p className="text-gray-600 text-base font-medium mb-2 font-sans">
+                  Send to
+                </p>
+                {/* Off-Ramp Partner Section */}
+                <div className="flex items-center">
+                  <Image
+                    src={transak}
+                    alt="Off-Ramp Partner"
+                    className="h-7 w-20"
                   />
-                </svg>
-              </>
-            ) : (
-              <div className="flex items-center">
-                <TelegramIcon
-                  size={29}
-                  round
-                  bgStyle={{ fill: "transparent" }}
-                />
-                <span className="ml-2 text-lg font-sans">Telegram</span>
+                </div>
               </div>
-            )}
-          </button>
 
-          {/* QR Code Button */}
-          <button
-            type="button"
-            className="flex justify-center items-center w-1/6 border-black border font-medium text-lg h-12 rounded-full transition-all font-bold text-white"
-            style={{
-              backgroundColor: buttonColor || "#007BFF",
-              borderColor: buttonColor || "#007BFF",
-              opacity: isCryptoPaymentMethod && recipientAddress ? 1 : 0.5,
-            }}
-            disabled={!isCryptoPaymentMethod || !recipientAddress}
-            onClick={() => handleButtonClick("qr")}
-          >
-            {loadingButton === "qr" ? (
-              <>
-                <svg
-                  className="animate-spin rounded-full w-5 h-5 mr-3 bg-black-500"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    strokeWidth="4"
-                    stroke="currentColor"
-                    strokeDasharray="32"
-                    strokeLinecap="round"
-                    fill="transparent"
-                  />
-                </svg>
-              </>
-            ) : (
-              <QrCode />
-            )}
-          </button>
+              {/* Bank Payment Method */}
+              <div className="relative items-center justify-between p-3 bg-white border rounded-lg shadow">
+                <div className="font-bold text-slate-600">My Bank Account</div>
+                <div className="text-gray-700 font-semibold text-lg tracking-wider">
+                  •••• - •••• - •••• {recipientBankCardNumberTransak.slice(-4)}
+                </div>
+              </div>
 
-          {/* Copy Link Button */}
-          <button
-            type="button"
-            className="flex justify-center items-center w-1/6 border-black border font-medium text-lg h-12 rounded-full transition-all font-bold text-white"
-            style={{
-              backgroundColor: buttonColor || "#007BFF",
-              borderColor: buttonColor || "#007BFF",
-              opacity: isCryptoPaymentMethod && recipientAddress ? 1 : 0.5,
-            }}
-            disabled={!isCryptoPaymentMethod || !recipientAddress}
-            onClick={() => handleButtonClick("copy")}
-          >
-            {loadingButton === "copy" ? (
-              <>
-                <svg
-                  className="animate-spin rounded-full w-5 h-5 mr-3 bg-black-500"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    strokeWidth="4"
-                    stroke="currentColor"
-                    strokeDasharray="32"
-                    strokeLinecap="round"
-                    fill="transparent"
+              {/* Labels for Network and Address */}
+              <div className="mt-4">
+                <div className="relative flex items-center w-full">
+                  {/* Network Label */}
+                  <div
+                    className={`font-sans text-base leading-snug font-medium mb-2 ${
+                      theme === "dark" ? "text-gray-200" : "text-slate-600"
+                    }`}
+                  >
+                    Your bank associated crypto address
+                  </div>
+                </div>
+
+                {/* Network & Wallet Address */}
+                <div className="relative flex items-center w-full p-4 bg-white border rounded-lg">
+                  {/* Chain */}
+                  <div className="flex items-center basis-1/2">
+                    <Image
+                      src={allChainsLogo}
+                      alt="All Chains Logo"
+                      className="h-7 w-7 mr-2"
+                    />
+                    <span className="text-gray-700 font-medium text-lg">
+                      {recipientNetworkTransak}
+                    </span>
+                  </div>
+
+                  {/* Address */}
+                  <div className="text-gray-700 text-lg basis-1/2 text-right">
+                    {hydrated
+                      ? `${recipientAddress.slice(
+                          0,
+                          5
+                        )}...${recipientAddress.slice(-5)}`
+                      : ""}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        ) : (
+          <></>
+        )}
+
+        {/* Create Payment Link Requests with crypto method */}
+        {isCryptoPaymentMethod && (
+          <div className="flex w-full mt-6 gap-2">
+            {/* Telegram Button */}
+            <button
+              type="button"
+              className="flex justify-center items-center w-2/3 border-black border font-medium text-lg h-12 rounded-full transition-all font-bold text-white"
+              style={{
+                backgroundColor: buttonColor || "#007BFF",
+                borderColor: buttonColor || "#007BFF",
+                opacity: isCryptoPaymentMethod && recipientAddress ? 1 : 0.5,
+              }}
+              disabled={!isCryptoPaymentMethod || !recipientAddress}
+              onClick={() => handleButtonClick("telegram")}
+            >
+              {loadingButton === "telegram" ? (
+                <>
+                  <svg
+                    className="animate-spin rounded-full w-5 h-5 bg-black-500"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      strokeWidth="4"
+                      stroke="currentColor"
+                      strokeDasharray="32"
+                      strokeLinecap="round"
+                      fill="transparent"
+                    />
+                  </svg>
+                </>
+              ) : (
+                <div className="flex items-center">
+                  <TelegramIcon
+                    size={29}
+                    round
+                    bgStyle={{ fill: "transparent" }}
                   />
-                </svg>
-              </>
-            ) : (
-              <ContentCopyIcon className="white" fontSize="medium" />
-            )}
-          </button>
-        </div>
+                  <span className="ml-2 text-xl font-sans">Telegram</span>
+                </div>
+              )}
+            </button>
+
+            {/* QR Code Button */}
+            <button
+              type="button"
+              className="flex justify-center items-center w-1/6 border-black border font-medium text-lg h-12 rounded-full transition-all font-bold text-white"
+              style={{
+                backgroundColor: buttonColor || "#007BFF",
+                borderColor: buttonColor || "#007BFF",
+                opacity: isCryptoPaymentMethod && recipientAddress ? 1 : 0.5,
+              }}
+              disabled={!isCryptoPaymentMethod || !recipientAddress}
+              onClick={() => handleButtonClick("qr")}
+            >
+              {loadingButton === "qr" ? (
+                <>
+                  <svg
+                    className="animate-spin rounded-full w-5 h-5 bg-black-500"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      strokeWidth="4"
+                      stroke="currentColor"
+                      strokeDasharray="32"
+                      strokeLinecap="round"
+                      fill="transparent"
+                    />
+                  </svg>
+                </>
+              ) : (
+                <QrCode />
+              )}
+            </button>
+
+            {/* Copy Link Button */}
+            <button
+              type="button"
+              className="flex justify-center items-center w-1/6 border-black border font-medium text-lg h-12 rounded-full transition-all font-bold text-white"
+              style={{
+                backgroundColor: buttonColor || "#007BFF",
+                borderColor: buttonColor || "#007BFF",
+                opacity: isCryptoPaymentMethod && recipientAddress ? 1 : 0.5,
+              }}
+              disabled={!isCryptoPaymentMethod || !recipientAddress}
+              onClick={() => handleButtonClick("copy")}
+            >
+              {loadingButton === "copy" ? (
+                <>
+                  <svg
+                    className="animate-spin rounded-full w-5 h-5 bg-black-500"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      strokeWidth="4"
+                      stroke="currentColor"
+                      strokeDasharray="32"
+                      strokeLinecap="round"
+                      fill="transparent"
+                    />
+                  </svg>
+                </>
+              ) : (
+                <ContentCopyIcon className="white" fontSize="medium" />
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* Create Payment Link Requests with bank method */}
+        {isBankPaymentMethod && (
+          <div className="flex w-full mt-6 gap-2">
+            {/* Telegram Button */}
+            <button
+              type="button"
+              className="flex justify-center items-center w-2/3 border-black border font-medium text-lg h-12 rounded-full transition-all font-bold text-white"
+              style={{
+                backgroundColor: buttonColor || "#007BFF",
+                borderColor: buttonColor || "#007BFF",
+              }}
+              onClick={() => handleButtonClick("telegram")}
+            >
+              {loadingButton === "telegram" ? (
+                <>
+                  <svg
+                    className="animate-spin rounded-full w-5 h-5 bg-black-500"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      strokeWidth="4"
+                      stroke="currentColor"
+                      strokeDasharray="32"
+                      strokeLinecap="round"
+                      fill="transparent"
+                    />
+                  </svg>
+                </>
+              ) : (
+                <div className="flex items-center">
+                  <TelegramIcon
+                    size={29}
+                    round
+                    bgStyle={{ fill: "transparent" }}
+                  />
+                  <span className="ml-2 text-xl font-sans">Telegram</span>
+                </div>
+              )}
+            </button>
+
+            {/* QR Code Button */}
+            <button
+              type="button"
+              className="flex justify-center items-center w-1/6 border-black border font-medium text-lg h-12 rounded-full transition-all font-bold text-white"
+              style={{
+                backgroundColor: buttonColor || "#007BFF",
+                borderColor: buttonColor || "#007BFF",
+              }}
+              onClick={() => handleButtonClick("qr")}
+            >
+              {loadingButton === "qr" ? (
+                <>
+                  <svg
+                    className="animate-spin rounded-full w-5 h-5 bg-black-500"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      strokeWidth="4"
+                      stroke="currentColor"
+                      strokeDasharray="32"
+                      strokeLinecap="round"
+                      fill="transparent"
+                    />
+                  </svg>
+                </>
+              ) : (
+                <QrCode />
+              )}
+            </button>
+
+            {/* Copy Link Button */}
+            <button
+              type="button"
+              className="flex justify-center items-center w-1/6 border-black border font-medium text-lg h-12 rounded-full transition-all font-bold text-white"
+              style={{
+                backgroundColor: buttonColor || "#007BFF",
+                borderColor: buttonColor || "#007BFF",
+              }}
+              onClick={() => handleButtonClick("copy")}
+            >
+              {loadingButton === "copy" ? (
+                <>
+                  <svg
+                    className="items-center animate-spin rounded-full w-5 h-5 bg-black-500"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      strokeWidth="4"
+                      stroke="currentColor"
+                      strokeDasharray="32"
+                      strokeLinecap="round"
+                      fill="transparent"
+                    />
+                  </svg>
+                </>
+              ) : (
+                <ContentCopyIcon className="white" fontSize="medium" />
+              )}
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="mb-2">

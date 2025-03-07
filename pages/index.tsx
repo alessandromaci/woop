@@ -10,8 +10,6 @@ export default function Home() {
   const [theme] = React.useState("white");
   const [logo] = React.useState("");
   const [buttonColor] = React.useState("#007BFF");
-  const [recipientAddressTransak, setRecipientAddressTransak] =
-    React.useState("");
   const [chainId, setChainId] = React.useState<string>("");
   const [currencies] = React.useState(
     tokensDetails.map((token) => token.label)
@@ -57,7 +55,6 @@ export default function Home() {
             logo={logo}
             buttonColor={buttonColor}
             currencies={currencies}
-            recipientAddressTransak={recipientAddressTransak}
             chainId={chainId}
             setChainId={setChainId}
           />
@@ -72,7 +69,6 @@ export default function Home() {
             logo={logo}
             buttonColor={buttonColor}
             currencies={currencies}
-            recipientAddressTransak={recipientAddressTransak}
             chainId={chainId}
             setChainId={setChainId}
           />
