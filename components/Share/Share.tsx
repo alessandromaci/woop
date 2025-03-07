@@ -135,7 +135,7 @@ export const Share: React.FC<{
 
               {/* Back Button */}
               <button
-                className="flex items-center text-black text-sm mb-3"
+                className="flex items-center text-black mb-3 w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-2xl"
                 onClick={() => visibility(false)}
               >
                 <ArrowBackIcon />
