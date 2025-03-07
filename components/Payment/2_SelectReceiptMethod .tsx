@@ -240,13 +240,14 @@ export default function SelectReceiptMethod({
 
     setLoadingButton(action);
     try {
-      const requestPath = await createRequest();
-      setPaymentRequest(`${baseUrl}${requestPath}`);
+      const requestPath = await createRequest(); // Ensure request is created first
+      const fullRequestUrl = `${baseUrl}${requestPath}`;
+      setPaymentRequest(fullRequestUrl);
 
       if (action === "telegram") {
         window.open(
           `https://t.me/share/url?url=${encodeURIComponent(
-            paymentRequest
+            fullRequestUrl
           )}&text=${encodeURIComponent(
             `Hey, can you please send me ${selectedAmount} ${
               selectedToken.label
