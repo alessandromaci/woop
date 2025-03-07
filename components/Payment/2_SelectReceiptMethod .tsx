@@ -399,7 +399,7 @@ export default function SelectReceiptMethod({
                   : "border-black text-slate-600 hover:bg-gray-300"
               } ${
                 isCryptoPaymentMethod
-                  ? "bg-gray-300 text-black"
+                  ? "bg-blue-100 text-black"
                   : "bg-transparent"
               }`}
               onClick={() => {
@@ -429,7 +429,7 @@ export default function SelectReceiptMethod({
                   : "border-black text-slate-600 hover:bg-gray-300"
               } ${
                 isBankPaymentMethod
-                  ? "bg-gray-300 text-black"
+                  ? "bg-blue-100 text-black"
                   : "bg-transparent"
               }`}
               onClick={() => {
@@ -598,7 +598,7 @@ export default function SelectReceiptMethod({
                   <Image
                     src={transak}
                     alt="Off-Ramp Partner"
-                    className="h-7 w-20"
+                    className="h-9 w-28"
                   />
                 </div>
               </div>
