@@ -14,7 +14,7 @@ const InstantOffRampEventsSDK: React.FC<InstantOffRampProps> = ({
   onBankMethodReceived,
   onBankCardNumberReceived,
 }) => {
-  const globalStagingAPIKey = "da9c619d-62b5-4aaf-b3f8-54911324f40e";
+  const globalStagingAPIKey = process.env.NEXT_PUBLIC_TRANSAK_API!;
 
   React.useEffect(() => {
     const transak = new Transak({
