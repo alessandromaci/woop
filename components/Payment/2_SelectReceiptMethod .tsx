@@ -374,7 +374,7 @@ export default function SelectReceiptMethod({
                   {selectedDescription}
                 </h3>
               ) : (
-                <h3 className="text-xl ml-1 font-bold font-sans tracking-wide text-gray-800">
+                <h3 className="text-base ml-1 font-sans font-semibold text-gray-500 w-auto">
                   new request
                 </h3>
               )}
@@ -424,18 +424,29 @@ export default function SelectReceiptMethod({
 
             {/* Bank Card */}
             <div
-              className={`flex items-center justify-between basis-1/2 h-12 border rounded font-medium cursor-pointer px-2 ${
+              className={`flex items-center justify-between basis-1/2 h-12 border rounded font-medium px-2 ${
                 theme === "dark"
-                  ? "border-gray-700 text-gray-200 hover:bg-gray-700"
-                  : "border-black text-slate-600 hover:bg-gray-300"
+                  ? "border-gray-700 text-gray-200"
+                  : "border-black text-slate-600"
               } ${
-                isBankPaymentMethod
+                selectedToken.label === "USD" || selectedToken.label === "EURO"
+                  ? "cursor-pointer hover:bg-gray-300"
+                  : "cursor-not-allowed opacity-50"
+              } ${
+                isBankPaymentMethod &&
+                (selectedToken.label === "USD" ||
+                  selectedToken.label === "EURO")
                   ? "bg-blue-100 text-black"
                   : "bg-transparent"
               }`}
               onClick={() => {
-                setIsBankPaymentMethod(true);
-                setIsCryptoPaymentMethod(false);
+                if (
+                  selectedToken.label === "USD" ||
+                  selectedToken.label === "EURO"
+                ) {
+                  setIsBankPaymentMethod(true);
+                  setIsCryptoPaymentMethod(false);
+                }
               }}
             >
               <div className="flex items-center">
