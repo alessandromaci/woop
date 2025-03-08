@@ -11,6 +11,7 @@ import {
   tokensDetails,
   MAX_CHARACTER_LIMIT,
   darkenColor,
+  maxAmounts,
 } from "../../utils/constants";
 import mixpanel from "mixpanel-browser";
 
@@ -390,8 +391,16 @@ export default function RequestAmount({
             e.currentTarget.style.backgroundColor = buttonColor || "#007BFF";
           }}
           onClick={() => {
+            const tokenLabel = selectedToken.label as keyof typeof maxAmounts;
+
+            const maxAmount = maxAmounts[tokenLabel] ?? 250; // Default max is 250 if undefined
+
             if (amount === "0" || amount === "") {
               setBadRequest("The requested amount must be higher than zero");
+            } else if (parseFloat(amount) > maxAmount) {
+              setBadRequest(
+                `The requested amount exceeds the limit of ${maxAmount} ${selectedToken.label}`
+              );
             } else {
               setBadRequest("");
               onContinue(amount, selectedToken, description);

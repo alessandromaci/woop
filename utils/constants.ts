@@ -92,6 +92,16 @@ export const tokensDetails: Token[] = [
   },
 ];
 
+export const maxAmounts: Record<string, number> = {
+  USDC: 250,
+  USDT: 250,
+  USD: 250,
+  EURO: 250,
+  cbBTC: 0.003125, // 250 EUR equivalent in BTC
+  WBTC: 0.003125, // 250 EUR equivalent in BTC
+  ETH: 0.125, // 250 EUR equivalent in ETH
+};
+
 export const setEtherscanBase = (network: string, hash: string | undefined) => {
   if (network == "Arbitrum") {
     return `https://arbiscan.io/tx/${hash}`;
