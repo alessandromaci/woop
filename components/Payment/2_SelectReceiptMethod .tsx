@@ -629,9 +629,7 @@ export default function SelectReceiptMethod({
                 <div className="relative flex items-center w-full">
                   {/* Network Label */}
                   <div
-                    className={`font-sans text-base leading-snug font-medium mb-2 ${
-                      theme === "dark" ? "text-gray-200" : "text-slate-600"
-                    }`}
+                    className={`font-sans text-base leading-snug font-medium mb-2 text-gray-600`}
                   >
                     Your bank associated crypto address
                   </div>
@@ -659,6 +657,18 @@ export default function SelectReceiptMethod({
                           5
                         )}...${recipientAddress.slice(-5)}`
                       : ""}
+                  </div>
+                </div>
+
+                <div className="relative flex items-center w-full">
+                  {/* Disclaimer */}
+                  <div
+                    className={`font-sans text-xs leading-snug text-gray-600 mt-1`}
+                  >
+                    {`*This wallet address is linked to your bank account through
+                    Transak. Any crypto sent to this address will be
+                    automatically converted and deposited into your bank
+                    account.`}
                   </div>
                 </div>
               </div>
