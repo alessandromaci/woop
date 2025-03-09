@@ -49,8 +49,6 @@ export default function RequestAmount({
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
   const [allowPayerSelectAmount, setAllowPayerSelectAmount] =
     React.useState<boolean>(false);
-  const [isEditingManualRequest, setIsEditingManualRequest] =
-    React.useState<boolean>(false);
   const { chain } = useAccount();
   const [selectorVisibility, setSelectorVisibility] =
     React.useState<boolean>(false);
@@ -306,6 +304,33 @@ export default function RequestAmount({
             </button>
           </div>
 
+          {/* Quick Selection Buttons */}
+          {/* <div className="grid grid-cols-4 gap-2 mt-3 mb-5 w-full">
+            {[0.4, 0.8, 2, 4].map((quarter) => {
+              const fractionValue =
+                (maxAmounts[selectedToken.label] * quarter) / 4;
+              const isCryptoAndStable = ![
+                "USD",
+                "EURO",
+                "USDC",
+                "USDT",
+              ].includes(selectedToken.label);
+              const formattedValue = isCryptoAndStable
+                ? fractionValue.toFixed(4)
+                : fractionValue.toFixed(0);
+
+              return (
+                <button
+                  key={quarter}
+                  className="flex justify-center items-center rounded-full text-black border border-black px-2 py-2 text-xs transition-all hover:bg-[#007BFF] hover:text-white focus:outline-none w-full font-sans"
+                  onClick={() => setAmount(formattedValue)}
+                >
+                  {formattedValue} {selectedToken.label}
+                </button>
+              );
+            })}
+          </div> */}
+
           {/* "Any amount" toggle below */}
           <div className="flex items-center mt-2">
             <div
@@ -335,7 +360,6 @@ export default function RequestAmount({
         </div>
 
         {/* Request Description Input Section */}
-
         <div>
           <div
             className={`font-sans text-base leading-snug font-medium mt-2 mb-2 pl-2 ${
