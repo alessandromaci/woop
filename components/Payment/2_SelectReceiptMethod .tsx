@@ -282,7 +282,8 @@ export default function SelectReceiptMethod({
         Address: address,
       });
       setRecipientAddress(address as string);
-      console.log("hello");
+      setIsEditingRecipient(false);
+      setNewAddress(address as string);
     } else {
       setIsConnected(false);
     }
