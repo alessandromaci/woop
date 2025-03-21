@@ -56,7 +56,7 @@ const Header = () => {
 
         {/* Dropdown Menu */}
         {menuOpen && (
-          <div className="absolute left-0 mt-2 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+          <div className="absolute left-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
             <p className="block w-full text-left font-sans text-bold font-medium px-4 py-2 text-gray-800">
               App
             </p>
@@ -89,6 +89,15 @@ const Header = () => {
             >
               {`Contact us`}
             </a>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                router.push("/terms");
+              }}
+              className="block w-full text-left font-sans font-medium px-4 py-2 text-gray-400 hover:bg-gray-100"
+            >
+              Terms of Service
+            </button>
           </div>
         )}
       </div>
