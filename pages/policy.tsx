@@ -1,44 +1,155 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
+import Head from "next/head";
+import Image from "next/image";
+import Link from "next/link";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
-type IPolicyProps = {};
-
-const defaultProps = {};
-
-const Policy: React.FC<IPolicyProps> = (props) => {
-  const {} = props;
-
-  useEffect(() => {}, []);
-
+export default function Policy() {
   return (
-    <article className="flex justify-center">
-      <div className="max-w-lg my-20 p-5 rounded-lg shadow-md">
-        <h2 className="text-center font-semibold text-2xl mb-5">
-          {"Woop Pay Privacy Policy"}
-        </h2>
-        <p className="text-center mb-5">{"Last modified: June 27, 2023"}</p>
-        <p className="text-center mb-5">{"Data We Collect"}</p>
-        <p className="text-justify mb-5">
-          {
-            "Privacy is central to everything we do. Accordingly, we aspire to be transparent about the data we collect. We do not maintain user accounts and do not collect and store personal data, such as your name or internet protocol (“IP”) address. When you interact with the Services, we collect only publicly-available blockchain data. We also collect certain activity data using Mixpanel. These analytics tools help us understand how our users interact with our services. For instance, we track events such as visits to the payment page, including details such as the token used, network name, amount, user's public blockchain address, and related link. When you connect your non-custodial blockchain wallet to the Services, we collect your publicly-available blockchain address. Note that blockchain addresses are publicly-available data that are not created or assigned by us or any central party, and by themselves are not personally identifying."
-          }
-        </p>
-        <p className="text-center mb-5">{"How We Share Data"}</p>
-        <p className="text-justify mb-5">
-          {
-            "We may share or disclose the data we collect with service providers. We may share your information with our service providers to assist us in providing the Services. For example, we may share your wallet address and event data with service providers like Infura and Mixpanel to provide technical infrastructure services and to help us understand the usage patterns for our services."
-          }
-        </p>
-        <p className="text-center mb-5">{"Age Requirements"}</p>
-        <p className="text-justify mb-5">
-          {
-            "The Services are intended for a general audience and are not directed at children."
-          }
-        </p>
+    <>
+      <Head>
+        <title>Woop - Privacy Policy</title>
+        <meta name="description" content="Woop Privacy Policy" />
+      </Head>
+
+      <div className="min-h-screen bg-white">
+        {/* Header */}
+        <header className="border-b">
+          <div className="max-w-7xl mx-auto px-4 py-4 flex items-center">
+            <div className="flex items-center gap-4">
+              <Link
+                href="/"
+                className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200"
+              >
+                <ArrowBackIcon className="text-gray-600" />
+              </Link>
+              <Image
+                alt="Woop Logo"
+                src="/woop_logo.png"
+                width={90}
+                height={70}
+                className="h-8 w-auto"
+              />
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="max-w-4xl mx-auto px-4 py-12">
+          <article className="prose prose-lg max-w-none">
+            <h1 className="text-4xl font-bold mb-8">Privacy Policy</h1>
+            <p className="text-gray-600 mb-8">Effective Date: March 21, 2025</p>
+
+            <div className="text-gray-700">
+              <p className="mb-8">
+                This Privacy Policy describes how Woop (the
+                &ldquo;Platform,&rdquo; &ldquo;we,&rdquo; or &ldquo;us&rdquo;)
+                collects, uses, and manages limited data related to user
+                interactions on our platform. We are committed to respecting
+                your privacy and ensuring transparency in how we handle data.
+              </p>
+
+              <p className="text-center font-semibold mb-5">
+                1. Information We Collect
+              </p>
+              <p className="text-justify mb-5">
+                Woop collects only essential data to facilitate platform
+                operations. This includes:
+              </p>
+              <ul className="list-disc ml-8 mb-5">
+                <li>Blockchain wallet addresses used for transactions</li>
+                <li>Transaction details (amount, token type, network used)</li>
+                <li>Device type and operating system</li>
+                <li>Approximate country of origin (based on IP)</li>
+              </ul>
+              <p className="text-justify mb-5">
+                We do not collect personally identifiable information (PII),
+                such as names, emails, or physical addresses.
+              </p>
+
+              <p className="text-center font-semibold mb-5">
+                2. How We Use Data
+              </p>
+              <p className="text-justify mb-5">
+                The limited data collected is used for:
+              </p>
+              <ul className="list-disc ml-8 mb-5">
+                <li>Facilitating crypto payment requests and transactions</li>
+                <li>Enhancing user experience and platform functionality</li>
+                <li>Monitoring platform activity and security</li>
+              </ul>
+
+              <p className="text-center font-semibold mb-5">
+                3. Analytics and Tracking
+              </p>
+              <p className="text-justify mb-5">
+                Woop uses Mixpanel to gather **anonymized** analytics data,
+                including:
+              </p>
+              <ul className="list-disc ml-8 mb-5">
+                <li>General usage patterns (e.g., features accessed)</li>
+                <li>Device type and operating system</li>
+                <li>
+                  Approximate geographic region (based on IP, no precise
+                  tracking)
+                </li>
+              </ul>
+              <p className="text-justify mb-5">
+                This data helps us improve the platform, but does not allow us
+                to personally identify users.
+              </p>
+
+              <p className="text-center font-semibold mb-5">4. Data Sharing</p>
+              <p className="text-justify mb-5">
+                Woop does not sell, rent, or share user data except in the
+                following cases:
+              </p>
+              <ul className="list-disc ml-8 mb-5">
+                <li>With analytics providers for platform optimization</li>
+                <li>With legal authorities if required by law</li>
+                <li>
+                  With third-party wallet providers when users approve
+                  transactions
+                </li>
+              </ul>
+
+              <p className="text-center font-semibold mb-5">
+                5. Third-Party Services
+              </p>
+              <p className="text-justify mb-5">
+                Our platform integrates with external services, such as wallet
+                providers. These services have their own privacy policies, and
+                we encourage users to review them.
+              </p>
+
+              <p className="text-center font-semibold mb-5">6. User Control</p>
+              <p className="text-justify mb-5">Users have the right to:</p>
+              <ul className="list-disc ml-8 mb-5">
+                <li>Request an overview of the data we collect</li>
+                <li>Opt out of analytics tracking (where applicable)</li>
+              </ul>
+
+              <p className="text-center font-semibold mb-5">
+                7. Changes to This Policy
+              </p>
+              <p className="text-justify mb-5">
+                We may update this Privacy Policy periodically. Any changes will
+                be reflected on this page, and continued use of the platform
+                constitutes acceptance of the updated policy.
+              </p>
+            </div>
+          </article>
+        </main>
+
+        {/* Footer */}
+        <footer className="border-t mt-16">
+          <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-center">
+            <span className="text-sm text-gray-500">
+              © 2025 Woop. All rights reserved.
+            </span>
+          </div>
+        </footer>
       </div>
-    </article>
+    </>
   );
-};
-
-Policy.defaultProps = defaultProps;
-
-export default Policy;
+}

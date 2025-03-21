@@ -98,6 +98,15 @@ const Header = () => {
             >
               Terms of Service
             </button>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                router.push("/policy");
+              }}
+              className="block w-full text-left font-sans font-medium px-4 py-2 text-gray-400 hover:bg-gray-100"
+            >
+              Privacy Policy
+            </button>
           </div>
         )}
       </div>
