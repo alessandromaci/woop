@@ -53,124 +53,129 @@ export default function Terms() {
               </p>
 
               <p className="text-center font-semibold mb-5">
-                {"1. Ownership and Relationship to Digitcloud Ltd."}
+                1. Ownership and Relationship to Digitcloud Ltd.
               </p>
               <p className="text-justify mb-5">
-                {
-                  "Woop is a platform owned and operated by Digitcloud Ltd., a Cyprus-registered company. Digitcloud Ltd. is responsible for the management, development, and maintenance of Woop, but does not handle, process, or store cryptocurrency transactions or fiat payments."
-                }
+                Woop is a platform owned and operated by Digitcloud Ltd., a
+                Cyprus-registered company. Digitcloud Ltd. is responsible for
+                the management, development, and maintenance of Woop, but does
+                not handle, process, or store cryptocurrency transactions or
+                fiat payments.
               </p>
 
               <p className="text-center font-semibold mb-5">
-                {"2. Description of Services"}
+                2. Description of Services
               </p>
               <p className="text-justify mb-5">
-                {
-                  "Woop is a user interface (UI) that facilitates crypto payment requests by connecting users to third-party service providers, including wallet providers. Woop itself does not process, hold, or transfer any funds—users remain in full control of their transactions at all times."
-                }
+                Woop is a user interface (UI) that facilitates crypto payment
+                requests by connecting users to third-party service providers,
+                including wallet providers. Woop itself does not process, hold,
+                or transfer any funds—users remain in full control of their
+                transactions at all times.
               </p>
 
               <p className="text-center font-semibold mb-5">
-                {"3. Third-Party Service Providers"}
+                3. Third-Party Service Providers
               </p>
               <p className="text-justify mb-5">
-                {
-                  "To use the platform, users must connect with third-party services such as wallet providers. By using these services, you acknowledge that:"
-                }
+                To use the platform, users must connect with third-party
+                services such as wallet providers. By using these services, you
+                acknowledge that:
               </p>
               <ul className="list-disc ml-8 mb-5">
                 <li>
-                  {
-                    "Woop does not manage, execute, or process transactions—wallet providers facilitate approvals, and third-party services handle conversions and off-ramping."
-                  }
+                  Woop does not manage, execute, or process transactions—wallet
+                  providers facilitate approvals, and third-party services
+                  handle conversions and off-ramping.
                 </li>
                 <li>
-                  {
-                    "All transactions occur between you and these third-party providers, subject to their respective terms and conditions."
-                  }
+                  All transactions occur between you and these third-party
+                  providers, subject to their respective terms and conditions.
                 </li>
                 <li>
-                  {
-                    "Woop does not endorse, control, or guarantee the security, reliability, or regulatory compliance of third-party providers."
-                  }
+                  Woop does not endorse, control, or guarantee the security,
+                  reliability, or regulatory compliance of third-party
+                  providers.
                 </li>
               </ul>
 
               <p className="text-center font-semibold mb-5">
-                {"4. No Investment or Financial Advice"}
+                4. No Investment or Financial Advice
               </p>
               <p className="text-justify mb-5">
-                {
-                  "Woop does not provide investment advice or financial services. All decisions related to cryptocurrency transactions are made at your sole discretion."
-                }
+                Woop does not provide investment advice or financial services.
+                All decisions related to cryptocurrency transactions are made at
+                your sole discretion.
               </p>
 
               <p className="text-center font-semibold mb-5">
-                {"5. User Responsibilities and Compliance"}
+                5. User Responsibilities and Compliance
               </p>
               <p className="text-justify mb-5">
-                {
-                  "By using Woop, you are solely responsible for complying with all applicable laws and regulations in your jurisdiction regarding cryptocurrency transactions."
-                }
+                By using Woop, you are solely responsible for complying with all
+                applicable laws and regulations in your jurisdiction regarding
+                cryptocurrency transactions.
               </p>
 
               <p className="text-center font-semibold mb-5">
-                {"6. Analytics and Data Tracking"}
+                6. Analytics and Data Tracking
               </p>
               <p className="text-justify mb-5">
-                {
-                  "Woop uses third-party analytics tools, such as Mixpanel, to track user interactions within the platform. The data collected includes:"
-                }
+                Woop uses third-party analytics tools, such as Mixpanel, to
+                track user interactions within the platform. The data collected
+                includes:
               </p>
               <ul className="list-disc ml-8 mb-5">
                 <li>
-                  {
-                    "Transaction details (e.g., token type, blockchain network, amount)."
-                  }
+                  Transaction details (e.g., token type, blockchain network,
+                  amount).
                 </li>
-                <li>{"Wallet addresses used in interactions."}</li>
-                <li>{"Generated payment request links."}</li>
+                <li>Wallet addresses used in interactions.</li>
+                <li>Generated payment request links.</li>
               </ul>
               <p className="text-justify mb-5">
-                {
-                  "No personally identifiable information is collected; however, Mixpanel may log approximate location data based on user device interactions."
-                }
+                No personally identifiable information is collected; however,
+                Mixpanel may log approximate location data based on user device
+                interactions.
               </p>
 
               <p className="text-center font-semibold mb-5">
-                {"7. Assumption of Risk"}
+                7. Assumption of Risk
               </p>
               <p className="text-justify mb-5">
-                {
-                  "By accessing Woop, you acknowledge that blockchain transactions are irreversible and carry financial and security risks. Woop is not liable for any loss of assets due to user actions, wallet provider errors, or vulnerabilities in third-party services."
-                }
+                By accessing Woop, you acknowledge that blockchain transactions
+                are irreversible and carry financial and security risks. Woop is
+                not liable for any loss of assets due to user actions, wallet
+                provider errors, or vulnerabilities in third-party services.
               </p>
 
               <p className="text-center font-semibold mb-5">
-                {"8. Release of Claims"}
+                8. Release of Claims
               </p>
               <p className="text-justify mb-5">
-                {
-                  "You expressly waive and release Digitcloud Ltd. and Woop from any and all claims related to the use of the platform, including losses due to failed or unauthorized transactions."
-                }
+                You expressly waive and release Digitcloud Ltd. and Woop from
+                any and all claims related to the use of the platform, including
+                losses due to failed or unauthorized transactions.
               </p>
 
               <p className="text-center font-semibold mb-5">
-                {"10. No Warranties and Limitation of Liability"}
+                10. No Warranties and Limitation of Liability
               </p>
               <p className="text-justify mb-5">
-                {
-                  "The platform is provided 'AS IS' and 'AS AVAILABLE' without any guarantees of uptime, security, or uninterrupted service. Under no circumstances shall Woop or Digitcloud Ltd. be liable for any direct, indirect, or consequential damages, including lost funds or financial losses."
-                }
+                The platform is provided &ldquo;AS IS&rdquo; and &ldquo;AS
+                AVAILABLE&rdquo; without any guarantees of uptime, security, or
+                uninterrupted service. Under no circumstances shall Woop or
+                Digitcloud Ltd. be liable for any direct, indirect, or
+                consequential damages, including lost funds or financial losses.
               </p>
 
               <p className="text-center font-semibold mb-5">
-                {"11. Changes to Terms"}
+                11. Changes to Terms
               </p>
               <p className="text-justify mb-5">
-                {
-                  "We reserve the right to update these Terms at any time. Continued use of the platform constitutes acceptance of any modifications."
-                }
+                We reserve the right to update these Terms at any time.
+                Continued use of the platform constitutes acceptance of any
+                modifications.
               </p>
             </div>
           </article>
