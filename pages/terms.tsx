@@ -44,12 +44,14 @@ export default function Terms() {
 
             <div className="text-gray-700">
               <p className="mb-8">
-                Welcome to Woop, a web-based platform (the "Platform," "we," or
-                "us") that facilitates crypto payments by connecting users with
+                Welcome to Woop, a web-based platform (the
+                &ldquo;Platform,&rdquo; &ldquo;we,&rdquo; or &ldquo;us&rdquo;)
+                that facilitates crypto payments by connecting users with
                 third-party payment processors and wallet providers. By
                 accessing or using the Platform, you agree to comply with and be
-                bound by the following Terms of Service (the "Terms"). Please
-                read these Terms carefully before using our services.
+                bound by the following Terms of Service (the
+                &ldquo;Terms&rdquo;). Please read these Terms carefully before
+                using our services.
               </p>
 
               <p className="text-center font-semibold mb-5">
