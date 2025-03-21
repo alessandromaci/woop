@@ -31,11 +31,17 @@ export default function Payment({
   logo,
   currencies,
   buttonColor,
+  recipientAddressTransak,
+  chainId,
+  setChainId,
 }: {
   theme: string;
   logo: any;
   buttonColor: string;
   currencies: any;
+  recipientAddressTransak: string;
+  chainId: string;
+  setChainId: any;
 }) {
   const [selectedToken, setSelectedToken] = React.useState<{
     label: string;
@@ -53,7 +59,6 @@ export default function Payment({
   const [characterCount, setCharacterCount] = useState(MAX_CHARACTER_LIMIT);
   const [path, setPath] = React.useState<string>("");
   const [ipfsLoading, setIpfsLoading] = React.useState<boolean>(false);
-  const [chainId, setChainId] = React.useState<string>("");
   const [isEditingChain, setIsEditingChain] = React.useState(false);
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
   const [allowPayerSelectAmount, setAllowPayerSelectAmount] =
@@ -89,6 +94,7 @@ export default function Payment({
     Optimism: optimismLogo,
     Arbitrum: arbitrumLogo,
     Any_Chain: allChainsLogo,
+    Bank: allChainsLogo,
   };
 
   function getLogo(chainId: string): string | any {
@@ -151,6 +157,7 @@ export default function Payment({
       Arbitrum: { id: 42161, name: "Arbitrum One" },
       Sepolia: { id: 11155111, name: "Sepolia" },
       Any_Chain: { id: 0, name: "Any" },
+      Bank: { id: 0, name: "Bank" },
     };
 
     const selectedChain = chainData[selectedChainName];
@@ -256,6 +263,12 @@ export default function Payment({
       setIsConnected(false);
     }
   }, [connected]);
+
+  React.useEffect(() => {
+    if (recipientAddressTransak) {
+      setRecipientAddress(recipientAddressTransak);
+    }
+  }, [recipientAddressTransak]);
 
   React.useEffect(() => {
     if (allowPayerSelectAmount) {

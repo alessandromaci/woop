@@ -96,47 +96,50 @@ export const Share: React.FC<{
 
   return (
     <div className="flex flex-col p-4 max-w-lg mx-auto bg-white rounded">
-      {/* Back Button */}
-      <button
-        className="flex items-center text-black text-sm mb-3"
-        onClick={() => visibility(false)}
-      >
-        <ArrowBackIcon />
-      </button>
       {path ? (
         <div>
           {/* Payment Details */}
           <div className="mb-1">
-            <div className="flex items-center space-x-2">
-              {/* Title */}
-              <h3
-                className={`text-2xl font-extrabold font-sans tracking-wide text-gray-800 break-words ${
-                  description && description.length > 30 ? "w-3/4" : "w-auto"
-                }`}
-              >
-                {description || "Request details"}
-              </h3>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                {/* Title */}
+                <h3
+                  className={`text-2xl font-extrabold font-sans tracking-wide text-gray-800 break-words ${
+                    description && description.length > 30 ? "w-3/4" : "w-auto"
+                  }`}
+                >
+                  {description || "Request details"}
+                </h3>
 
-              {/* Badge */}
-              <span
-                className={`${
-                  description && description.length > 30 ? "ml-auto" : ""
-                } bg-blue-500 text-white text-sm px-2 py-0.5 rounded-full font-sans font-medium whitespace-nowrap`}
+                {/* Badge */}
+                <span
+                  className={`${
+                    description && description.length > 30 ? "ml-auto" : ""
+                  } bg-blue-500 text-white text-sm px-2 py-0.5 rounded-full font-sans font-medium whitespace-nowrap`}
+                >
+                  {notifications.filter(
+                    (notification: any) =>
+                      notification?.title === "Woop Payment Received" &&
+                      notification?.notification.body === `${path}`
+                  ).length > 0
+                    ? `paid ${
+                        notifications.filter(
+                          (notification: any) =>
+                            notification?.title === "Woop Payment Received" &&
+                            notification?.notification.body === `${path}`
+                        ).length
+                      }x`
+                    : "not paid"}
+                </span>
+              </div>
+
+              {/* Back Button */}
+              <button
+                className="flex items-center text-black mb-3 w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-2xl"
+                onClick={() => visibility(false)}
               >
-                {notifications.filter(
-                  (notification: any) =>
-                    notification?.title === "Woop Payment Received" &&
-                    notification?.notification.body === `${path}`
-                ).length > 0
-                  ? `paid ${
-                      notifications.filter(
-                        (notification: any) =>
-                          notification?.title === "Woop Payment Received" &&
-                          notification?.notification.body === `${path}`
-                      ).length
-                    }x`
-                  : "not paid"}
-              </span>
+                <ArrowBackIcon />
+              </button>
             </div>
 
             {/* Amount */}
@@ -190,60 +193,6 @@ export const Share: React.FC<{
           {/* QR Code Section */}
           <div className="flex justify-center bg-white mt-3">
             <div ref={qrContainer}></div>
-          </div>
-
-          {/* Share Section */}
-          <div className="flex justify-between items-center mx-8 mt-3">
-            {/* WhatsApp Share */}
-            <WhatsappShareButton
-              url={`${baseUrl}${path}`}
-              title={`Hey, can you please send me ${
-                amount === "allowPayerSelectAmount" ? "some" : amount
-              } ${token} ${description ? `for ${description}` : ``} at`}
-              className="shadow"
-            >
-              <WhatsappIcon size={57} round />
-            </WhatsappShareButton>
-
-            {/* Telegram Share */}
-            <TelegramShareButton
-              url={`${baseUrl}${path}`}
-              title={`Hey, can you please send me ${
-                amount === "allowPayerSelectAmount" ? "some" : amount
-              } ${token} ${description ? `for ${description}` : ``} at`}
-              className="shadow"
-            >
-              <TelegramIcon size={57} round />
-            </TelegramShareButton>
-
-            {/* Twitter Share */}
-            <TwitterShareButton
-              url={`${baseUrl}${path}`}
-              title={`Hey, can you please send me ${
-                amount === "allowPayerSelectAmount" ? "some" : amount
-              } ${token} ${description ? `for ${description}` : ``} at`}
-              className="shadow"
-            >
-              <TwitterIcon size={57} round />
-            </TwitterShareButton>
-
-            {/* Copy Link */}
-            <button
-              type="button"
-              onClick={() => {
-                navigator.clipboard.writeText(`${baseUrl}${path}`);
-                setCopySuccess(true);
-                setTimeout(() => setCopySuccess(false), 2000); // Reset after 2 seconds
-              }}
-              className="w-14 h-14 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full transition border border-slate-400"
-              title="Copy Link"
-            >
-              {copySuccess ? (
-                <CheckIcon className="text-green-600" fontSize="medium" />
-              ) : (
-                <ContentCopyIcon className="text-gray-600" fontSize="medium" />
-              )}
-            </button>
           </div>
         </div>
       ) : (
