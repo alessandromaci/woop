@@ -4,6 +4,7 @@ import Image from "next/image";
 import Navigation from "../common/Navigation";
 import CloseIcon from "@mui/icons-material/Close";
 import Wallet from "../common/Wallet";
+import Footer from "../common/Footer";
 
 const wallets = [
   {
@@ -43,11 +44,11 @@ export default function Layout({ children, activeTab, onBack }: LayoutProps) {
   }, []);
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-[#e6e7e9] text-black">
+    <div className="min-h-screen w-full flex flex-col bg-[#F8F9FF]">
       <Header />
-      <div className="flex justify-center items-center flex-grow mt-10 relative">
-        {/* Widget Container with Background Extension */}
-        <div className="relative">
+      <main className="flex-1 flex flex-col justify-center items-center">
+        {/* Widget Container */}
+        <div className="relative mt-[140px]">
           {/* Wallet Header */}
           <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden">
             <div
@@ -114,7 +115,8 @@ export default function Layout({ children, activeTab, onBack }: LayoutProps) {
             </div>
           </div>
         </div>
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }

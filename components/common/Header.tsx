@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import Logo from "../../public/woop_logo_beta.svg";
-import Wallet from "./Wallet";
 import { useRouter } from "next/router";
 import { telegramLink } from "../../utils/constants";
 
@@ -25,95 +24,99 @@ const Header = () => {
   }, []);
 
   return (
-    <div className="absolute top-0 left-0 w-full flex justify-between p-7 z-30 items-center bg-transparent">
-      {/* Logo Section with Dropdown */}
-      <div className="relative" ref={menuRef}>
-        {/* Logo */}
-        <div className="flex items-center">
-          <Image alt="woop" src={Logo} width={120} height={100} />
+    <>
+      <div className="absolute top-0 left-0 w-full flex justify-between p-7 z-30 items-center bg-transparent">
+        {/* Logo and Navigation */}
+        <div className="flex items-center justify-between w-full">
+          {/* Logo */}
+          <div className="flex items-center">
+            <Image alt="woop" src={Logo} width={140} height={120} />
+          </div>
 
-          {/* Dropdown Button */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="ml-0.5 flex items-center focus:outline-none"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              stroke="currentColor"
-              className="h-6 w-6 text-gray-600"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 8h16M4 16h16"
-              />
-            </svg>
-          </button>
-        </div>
-
-        {/* Dropdown Menu */}
-        {menuOpen && (
-          <div className="absolute left-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-            <p className="block w-full text-left font-sans text-bold font-medium px-4 py-2 text-gray-800">
-              App
-            </p>
-            <button
-              onClick={() => {
-                setMenuOpen(false);
-                router.push("/");
-              }}
-              className="block w-full text-left font-sans font-medium px-4 py-2 text-gray-400 hover:bg-gray-100"
-            >
-              {`Request`}
-            </button>
-            <button
-              onClick={() => {
-                setMenuOpen(false);
-                router.push("/widget");
-              }}
-              className="block w-full text-left font-sans font-medium px-4 py-2 text-gray-400 hover:bg-gray-100"
-            >
-              {`Widget`}
-            </button>
-            <p className="block w-full text-left font-sans text-bold font-medium px-4 py-2 text-gray-800 mt-4">
-              Need help?
-            </p>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-4">
             <a
               href={telegramLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full text-left font-sans font-medium px-4 py-2 text-gray-400 hover:bg-gray-100"
+              className="text-[#4B6BFB] hover:text-[#3b56e6] font-medium"
             >
-              {`Contact us`}
+              Contact us
             </a>
             <button
-              onClick={() => {
-                setMenuOpen(false);
-                router.push("/terms");
-              }}
-              className="block w-full text-left font-sans font-medium px-4 py-2 text-gray-400 hover:bg-gray-100"
+              onClick={() => router.push("/dashboard")}
+              className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full font-medium hover:bg-[#3b56e6] transition-colors"
             >
-              Terms of Service
+              Dashboard
             </button>
             <button
-              onClick={() => {
-                setMenuOpen(false);
-                router.push("/policy");
-              }}
-              className="block w-full text-left font-sans font-medium px-4 py-2 text-gray-400 hover:bg-gray-100"
+              onClick={() => router.push("/widget")}
+              className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full font-medium hover:bg-[#3b56e6] transition-colors"
             >
-              Privacy Policy
+              Integrate Woop
             </button>
           </div>
-        )}
-      </div>
 
-      {/* Wallet Section */}
-      <Wallet />
-    </div>
+          {/* Mobile Menu Button */}
+          <div className="md:hidden" ref={menuRef}>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="flex items-center focus:outline-none"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                className="h-10 w-10 text-gray-600"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 8h16M4 16h16"
+                />
+              </svg>
+            </button>
+
+            {/* Mobile Dropdown Menu */}
+            {menuOpen && (
+              <div className="absolute right-0 top-16 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                <div className="py-2">
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      router.push("/dashboard");
+                    }}
+                    className="block w-full text-left px-4 py-2 text-[#4B6BFB] hover:bg-gray-100"
+                  >
+                    Dashboard
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      router.push("/widget");
+                    }}
+                    className="block w-full text-left px-4 py-2 text-[#4B6BFB] hover:bg-gray-100"
+                  >
+                    Integrate Woop
+                  </button>
+                  <a
+                    href={telegramLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  >
+                    Contact us
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="absolute top-[88px] left-0 w-full h-px bg-gray-200" />
+    </>
   );
 };
 
