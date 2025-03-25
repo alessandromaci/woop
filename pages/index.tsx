@@ -1,6 +1,5 @@
 import * as React from "react";
 import Layout from "../components/layout/LayoutPayment";
-//import Payment from "../components/Payment/Payment";
 import RequestAmount from "../components/Payment/1_RequestAmount";
 import SelectReceiptMethod from "../components/Payment/2_SelectReceiptMethod ";
 import SEO from "../components/common/Seo";
@@ -26,22 +25,6 @@ export default function Home() {
         description="Woop is the easiest way to create, track, and receive cryptocurrency payment requests. Designed for both crypto natives and beginners."
         rrssImg="./RRSS.jpg"
       />
-      {/* <Layout>
-        <Payment
-          logo={logo}
-          theme={theme}
-          buttonColor={buttonColor}
-          currencies={currencies}
-          recipientAddressTransak={recipientAddressTransak}
-          chainId={chainId}
-          setChainId={setChainId}
-        />
-        {chainId === "Bank" && (
-          <InstantOffRampEventsSDK
-            onWalletAddressReceived={setRecipientAddressTransak}
-          />
-        )}
-      </Layout> */}
       <Layout
         activeTab="receive"
         onBack={currentStep === 2 ? () => setCurrentStep(1) : undefined}

@@ -4,13 +4,13 @@ export default function Wallet() {
   return (
     <div className="">
       <ConnectButton
-        chainStatus="icon"
+        chainStatus="none"
         accountStatus={{
-          smallScreen: "avatar",
+          smallScreen: "full",
           largeScreen: "full",
         }}
         showBalance={{
-          smallScreen: false,
+          smallScreen: true,
           largeScreen: true,
         }}
       />
