@@ -318,68 +318,40 @@ export default function SelectReceiptMethod({
   return (
     <>
       <div className="p-2 flex flex-col w-full">
-        <div className="flex justify-between items-center mt-2 mb-2">
-          {/*Logo*/}
-          <div className="flex justify-center items-center mt-2 mb-2">
-            <Image
-              alt="Logo"
-              src={logo || "/woop_logo.png"}
-              width={90}
-              height={70}
-            />
+        {/* Payment Details */}
+        <div className="rounded-xl relative p-4 w-full items-center bg-gray-100">
+          {/* Amount */}
+          <div className="flex items-center whitespace-nowrap">
+            <span className="font-sans font-semibold text-lg text-gray-500">
+              Requested:
+            </span>
+            <span className="text-lg ml-1 font-sans font-semibold text-gray-500">
+              {selectedAmount === "allowPayerSelectAmount"
+                ? "any"
+                : selectedAmount || "N/A"}{" "}
+              {selectedToken?.label}{" "}
+            </span>
           </div>
-          {/* Back */}
           <div className="flex items-center">
-            <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-2xl">
-              <button
-                className="flex"
-                onClick={() => {
-                  onBack();
-                }}
-                type="button"
+            {/* Description */}
+            <span className="font-sans text-base font-semibold text-gray-500">
+              Message:
+            </span>
+            {selectedDescription ? (
+              <h3
+                className={`text-base ml-1 font-sans font-semibold text-gray-500 ${
+                  selectedDescription && selectedDescription.length > 30
+                    ? "w-3/4"
+                    : "w-auto"
+                }`}
               >
-                <ArrowBackIcon />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex bg-gray-100 mt-4">
-          {/* Payment Details */}
-          <div className="rounded-3xl relative p-4 w-4/5 items-center bg-gray-100">
-            {/* Amount */}
-            <div className="flex items-center whitespace-nowrap">
-              <span className="font-sans font-semibold text-lg text-gray-500">
-                Requested:
-              </span>
-              <span className="text-lg ml-1 font-sans font-semibold text-gray-500">
-                {selectedAmount === "allowPayerSelectAmount"
-                  ? "any"
-                  : selectedAmount || "N/A"}{" "}
-                {selectedToken?.label}{" "}
-              </span>
-            </div>
-            <div className="flex items-center">
-              {/* Description */}
-              <span className="font-sans text-base font-semibold text-gray-500">
-                Message:
-              </span>
-              {selectedDescription ? (
-                <h3
-                  className={`text-base ml-1 font-sans font-semibold text-gray-500 ${
-                    selectedDescription && selectedDescription.length > 30
-                      ? "w-3/4"
-                      : "w-auto"
-                  }`}
-                >
-                  {selectedDescription}
-                </h3>
-              ) : (
-                <h3 className="text-base ml-1 font-sans font-semibold text-gray-500 w-auto">
-                  new request
-                </h3>
-              )}
-            </div>
+                {selectedDescription}
+              </h3>
+            ) : (
+              <h3 className="text-base ml-1 font-sans font-semibold text-gray-500 w-auto">
+                new request
+              </h3>
+            )}
           </div>
         </div>
 

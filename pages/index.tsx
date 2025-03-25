@@ -1,5 +1,5 @@
 import * as React from "react";
-import Layout from "../components/layout/LayoutReceive";
+import Layout from "../components/layout/LayoutPayment";
 //import Payment from "../components/Payment/Payment";
 import RequestAmount from "../components/Payment/1_RequestAmount";
 import SelectReceiptMethod from "../components/Payment/2_SelectReceiptMethod ";
@@ -42,7 +42,10 @@ export default function Home() {
           />
         )}
       </Layout> */}
-      <Layout>
+      <Layout
+        activeTab="receive"
+        onBack={currentStep === 2 ? () => setCurrentStep(1) : undefined}
+      >
         {currentStep === 1 && (
           <RequestAmount
             onContinue={(amount: any, token: any, description: string) => {

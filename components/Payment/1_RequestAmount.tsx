@@ -174,39 +174,6 @@ export default function RequestAmount({
       )}
 
       <div className="p-2 flex flex-col w-full">
-        {/*Logo*/}
-        <div className="flex justify-center items-center mt-2 mb-2">
-          <Image
-            alt="Logo"
-            src={logo || "/woop_logo.png"}
-            width={70}
-            height={50}
-          />
-        </div>
-
-        {/* Menu Selection */}
-        <div className="flex items-center justify-center mt-2 mb-2 border border-gray-600 rounded-md overflow-hidden">
-          {/* Receive Button */}
-          <div
-            className={`flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 text-white transition-all`}
-            style={{ backgroundColor: buttonColor ? buttonColor : "#007BFF" }}
-          >
-            Receive
-          </div>
-
-          {/* Track Button */}
-          <Link
-            href="/dashboard"
-            className={`flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 ${
-              theme === "dark"
-                ? "text-gray-400 hover:bg-gray-700"
-                : "text-black hover:bg-gray-300"
-            } transition-all`}
-          >
-            Track
-          </Link>
-        </div>
-
         {/* Amount Input Section */}
         <p
           className={`font-sans text-base leading-snug font-medium ${
