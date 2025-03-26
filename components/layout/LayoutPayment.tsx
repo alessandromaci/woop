@@ -43,14 +43,84 @@ export default function Layout({ children, activeTab, onBack }: LayoutProps) {
     return () => clearInterval(interval);
   }, []);
 
+  const getNextWalletIndex = (current: number) =>
+    (current + 1) % wallets.length;
+  const getPrevWalletIndex = (current: number) =>
+    (current - 1 + wallets.length) % wallets.length;
+
   return (
     <div className="min-h-screen w-full flex flex-col bg-[#F8F9FF]">
       <Header />
-      <main className="flex-1 flex flex-col justify-center items-center">
-        {/* Widget Container */}
-        <div className="relative mt-[140px]">
+      <main className="flex-1 flex flex-col justify-center items-center relative">
+        {/* Preview Widgets - Hidden on mobile */}
+        <div className="absolute w-full h-full hidden lg:flex justify-center items-center">
+          {/* Left Preview Widget */}
+          <div className="absolute transform -translate-x-[400px] scale-75 opacity-30 transition-all duration-500">
+            <div className="relative mt-[90px]">
+              <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
+                <div
+                  className={`w-full h-full bg-gradient-to-r ${
+                    wallets[getPrevWalletIndex(currentWalletIndex)].gradient
+                  }`}
+                >
+                  <div className="absolute inset-0 flex items-center justify-between px-6">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 rounded-full bg-white backdrop-blur-sm flex items-center justify-center p-2 shadow-md">
+                        <Image
+                          src={`/${
+                            wallets[getPrevWalletIndex(currentWalletIndex)].name
+                          }.png`}
+                          alt={
+                            wallets[getPrevWalletIndex(currentWalletIndex)].name
+                          }
+                          width={32}
+                          height={32}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="w-[380px] h-[500px] bg-white rounded-2xl shadow-xl" />
+            </div>
+          </div>
+
+          {/* Right Preview Widget */}
+          <div className="absolute transform translate-x-[400px] scale-75 opacity-30 transition-all duration-500">
+            <div className="relative mt-[90px]">
+              <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
+                <div
+                  className={`w-full h-full bg-gradient-to-r ${
+                    wallets[getNextWalletIndex(currentWalletIndex)].gradient
+                  }`}
+                >
+                  <div className="absolute inset-0 flex items-center justify-between px-6">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 rounded-full bg-white backdrop-blur-sm flex items-center justify-center p-2 shadow-md">
+                        <Image
+                          src={`/${
+                            wallets[getNextWalletIndex(currentWalletIndex)].name
+                          }.png`}
+                          alt={
+                            wallets[getNextWalletIndex(currentWalletIndex)].name
+                          }
+                          width={32}
+                          height={32}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="w-[380px] h-[500px] bg-white rounded-2xl shadow-xl" />
+            </div>
+          </div>
+        </div>
+
+        {/* Main Widget */}
+        <div className="relative mt-[140px] z-10">
           {/* Wallet Header */}
-          <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden">
+          <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
             <div
               className={`w-full h-full bg-gradient-to-r transition-opacity duration-1000 ${
                 wallets[currentWalletIndex].gradient
@@ -59,7 +129,7 @@ export default function Layout({ children, activeTab, onBack }: LayoutProps) {
               {/* Wallet Info */}
               <div className="absolute inset-0 flex items-center justify-between px-6">
                 <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-white backdrop-blur-sm flex items-center justify-center p-2">
+                  <div className="w-10 h-10 rounded-full bg-white backdrop-blur-sm flex items-center justify-center p-2 shadow-md">
                     <Image
                       src={`/${wallets[currentWalletIndex].name}.png`}
                       alt={wallets[currentWalletIndex].name}
@@ -68,14 +138,13 @@ export default function Layout({ children, activeTab, onBack }: LayoutProps) {
                     />
                   </div>
                 </div>
-                {/* Integrate Wallet Component */}
                 <Wallet />
               </div>
             </div>
           </div>
 
           {/* Widget Content */}
-          <div className="w-[380px] tablet:w-[450px] p-4 bg-white rounded-2xl relative">
+          <div className="w-[380px] tablet:w-[450px] p-4 bg-white rounded-2xl relative shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
             <div className="flex flex-col w-full">
               {/* Logo and Navigation */}
               <div className="flex flex-col">
