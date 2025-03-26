@@ -6,9 +6,10 @@ import { telegramLink } from "../../utils/constants";
 
 interface HeaderProps {
   isDashboard?: boolean;
+  isWidget?: boolean;
 }
 
-const Header = ({ isDashboard }: HeaderProps) => {
+const Header = ({ isDashboard, isWidget }: HeaderProps) => {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -29,14 +30,27 @@ const Header = ({ isDashboard }: HeaderProps) => {
 
   return (
     <>
-      <div className="absolute top-0 left-0 w-full flex justify-between p-7 z-30 items-center bg-transparent">
-        {/* Logo and Navigation */}
-        <div className="flex items-center justify-between w-full">
-          {/* Logo */}
-          <div className="flex items-center">
-            <Image alt="woop" src={Logo} width={140} height={120} />
-          </div>
+      <div className="w-full flex justify-between p-7 z-30 items-center bg-transparent border-b border-gray-200">
+        {/* Logo */}
+        <div className="flex items-center">
+          {isWidget ? (
+            <div className="flex items-center">
+              <Image alt="woop" src={Logo} width={140} height={120} />
+              <span className="bg-[#4B6BFB] text-white text-sm px-3 py-1 ml-2 rounded-full font-sans font-medium">
+                widget
+              </span>
+            </div>
+          ) : (
+            !isWidget && (
+              <div className="flex items-center">
+                <Image alt="woop" src={Logo} width={140} height={120} />
+              </div>
+            )
+          )}
+        </div>
 
+        {/* Navigation */}
+        <div className="flex items-center">
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
             <a
@@ -182,7 +196,6 @@ const Header = ({ isDashboard }: HeaderProps) => {
           </div>
         </div>
       </div>
-      <div className="absolute top-[88px] left-0 w-full h-px bg-gray-200" />
     </>
   );
 };

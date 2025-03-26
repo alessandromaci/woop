@@ -34,9 +34,7 @@ export default function WidgetPage() {
         setCurrencies={setCurrencies}
       >
         <div
-          className={`border rounded border-gray-400 ${
-            theme === "dark" ? "bg-black" : "bg-white"
-          }`}
+          className={`rounded ${theme === "dark" ? "bg-black" : "bg-white"}`}
         >
           {currentStep === 1 && (
             <RequestAmount
