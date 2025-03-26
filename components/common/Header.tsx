@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Logo from "../../public/woop_logo_beta.svg";
 import { useRouter } from "next/router";
 import { telegramLink } from "../../utils/constants";
@@ -35,7 +36,9 @@ const Header = ({ isDashboard, isWidget }: HeaderProps) => {
         <div className="flex items-center">
           {isWidget ? (
             <div className="flex items-center">
-              <Image alt="woop" src={Logo} width={140} height={120} />
+              <Link href="/">
+                <Image alt="woop" src={Logo} width={140} height={120} />
+              </Link>
               <span className="bg-[#4B6BFB] text-white text-sm px-3 py-1 ml-2 rounded-full font-sans font-medium">
                 widget
               </span>
@@ -43,7 +46,9 @@ const Header = ({ isDashboard, isWidget }: HeaderProps) => {
           ) : (
             !isWidget && (
               <div className="flex items-center">
-                <Image alt="woop" src={Logo} width={140} height={120} />
+                <Link href="/">
+                  <Image alt="woop" src={Logo} width={140} height={120} />
+                </Link>
               </div>
             )
           )}
