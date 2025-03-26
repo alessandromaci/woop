@@ -47,7 +47,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen w-full flex flex-col bg-[#F8F9FF]">
       <Header isDashboard={true} />
-      <main className="flex-1 flex flex-col justify-center items-center relative py-8">
+      <main className="flex-1 flex flex-col justify-center items-center relative pt-16 sm:py-8">
         {/* Preview Widgets - Hidden on mobile */}
         <div className="absolute w-full h-full hidden lg:flex justify-center items-center pointer-events-none">
           {/* Left Preview Widget */}
@@ -162,7 +162,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Main Widget */}
-        <div className="relative lg:transform lg:scale-[0.75] z-10">
+        <div className="relative lg:transform lg:scale-[0.75] z-10 mt-12 sm:mt-0">
           {/* Wallet Header */}
           <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
             <div
