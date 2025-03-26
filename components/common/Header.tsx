@@ -76,6 +76,15 @@ const Header = ({ isDashboard, isWidget }: HeaderProps) => {
                   Integrate Woop
                 </button>
               </>
+            ) : isWidget ? (
+              <>
+                <button
+                  onClick={() => router.push("/")}
+                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-[#3b56e6] transition-colors"
+                >
+                  Home
+                </button>
+              </>
             ) : (
               <>
                 <button
