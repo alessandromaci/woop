@@ -221,55 +221,6 @@ const ConfigMenu: React.FC<ConfigMenuProps> = ({
           ))}
         </div>
       </div>
-
-      {/* Deploy Section */}
-      {!hideDeploySection && (
-        <div>
-          <SectionTitle>Deploy Widget</SectionTitle>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const data = new FormData(e.target as HTMLFormElement);
-              const leadDetails = {
-                company: data.get("company"),
-                telegram: data.get("telegram"),
-              };
-              window.location.href = `mailto:hello@woop.ink?subject=Widget Deployment Request&body=${encodeURIComponent(
-                `Hi, I would like to integrate the Woop widget. Here is my data:
-
-Company: ${leadDetails.company}
-Telegram: ${leadDetails.telegram}
-
-Thanks!`
-              )}`;
-            }}
-            className="space-y-3"
-          >
-            <div className="space-y-2">
-              <input
-                type="text"
-                name="company"
-                placeholder="Company Name"
-                required
-                className="w-full h-12 px-4 bg-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-              />
-              <input
-                type="text"
-                name="telegram"
-                placeholder="Telegram Handle"
-                required
-                className="w-full h-12 px-4 bg-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full h-12 bg-[#4B6BFB] text-white text-sm font-medium rounded-xl hover:bg-[#3b56e6] transition-colors"
-            >
-              Deploy Widget
-            </button>
-          </form>
-        </div>
-      )}
     </div>
   );
 };
