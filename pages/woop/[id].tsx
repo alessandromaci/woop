@@ -432,7 +432,7 @@ const Request = () => {
         rrssImg="./RRSS.jpg"
         description={"You've been requested to send a crypto payment"}
       />
-      <Layout>
+      <Layout activeTab="receive">
         {hydrated ? (
           <div className={"w-full flex justify-center items-center"}>
             {isSuccess || isSuccessNative ? (
