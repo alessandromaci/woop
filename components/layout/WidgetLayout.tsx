@@ -244,16 +244,16 @@ const WidgetLayout = ({
           {/* Integration Steps */}
           <div>
             <p className="text-sm text-gray-600 mb-6">
-              Fill in your company name and Telegram handle above and click
-              Deploy.
+              {`Fill in your company name and Telegram handle above and click
+              Deploy.`}
             </p>
             <p className="text-sm text-gray-600 mb-6">
-              We'll send you a custom code snippet via email that's ready to
-              use.
+              {`We'll send you a custom code snippet via email that's ready to
+              use.`}
             </p>
             <p className="text-sm text-gray-600">
-              Simply add the code snippet to your website's HTML and you're
-              ready to go!
+              {`Simply add the code snippet to your website's HTML and you're
+              ready to go!`}
             </p>
           </div>
           <div className="mt-8">
