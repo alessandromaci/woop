@@ -149,7 +149,7 @@ const Header = ({ isDashboard, isWidget }: HeaderProps) => {
 
             {/* Mobile Dropdown Menu */}
             {menuOpen && (
-              <div className="absolute left-0 top-[88px] w-full bg-[#F8F9FF] border-t border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.1)] z-50">
+              <div className="absolute left-0 top-[79px] w-full bg-[#F8F9FF] border-t border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.1)] z-50">
                 <div className="max-w-7xl mx-auto px-7 py-8">
                   <nav className="flex flex-col gap-6">
                     {isDashboard ? (
