@@ -2,7 +2,6 @@ import React from "react";
 import Header from "../common/Header";
 import Image from "next/image";
 import Navigation from "../common/Navigation";
-import CloseIcon from "@mui/icons-material/Close";
 import Wallet from "../common/Wallet";
 import Footer from "../common/Footer";
 
@@ -24,10 +23,16 @@ const wallets = [
 interface LayoutProps {
   children: React.ReactNode;
   activeTab: "receive" | "invest" | "nfts";
+  showNavigation?: boolean;
   onBack?: () => void;
 }
 
-export default function Layout({ children, activeTab, onBack }: LayoutProps) {
+export default function Layout({
+  children,
+  activeTab,
+  showNavigation = true,
+  onBack,
+}: LayoutProps) {
   const [currentWalletIndex, setCurrentWalletIndex] = React.useState(0);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
 
@@ -83,18 +88,6 @@ export default function Layout({ children, activeTab, onBack }: LayoutProps) {
               </div>
               <div className="w-[380px] h-[400px] bg-white rounded-2xl shadow-xl overflow-hidden">
                 <div className="p-8">
-                  {/* Woop Logo */}
-                  <div className="flex justify-center mb-6">
-                    <Image
-                      alt="Logo"
-                      src="/woop_logo.png"
-                      width={90}
-                      height={70}
-                      priority
-                    />
-                  </div>
-                  <Navigation activeTab="receive" />
-                  {/* Placeholder Content */}
                   <div className="space-y-4">
                     <div className="h-12 bg-gray-100 rounded-xl animate-pulse"></div>
                     <div className="space-y-3">
@@ -138,18 +131,6 @@ export default function Layout({ children, activeTab, onBack }: LayoutProps) {
               </div>
               <div className="w-[380px] h-[400px] bg-white rounded-2xl shadow-xl overflow-hidden">
                 <div className="p-8">
-                  {/* Woop Logo */}
-                  <div className="flex justify-center mb-6">
-                    <Image
-                      alt="Logo"
-                      src="/woop_logo.png"
-                      width={90}
-                      height={70}
-                      priority
-                    />
-                  </div>
-                  <Navigation activeTab="receive" />
-                  {/* Placeholder Content */}
                   <div className="space-y-4">
                     <div className="h-12 bg-gray-100 rounded-xl animate-pulse"></div>
                     <div className="space-y-3">
@@ -194,40 +175,55 @@ export default function Layout({ children, activeTab, onBack }: LayoutProps) {
           {/* Widget Content */}
           <div className="w-[380px] tablet:w-[450px] p-4 bg-white rounded-2xl relative shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
             <div className="flex flex-col w-full">
-              {/* Logo and Navigation */}
-              <div className="flex flex-col">
-                {/* Logo and Close Button */}
-                <div
-                  className={`flex ${
-                    onBack ? "justify-between" : "justify-center"
-                  } items-center mt-2 mb-4`}
-                >
+              {showNavigation && (
+                <div className="flex flex-col">
                   <div
-                    className={`${onBack ? "" : "flex justify-center w-full"}`}
+                    className={`flex ${
+                      onBack ? "justify-between" : "justify-center"
+                    } items-center mt-2 mb-4`}
                   >
-                    <Image
-                      alt="Logo"
-                      src="/woop_logo.png"
-                      width={90}
-                      height={70}
-                      priority
-                    />
-                  </div>
-                  {onBack && (
-                    <div className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center cursor-pointer hover:bg-[#EBEBEB] transition-colors">
-                      <button
-                        className="flex p-1.5"
-                        onClick={onBack}
-                        type="button"
-                      >
-                        <CloseIcon className="text-[#666666]" />
-                      </button>
+                    <div
+                      className={`${
+                        onBack ? "" : "flex justify-center w-full"
+                      }`}
+                    >
+                      <Image
+                        alt="Logo"
+                        src="/woop_logo.png"
+                        width={90}
+                        height={70}
+                        priority
+                      />
                     </div>
-                  )}
+                    {onBack && (
+                      <div className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center cursor-pointer hover:bg-[#EBEBEB] transition-colors">
+                        <button
+                          className="flex p-1.5"
+                          onClick={onBack}
+                          type="button"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-[#666666]"
+                          >
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <Navigation activeTab={activeTab} />
                 </div>
-                {/* Navigation */}
-                <Navigation activeTab={activeTab} />
-              </div>
+              )}
               {children}
             </div>
           </div>
