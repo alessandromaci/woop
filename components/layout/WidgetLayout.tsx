@@ -34,6 +34,18 @@ const WidgetLayout = ({
 }: any) => {
   const [currentWalletIndex, setCurrentWalletIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -52,6 +64,31 @@ const WidgetLayout = ({
   const getPrevWalletIndex = (current: number) =>
     (current - 1 + wallets.length) % wallets.length;
 
+  if (isMobile) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8F9FF] p-6">
+        <div className="text-center space-y-4 max-w-md">
+          <Image
+            alt="Logo"
+            src="/woop_logo.png"
+            width={120}
+            height={90}
+            priority
+            className="mx-auto"
+          />
+          <h1 className="text-2xl font-bold text-gray-800">
+            Desktop Only Feature
+          </h1>
+          <p className="text-gray-600">
+            The Woop widget configuration is currently only available on desktop
+            devices. Please access this page from your computer for the best
+            experience.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F9FF]">
       {/* Header */}
@@ -60,18 +97,20 @@ const WidgetLayout = ({
       {/* Main Content */}
       <div className="flex flex-1">
         {/* Left Config Menu */}
-        <div className="w-[280px] bg-white py-6 px-6 border-r border-gray-200">
-          <ConfigMenu
-            theme={theme}
-            setTheme={setTheme}
-            logo={logo}
-            setLogo={setLogo}
-            buttonColor={buttonColor}
-            setButtonColor={setButtonColor}
-            currencies={currencies}
-            setCurrencies={setCurrencies}
-            hideDeploySection={true}
-          />
+        <div className="w-[280px] bg-white border-r border-gray-200 relative z-10 flex flex-col">
+          <div className="py-6 px-2 origin-top transform scale-[0.85]">
+            <ConfigMenu
+              theme={theme}
+              setTheme={setTheme}
+              logo={logo}
+              setLogo={setLogo}
+              buttonColor={buttonColor}
+              setButtonColor={setButtonColor}
+              currencies={currencies}
+              setCurrencies={setCurrencies}
+              hideDeploySection={true}
+            />
+          </div>
         </div>
 
         {/* Center Preview with Carousel */}
@@ -79,7 +118,7 @@ const WidgetLayout = ({
           {/* Preview Widgets - Hidden on mobile */}
           <div className="absolute w-full h-full hidden lg:flex justify-center items-center">
             {/* Left Preview Widget */}
-            <div className="absolute transform -translate-x-[450px] -rotate-[15deg] scale-75 opacity-30 transition-all duration-500">
+            <div className="absolute transform -translate-x-[350px] -rotate-[15deg] scale-[0.6] opacity-30 transition-all duration-500">
               <div className="relative mt-[90px]">
                 <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
                   <div
@@ -136,7 +175,7 @@ const WidgetLayout = ({
             </div>
 
             {/* Right Preview Widget */}
-            <div className="absolute transform translate-x-[450px] rotate-[15deg] scale-75 opacity-30 transition-all duration-500">
+            <div className="absolute transform translate-x-[350px] rotate-[15deg] scale-[0.6] opacity-30 transition-all duration-500">
               <div className="relative mt-[90px]">
                 <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
                   <div
@@ -194,7 +233,7 @@ const WidgetLayout = ({
           </div>
 
           {/* Main Widget */}
-          <div className="relative mt-[140px] z-10">
+          <div className="relative mt-[90px] transform scale-[0.75] z-10">
             {/* Wallet Header */}
             <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
               <div
@@ -240,7 +279,7 @@ const WidgetLayout = ({
         </div>
 
         {/* Right Integration Details */}
-        <div className="w-[280px] bg-white py-6 px-6 border-l border-gray-200">
+        <div className="w-[280px] bg-white py-6 px-6 border-l border-gray-200 relative z-10">
           {/* Integration Steps */}
           <div>
             <p className="text-sm text-gray-600 mb-6">

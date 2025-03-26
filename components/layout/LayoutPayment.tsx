@@ -51,11 +51,11 @@ export default function Layout({ children, activeTab, onBack }: LayoutProps) {
   return (
     <div className="min-h-screen w-full flex flex-col bg-[#F8F9FF]">
       <Header isDashboard={false} />
-      <main className="flex-1 flex flex-col justify-center items-center relative">
+      <main className="flex-1 flex flex-col justify-center items-center relative py-8">
         {/* Preview Widgets - Hidden on mobile */}
-        <div className="absolute w-full h-full hidden lg:flex justify-center items-center">
+        <div className="absolute w-full h-full hidden lg:flex justify-center items-center pointer-events-none">
           {/* Left Preview Widget */}
-          <div className="absolute transform -translate-x-[450px] -rotate-[15deg] scale-75 opacity-30 transition-all duration-500">
+          <div className="absolute transform -translate-x-[350px] -translate-y-[50px] -rotate-[15deg] scale-[0.6] opacity-30 transition-all duration-500">
             <div className="relative mt-[90px]">
               <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
                 <div
@@ -110,7 +110,7 @@ export default function Layout({ children, activeTab, onBack }: LayoutProps) {
           </div>
 
           {/* Right Preview Widget */}
-          <div className="absolute transform translate-x-[450px] rotate-[15deg] scale-75 opacity-30 transition-all duration-500">
+          <div className="absolute transform translate-x-[350px] -translate-y-[50px] rotate-[15deg] scale-[0.6] opacity-30 transition-all duration-500">
             <div className="relative mt-[90px]">
               <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
                 <div
@@ -166,7 +166,7 @@ export default function Layout({ children, activeTab, onBack }: LayoutProps) {
         </div>
 
         {/* Main Widget */}
-        <div className="relative mt-[140px] z-10">
+        <div className="relative transform scale-[0.70] z-10">
           {/* Wallet Header */}
           <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
             <div

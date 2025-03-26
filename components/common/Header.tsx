@@ -30,7 +30,7 @@ const Header = ({ isDashboard, isWidget }: HeaderProps) => {
 
   return (
     <>
-      <div className="w-full flex justify-between p-7 z-30 items-center bg-transparent border-b border-gray-200">
+      <div className="w-full flex justify-between p-5 z-30 items-center bg-transparent border-b border-gray-200">
         {/* Logo */}
         <div className="flex items-center">
           {isWidget ? (
