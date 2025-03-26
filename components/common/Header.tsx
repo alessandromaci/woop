@@ -4,7 +4,11 @@ import Logo from "../../public/woop_logo_beta.svg";
 import { useRouter } from "next/router";
 import { telegramLink } from "../../utils/constants";
 
-const Header = () => {
+interface HeaderProps {
+  isDashboard?: boolean;
+}
+
+const Header = ({ isDashboard }: HeaderProps) => {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -39,22 +43,41 @@ const Header = () => {
               href={telegramLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#4B6BFB] hover:text-[#3b56e6] text-lg font-medium"
+              className="text-black hover:text-[#4B6BFB] text-lg font-medium"
             >
               Contact us
             </a>
-            <button
-              onClick={() => router.push("/dashboard")}
-              className="bg-[#4B6BFB] text-white px-6 py-3 rounded-full text-lg font-medium hover:bg-[#3b56e6] transition-colors"
-            >
-              Dashboard
-            </button>
-            <button
-              onClick={() => router.push("/widget")}
-              className="bg-[#4B6BFB] text-white px-6 py-3 rounded-full text-lg font-medium hover:bg-[#3b56e6] transition-colors"
-            >
-              Integrate Woop
-            </button>
+            {isDashboard ? (
+              <>
+                <button
+                  onClick={() => router.push("/")}
+                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-[#3b56e6] transition-colors"
+                >
+                  Home
+                </button>
+                <button
+                  onClick={() => router.push("/widget")}
+                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-[#3b56e6] transition-colors"
+                >
+                  Integrate Woop
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => router.push("/dashboard")}
+                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-[#3b56e6] transition-colors"
+                >
+                  Dashboard
+                </button>
+                <button
+                  onClick={() => router.push("/widget")}
+                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-[#3b56e6] transition-colors"
+                >
+                  Integrate Woop
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -101,6 +124,49 @@ const Header = () => {
               <div className="absolute left-0 top-[88px] w-full bg-[#F8F9FF] border-t border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.1)] z-50">
                 <div className="max-w-7xl mx-auto px-7 py-8">
                   <nav className="flex flex-col gap-6">
+                    {isDashboard ? (
+                      <>
+                        <button
+                          onClick={() => {
+                            setMenuOpen(false);
+                            router.push("/");
+                          }}
+                          className="text-lg font-medium text-white bg-[#4B6BFB] hover:bg-[#3b56e6] px-6 py-2 rounded-full transition-colors w-fit"
+                        >
+                          Home
+                        </button>
+                        <button
+                          onClick={() => {
+                            setMenuOpen(false);
+                            router.push("/widget");
+                          }}
+                          className="text-lg font-medium text-white bg-[#4B6BFB] hover:bg-[#3b56e6] px-6 py-2 rounded-full transition-colors w-fit"
+                        >
+                          Integrate Woop
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => {
+                            setMenuOpen(false);
+                            router.push("/dashboard");
+                          }}
+                          className="text-lg font-medium text-white bg-[#4B6BFB] hover:bg-[#3b56e6] px-6 py-2 rounded-full transition-colors w-fit"
+                        >
+                          Dashboard
+                        </button>
+                        <button
+                          onClick={() => {
+                            setMenuOpen(false);
+                            router.push("/widget");
+                          }}
+                          className="text-lg font-medium text-white bg-[#4B6BFB] hover:bg-[#3b56e6] px-6 py-2 rounded-full transition-colors w-fit"
+                        >
+                          Integrate Woop
+                        </button>
+                      </>
+                    )}
                     <a
                       href={telegramLink}
                       target="_blank"
@@ -109,24 +175,6 @@ const Header = () => {
                     >
                       Contact us
                     </a>
-                    <button
-                      onClick={() => {
-                        setMenuOpen(false);
-                        router.push("/dashboard");
-                      }}
-                      className="text-lg font-medium text-white bg-[#4B6BFB] hover:bg-[#3b56e6] px-6 py-2 rounded-full transition-colors w-fit"
-                    >
-                      Dashboard
-                    </button>
-                    <button
-                      onClick={() => {
-                        setMenuOpen(false);
-                        router.push("/widget");
-                      }}
-                      className="text-lg font-medium text-white bg-[#4B6BFB] hover:bg-[#3b56e6] px-6 py-2 rounded-full transition-colors w-fit"
-                    >
-                      Integrate Woop
-                    </button>
                   </nav>
                 </div>
               </div>
@@ -134,7 +182,7 @@ const Header = () => {
           </div>
         </div>
       </div>
-      <div className="absolute top-[100px] left-0 w-full h-px bg-gray-200" />
+      <div className="absolute top-[88px] left-0 w-full h-px bg-gray-200" />
     </>
   );
 };

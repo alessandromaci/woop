@@ -71,37 +71,11 @@ const Dashboard = () => {
         rrssImg="./RRSS.jpg"
       />
       <Layout>
-        {/* Header Section */}
-        <div className="p-2 flex flex-col w-full">
-          {/*Logo*/}
-          <div className="flex justify-center items-center mt-2 mb-2">
-            <Image alt="Logo" src={"/woop_logo.png"} width={70} height={50} />
-          </div>
-
-          {/* Menu Selection */}
-          <div className="flex items-center justify-center mt-2 mb-3 border border-gray-600 rounded-md overflow-hidden">
-            {/* Receive Button */}
-            <Link
-              href="/"
-              className="flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 text-black hover:bg-gray-300 transition-all"
-            >
-              Receive
-            </Link>
-            {/* Track Button */}
-            <div className="flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 text-white bg-[#007BFF]">
-              Track
-            </div>
-          </div>
-        </div>
-
-        <p className="ml-2 text-left font-sans font-medium">My woops</p>
-        <hr className="my-1 border-2 border-gray-400" />
-
         {/* Main Dashboard Section */}
         <div
           className="overflow-y-scroll px-2"
           style={{
-            height: `calc(100vh - 300px)`,
+            height: `calc(50vh)`,
           }}
         >
           {filteredNotifications.length === 0 ? (
@@ -161,7 +135,7 @@ const Dashboard = () => {
                     </div>
                     {/* Content */}
                     <div className="flex flex-col flex-1">
-                      <p className="font-bold text-lg mb-1">
+                      <p className="font-bold text-lg mb-1 text-black">
                         {description ? description : "new request"}
                       </p>
                       <div className="flex items-center text-sm text-slate-500">
