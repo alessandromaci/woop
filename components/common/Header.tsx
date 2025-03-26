@@ -30,7 +30,7 @@ const Header = ({ isDashboard, isWidget }: HeaderProps) => {
 
   return (
     <>
-      <div className="w-full flex justify-between p-5 z-30 items-center bg-transparent border-b border-gray-200">
+      <div className="w-full flex justify-between px-5 py-4 z-30 items-center bg-transparent border-b border-gray-200">
         {/* Logo */}
         <div className="flex items-center">
           {isWidget ? (
@@ -52,12 +52,12 @@ const Header = ({ isDashboard, isWidget }: HeaderProps) => {
         {/* Navigation */}
         <div className="flex items-center">
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-4">
             <a
               href={telegramLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-black hover:text-[#4B6BFB] text-lg font-medium"
+              className="text-black hover:text-[#4B6BFB] font-medium"
             >
               Contact us
             </a>
@@ -65,13 +65,13 @@ const Header = ({ isDashboard, isWidget }: HeaderProps) => {
               <>
                 <button
                   onClick={() => router.push("/")}
-                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-[#3b56e6] transition-colors"
+                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full font-medium hover:bg-[#3b56e6] transition-colors"
                 >
                   Home
                 </button>
                 <button
                   onClick={() => router.push("/widget")}
-                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-[#3b56e6] transition-colors"
+                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full font-medium hover:bg-[#3b56e6] transition-colors"
                 >
                   Integrate Woop
                 </button>
@@ -80,7 +80,7 @@ const Header = ({ isDashboard, isWidget }: HeaderProps) => {
               <>
                 <button
                   onClick={() => router.push("/")}
-                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-[#3b56e6] transition-colors"
+                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full font-medium hover:bg-[#3b56e6] transition-colors"
                 >
                   Home
                 </button>
@@ -89,13 +89,13 @@ const Header = ({ isDashboard, isWidget }: HeaderProps) => {
               <>
                 <button
                   onClick={() => router.push("/dashboard")}
-                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-[#3b56e6] transition-colors"
+                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full font-medium hover:bg-[#3b56e6] transition-colors"
                 >
                   Dashboard
                 </button>
                 <button
                   onClick={() => router.push("/widget")}
-                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-[#3b56e6] transition-colors"
+                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full font-medium hover:bg-[#3b56e6] transition-colors"
                 >
                   Integrate Woop
                 </button>

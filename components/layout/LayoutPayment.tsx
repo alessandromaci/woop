@@ -166,7 +166,7 @@ export default function Layout({ children, activeTab, onBack }: LayoutProps) {
         </div>
 
         {/* Main Widget */}
-        <div className="relative transform scale-[0.70] z-10">
+        <div className="relative lg:transform lg:scale-[0.70] z-10">
           {/* Wallet Header */}
           <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
             <div

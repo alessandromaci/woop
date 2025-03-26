@@ -75,7 +75,7 @@ const Dashboard = () => {
         <div
           className="overflow-y-scroll px-2"
           style={{
-            height: `calc(50vh)`,
+            height: `calc(55vh)`,
           }}
         >
           {filteredNotifications.length === 0 ? (
