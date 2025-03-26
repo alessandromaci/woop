@@ -4,6 +4,7 @@ import Image from "next/image";
 import CloseIcon from "@mui/icons-material/Close";
 import Wallet from "../common/Wallet";
 import Footer from "../common/Footer";
+import Navigation from "../common/Navigation";
 import { useRouter } from "next/router";
 
 const wallets = [
@@ -50,7 +51,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {/* Preview Widgets - Hidden on mobile */}
         <div className="absolute w-full h-full hidden lg:flex justify-center items-center">
           {/* Left Preview Widget */}
-          <div className="absolute transform -translate-x-[400px] scale-75 opacity-30 transition-all duration-500">
+          <div className="absolute transform -translate-x-[450px] -rotate-[15deg] scale-75 opacity-30 transition-all duration-500">
             <div className="relative mt-[90px]">
               <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
                 <div
@@ -76,12 +77,36 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   </div>
                 </div>
               </div>
-              <div className="w-[380px] h-[500px] bg-white rounded-2xl shadow-xl" />
+              <div className="w-[380px] h-[400px] bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div className="p-8">
+                  {/* Woop Logo */}
+                  <div className="flex justify-center mb-6">
+                    <Image
+                      alt="Logo"
+                      src="/woop_logo.png"
+                      width={90}
+                      height={70}
+                      priority
+                    />
+                  </div>
+                  <Navigation activeTab="receive" />
+                  {/* Placeholder Content */}
+                  <div className="space-y-4">
+                    <div className="h-12 bg-gray-100 rounded-xl animate-pulse"></div>
+                    <div className="space-y-3">
+                      <div className="h-4 bg-gray-100 rounded w-3/4 animate-pulse"></div>
+                      <div className="h-4 bg-gray-100 rounded animate-pulse"></div>
+                      <div className="h-4 bg-gray-100 rounded w-1/2 animate-pulse"></div>
+                    </div>
+                    <div className="h-12 bg-gray-100 rounded-full mt-6 animate-pulse"></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Right Preview Widget */}
-          <div className="absolute transform translate-x-[400px] scale-75 opacity-30 transition-all duration-500">
+          <div className="absolute transform translate-x-[450px] rotate-[15deg] scale-75 opacity-30 transition-all duration-500">
             <div className="relative mt-[90px]">
               <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
                 <div
@@ -107,7 +132,31 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   </div>
                 </div>
               </div>
-              <div className="w-[380px] h-[500px] bg-white rounded-2xl shadow-xl" />
+              <div className="w-[380px] h-[400px] bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div className="p-8">
+                  {/* Woop Logo */}
+                  <div className="flex justify-center mb-6">
+                    <Image
+                      alt="Logo"
+                      src="/woop_logo.png"
+                      width={90}
+                      height={70}
+                      priority
+                    />
+                  </div>
+                  <Navigation activeTab="receive" />
+                  {/* Placeholder Content */}
+                  <div className="space-y-4">
+                    <div className="h-12 bg-gray-100 rounded-xl animate-pulse"></div>
+                    <div className="space-y-3">
+                      <div className="h-4 bg-gray-100 rounded w-3/4 animate-pulse"></div>
+                      <div className="h-4 bg-gray-100 rounded animate-pulse"></div>
+                      <div className="h-4 bg-gray-100 rounded w-1/2 animate-pulse"></div>
+                    </div>
+                    <div className="h-12 bg-gray-100 rounded-full mt-6 animate-pulse"></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

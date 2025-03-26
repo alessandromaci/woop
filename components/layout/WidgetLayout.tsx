@@ -55,7 +55,7 @@ const WidgetLayout = ({
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F9FF]">
       {/* Header */}
-      <Header isWidget={true} />
+      <Header isWidget={true} isDashboard={false} />
 
       {/* Main Content */}
       <div className="flex flex-1">
@@ -79,7 +79,7 @@ const WidgetLayout = ({
           {/* Preview Widgets - Hidden on mobile */}
           <div className="absolute w-full h-full hidden lg:flex justify-center items-center">
             {/* Left Preview Widget */}
-            <div className="absolute transform -translate-x-[400px] -rotate-[25deg] scale-75 opacity-30 transition-all duration-500">
+            <div className="absolute transform -translate-x-[450px] -rotate-[15deg] scale-75 opacity-30 transition-all duration-500">
               <div className="relative mt-[90px]">
                 <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
                   <div
@@ -107,8 +107,8 @@ const WidgetLayout = ({
                     </div>
                   </div>
                 </div>
-                <div className="w-[380px] h-[450px] bg-white rounded-2xl shadow-xl overflow-hidden">
-                  <div className="pt-8">
+                <div className="w-[380px] h-[400px] bg-white rounded-2xl shadow-xl overflow-hidden">
+                  <div className="p-8">
                     {/* Woop Logo */}
                     <div className="flex justify-center mb-6">
                       <Image
@@ -136,7 +136,7 @@ const WidgetLayout = ({
             </div>
 
             {/* Right Preview Widget */}
-            <div className="absolute transform translate-x-[400px] rotate-[25deg] scale-75 opacity-30 transition-all duration-500">
+            <div className="absolute transform translate-x-[450px] rotate-[15deg] scale-75 opacity-30 transition-all duration-500">
               <div className="relative mt-[90px]">
                 <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
                   <div
@@ -164,8 +164,8 @@ const WidgetLayout = ({
                     </div>
                   </div>
                 </div>
-                <div className="w-[380px] h-[450px] bg-white rounded-2xl shadow-xl overflow-hidden">
-                  <div className="pt-8">
+                <div className="w-[380px] h-[400px] bg-white rounded-2xl shadow-xl overflow-hidden">
+                  <div className="p-8">
                     {/* Woop Logo */}
                     <div className="flex justify-center mb-6">
                       <Image
