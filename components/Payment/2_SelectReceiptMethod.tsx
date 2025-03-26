@@ -890,28 +890,29 @@ export default function SelectReceiptMethod({
       </div>
 
       {isShareActive && (
-        <section className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen z-30">
+        <div className="absolute top-0 left-0 right-0 z-30">
           <div
-            onClick={() => setIsShareActive(!isShareActive)}
-            className="fixed top-0 left-0 w-screen h-screen bg-slate-900 opacity-30"
-          ></div>
-          <div
-            className={cx(
-              styles.shareBackground,
-              "z-20 rounded-3xl shadow-xl py-2 px-2 md:w-96 m-5"
-            )}
+            className={`${
+              theme === "dark" ? "bg-gray-800" : "bg-white"
+            } rounded-2xl shadow-xl w-full`}
           >
-            <Share
-              visibility={setIsShareActive}
-              path={path}
-              amount={selectedAmount}
-              description={selectedDescription}
-              token={selectedToken.label}
-              network={chainId}
-              address={recipientAddress}
-            />
+            <div className="p-4">
+              <Share
+                visibility={setIsShareActive}
+                path={path}
+                amount={selectedAmount}
+                description={selectedDescription}
+                token={selectedToken.label}
+                network={chainId}
+                address={recipientAddress}
+              />
+            </div>
           </div>
-        </section>
+          <div
+            onClick={() => setIsShareActive(false)}
+            className="fixed inset-0 bg-black bg-opacity-30 z-[-1]"
+          />
+        </div>
       )}
 
       <div className="flex justify-center items-center mt-5 mb-2">
