@@ -2,7 +2,7 @@ import React from "react";
 import SEO from "../components/common/Seo";
 import WidgetLayout from "../components/layout/WidgetLayout";
 import RequestAmount from "../components/Payment/1_RequestAmount";
-import SelectReceiptMethod from "../components/Payment/2_SelectReceiptMethod ";
+import SelectReceiptMethod from "../components/Payment/2_SelectReceiptMethod";
 //import Payment from "../components/Payment/Payment";
 import { tokensDetails } from "../utils/constants";
 

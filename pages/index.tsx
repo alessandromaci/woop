@@ -1,7 +1,7 @@
 import * as React from "react";
 import Layout from "../components/layout/LayoutPayment";
 import RequestAmount from "../components/Payment/1_RequestAmount";
-import SelectReceiptMethod from "../components/Payment/2_SelectReceiptMethod ";
+import SelectReceiptMethod from "../components/Payment/2_SelectReceiptMethod";
 import SEO from "../components/common/Seo";
 import { tokensDetails } from "../utils/constants";
 

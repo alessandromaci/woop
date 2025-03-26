@@ -319,40 +319,34 @@ export default function SelectReceiptMethod({
     <>
       <div className="p-2 flex flex-col w-full">
         {/* Payment Details */}
-        <div className="rounded-xl relative p-4 w-full items-center bg-gray-100">
-          {/* Amount */}
-          <div className="flex items-center whitespace-nowrap">
-            <span className="font-sans font-semibold text-lg text-gray-500">
-              Requested:
-            </span>
-            <span className="text-lg ml-1 font-sans font-semibold text-gray-500">
-              {selectedAmount === "allowPayerSelectAmount"
-                ? "any"
-                : selectedAmount || "N/A"}{" "}
-              {selectedToken?.label}{" "}
-            </span>
+        <div className="rounded-xl relative p-4 w-full bg-white border border-gray-200">
+          {/* Amount with Token Logo */}
+          <div className="flex items-center mb-3">
+            <Image
+              alt={selectedToken.label}
+              src={selectedToken.logo}
+              width={32}
+              height={32}
+              className="rounded-full mr-3"
+            />
+            <div className="flex items-center">
+              <span className="text-lg font-medium text-gray-500 mr-2">
+                You will receive
+              </span>
+              <span className="text-lg font-bold text-gray-900">
+                {selectedAmount === "allowPayerSelectAmount"
+                  ? "Any amount"
+                  : `${selectedAmount} ${selectedToken?.label}`}
+              </span>
+            </div>
           </div>
-          <div className="flex items-center">
-            {/* Description */}
-            <span className="font-sans text-base font-semibold text-gray-500">
-              Message:
-            </span>
-            {selectedDescription ? (
-              <h3
-                className={`text-base ml-1 font-sans font-semibold text-gray-500 ${
-                  selectedDescription && selectedDescription.length > 30
-                    ? "w-3/4"
-                    : "w-auto"
-                }`}
-              >
-                {selectedDescription}
-              </h3>
-            ) : (
-              <h3 className="text-base ml-1 font-sans font-semibold text-gray-500 w-auto">
-                new request
-              </h3>
-            )}
-          </div>
+
+          {/* Message */}
+          {selectedDescription && (
+            <div className="text-lg font-semibold text-gray-700 mt-2">
+              For {selectedDescription}
+            </div>
+          )}
         </div>
 
         {/* Payment Methods */}
