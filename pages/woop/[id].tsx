@@ -428,9 +428,9 @@ const Request = () => {
   return (
     <>
       <SEO
-        title={"Woop | Payment Request"}
-        rrssImg="./RRSS.jpg"
-        description={"You've been requested to send a crypto payment"}
+        title="Woop | Add More Ways For Using Your Crypto Wallet"
+        description="We help crypto wallet providers expand their features. Woop Widget enables seamless integration of payment, investment, and NFT capabilities."
+        rrssImg="./RRSS.svg"
       />
       <Layout showNavigation={false} activeTab="receive">
         {hydrated ? (

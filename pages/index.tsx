@@ -21,9 +21,9 @@ export default function Home() {
   return (
     <>
       <SEO
-        title="Woop | Create Cryptocurrency Payment Requests Easily"
-        description="Woop is the easiest way to create, track, and receive cryptocurrency payment requests. Designed for both crypto natives and beginners."
-        rrssImg="./RRSS.jpg"
+        title="Woop | Add More Ways For Using Your Crypto Wallet"
+        description="We help crypto wallet providers expand their features. Woop Widget enables seamless integration of payment, investment, and NFT capabilities."
+        rrssImg="./RRSS.svg"
       />
       <Layout
         activeTab="receive"

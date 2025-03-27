@@ -66,9 +66,9 @@ const Dashboard = () => {
   return (
     <>
       <SEO
-        title={"Woop | My Woops"}
-        description={"View your payments requested and manage them."}
-        rrssImg="./RRSS.jpg"
+        title="Woop | Add More Ways For Using Your Crypto Wallet"
+        description="We help crypto wallet providers expand their features. Woop Widget enables seamless integration of payment, investment, and NFT capabilities."
+        rrssImg="./RRSS.svg"
       />
       <Layout>
         {/* Main Dashboard Section */}
