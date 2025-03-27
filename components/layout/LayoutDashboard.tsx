@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../common/Header";
 import Image from "next/image";
-import Navigation from "../common/Navigation";
+import CloseIcon from "@mui/icons-material/Close";
 import Wallet from "../common/Wallet";
 import Footer from "../common/Footer";
+import Navigation from "../common/Navigation";
+import { useRouter } from "next/router";
 
 const wallets = [
   {
@@ -20,24 +22,13 @@ const wallets = [
   },
 ];
 
-interface LayoutProps {
-  children: React.ReactNode;
-  activeTab: "receive" | "invest" | "nfts";
-  showNavigation?: boolean;
-  onBack?: () => void;
-}
+export default function Layout({ children }: { children: React.ReactNode }) {
+  const [currentWalletIndex, setCurrentWalletIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [shouldScale, setShouldScale] = useState(false);
+  const router = useRouter();
 
-export default function Layout({
-  children,
-  activeTab,
-  showNavigation = true,
-  onBack,
-}: LayoutProps) {
-  const [currentWalletIndex, setCurrentWalletIndex] = React.useState(0);
-  const [isTransitioning, setIsTransitioning] = React.useState(false);
-  const [shouldScale, setShouldScale] = React.useState(false);
-
-  React.useEffect(() => {
+  useEffect(() => {
     const checkHeight = () => {
       const isMobile = window.innerWidth <= 768;
       const needsScaling = window.innerHeight < 780;
@@ -52,7 +43,7 @@ export default function Layout({
     return () => window.removeEventListener("resize", checkHeight);
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setIsTransitioning(true);
       setTimeout(() => {
@@ -71,10 +62,10 @@ export default function Layout({
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-[#F8F9FF]">
-      <Header isDashboard={false} />
+      <Header isDashboard={true} />
       <main
         className={`flex-1 flex flex-col justify-center items-center relative ${
-          !showNavigation ? "pt-16 sm:pt-8" : shouldScale ? "pt-2" : "py-8"
+          shouldScale ? "pt-2" : "pt-16 sm:py-8"
         }`}
       >
         {/* Preview Widgets - Hidden on mobile */}
@@ -108,6 +99,18 @@ export default function Layout({
               </div>
               <div className="w-[380px] h-[400px] bg-white rounded-2xl shadow-xl overflow-hidden">
                 <div className="p-8">
+                  {/* Woop Logo */}
+                  <div className="flex justify-center mb-6">
+                    <Image
+                      alt="Logo"
+                      src="/woop_logo.png"
+                      width={90}
+                      height={70}
+                      priority
+                    />
+                  </div>
+                  <Navigation activeTab="receive" />
+                  {/* Placeholder Content */}
                   <div className="space-y-4">
                     <div className="h-12 bg-gray-100 rounded-xl animate-pulse"></div>
                     <div className="space-y-3">
@@ -151,6 +154,18 @@ export default function Layout({
               </div>
               <div className="w-[380px] h-[400px] bg-white rounded-2xl shadow-xl overflow-hidden">
                 <div className="p-8">
+                  {/* Woop Logo */}
+                  <div className="flex justify-center mb-6">
+                    <Image
+                      alt="Logo"
+                      src="/woop_logo.png"
+                      width={90}
+                      height={70}
+                      priority
+                    />
+                  </div>
+                  <Navigation activeTab="receive" />
+                  {/* Placeholder Content */}
                   <div className="space-y-4">
                     <div className="h-12 bg-gray-100 rounded-xl animate-pulse"></div>
                     <div className="space-y-3">
@@ -187,7 +202,7 @@ export default function Layout({
               {/* Wallet Info */}
               <div className="absolute inset-0 flex items-center justify-between px-6">
                 <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-white backdrop-blur-sm flex items-center justify-center p-2 shadow-md">
+                  <div className="w-10 h-10 rounded-full bg-white backdrop-blur-sm flex items-center justify-center p-2">
                     <Image
                       src={`/${wallets[currentWalletIndex].name}.png`}
                       alt={wallets[currentWalletIndex].name}
@@ -204,55 +219,27 @@ export default function Layout({
           {/* Widget Content */}
           <div className="w-[380px] tablet:w-[450px] p-4 bg-white rounded-2xl relative shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
             <div className="flex flex-col w-full">
-              {showNavigation && (
-                <div className="flex flex-col">
-                  <div
-                    className={`flex ${
-                      onBack ? "justify-between" : "justify-center"
-                    } items-center mt-2 mb-4`}
-                  >
-                    <div
-                      className={`${
-                        onBack ? "" : "flex justify-center w-full"
-                      }`}
-                    >
-                      <Image
-                        alt="Logo"
-                        src="/woop_logo.png"
-                        width={90}
-                        height={70}
-                        priority
-                      />
-                    </div>
-                    {onBack && (
-                      <div className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center cursor-pointer hover:bg-[#EBEBEB] transition-colors">
-                        <button
-                          className="flex p-1.5"
-                          onClick={onBack}
-                          type="button"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="text-[#666666]"
-                          >
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                          </svg>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  <Navigation activeTab={activeTab} />
+              {/* Logo and Close Button */}
+              <div className="flex justify-between items-center mt-2 mb-6">
+                <div className="flex justify-center">
+                  <Image
+                    alt="Logo"
+                    src="/woop_logo.png"
+                    width={90}
+                    height={70}
+                    priority
+                  />
                 </div>
-              )}
+                <div className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center cursor-pointer hover:bg-[#EBEBEB] transition-colors">
+                  <button
+                    className="flex p-1.5"
+                    onClick={() => router.push("/")}
+                    type="button"
+                  >
+                    <CloseIcon className="text-[#666666]" />
+                  </button>
+                </div>
+              </div>
               {children}
             </div>
           </div>

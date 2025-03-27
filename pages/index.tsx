@@ -1,8 +1,7 @@
 import * as React from "react";
-import Layout from "../components/layout/LayoutReceive";
-//import Payment from "../components/Payment/Payment";
+import Layout from "../components/layout/LayoutPayment";
 import RequestAmount from "../components/Payment/1_RequestAmount";
-import SelectReceiptMethod from "../components/Payment/2_SelectReceiptMethod ";
+import SelectReceiptMethod from "../components/Payment/2_SelectReceiptMethod";
 import SEO from "../components/common/Seo";
 import { tokensDetails } from "../utils/constants";
 
@@ -22,27 +21,14 @@ export default function Home() {
   return (
     <>
       <SEO
-        title="Woop | Create Cryptocurrency Payment Requests Easily"
-        description="Woop is the easiest way to create, track, and receive cryptocurrency payment requests. Designed for both crypto natives and beginners."
-        rrssImg="./RRSS.jpg"
+        title="Woop | Add More Ways For Using Your Crypto Wallet"
+        description="We help crypto wallet providers expand their features. Woop Widget enables seamless integration of payment, investment, and NFT capabilities."
+        rrssImg="./RRSS.svg"
       />
-      {/* <Layout>
-        <Payment
-          logo={logo}
-          theme={theme}
-          buttonColor={buttonColor}
-          currencies={currencies}
-          recipientAddressTransak={recipientAddressTransak}
-          chainId={chainId}
-          setChainId={setChainId}
-        />
-        {chainId === "Bank" && (
-          <InstantOffRampEventsSDK
-            onWalletAddressReceived={setRecipientAddressTransak}
-          />
-        )}
-      </Layout> */}
-      <Layout>
+      <Layout
+        activeTab="receive"
+        onBack={currentStep === 2 ? () => setCurrentStep(1) : undefined}
+      >
         {currentStep === 1 && (
           <RequestAmount
             onContinue={(amount: any, token: any, description: string) => {

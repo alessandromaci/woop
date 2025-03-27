@@ -1,11 +1,16 @@
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Logo from "../../public/woop_logo_beta.svg";
-import Wallet from "./Wallet";
 import { useRouter } from "next/router";
 import { telegramLink } from "../../utils/constants";
 
-const Header = () => {
+interface HeaderProps {
+  isDashboard?: boolean;
+  isWidget?: boolean;
+}
+
+const Header = ({ isDashboard, isWidget }: HeaderProps) => {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -25,95 +30,187 @@ const Header = () => {
   }, []);
 
   return (
-    <div className="absolute top-0 left-0 w-full flex justify-between p-7 z-30 items-center bg-transparent">
-      {/* Logo Section with Dropdown */}
-      <div className="relative" ref={menuRef}>
+    <>
+      <div className="w-full flex justify-between px-5 py-4 z-30 items-center bg-transparent border-b border-gray-200">
         {/* Logo */}
         <div className="flex items-center">
-          <Image alt="woop" src={Logo} width={120} height={100} />
-
-          {/* Dropdown Button */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="ml-0.5 flex items-center focus:outline-none"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              stroke="currentColor"
-              className="h-6 w-6 text-gray-600"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 8h16M4 16h16"
-              />
-            </svg>
-          </button>
+          {isWidget ? (
+            <div className="flex items-center">
+              <Link href="/">
+                <Image alt="woop" src={Logo} width={140} height={120} />
+              </Link>
+              <span className="bg-[#4B6BFB] text-white text-sm px-3 py-1 ml-2 rounded-full font-sans font-medium">
+                widget
+              </span>
+            </div>
+          ) : (
+            !isWidget && (
+              <div className="flex items-center">
+                <Link href="/">
+                  <Image alt="woop" src={Logo} width={140} height={120} />
+                </Link>
+              </div>
+            )
+          )}
         </div>
 
-        {/* Dropdown Menu */}
-        {menuOpen && (
-          <div className="absolute left-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-            <p className="block w-full text-left font-sans text-bold font-medium px-4 py-2 text-gray-800">
-              App
-            </p>
-            <button
-              onClick={() => {
-                setMenuOpen(false);
-                router.push("/");
-              }}
-              className="block w-full text-left font-sans font-medium px-4 py-2 text-gray-400 hover:bg-gray-100"
-            >
-              {`Request`}
-            </button>
-            <button
-              onClick={() => {
-                setMenuOpen(false);
-                router.push("/widget");
-              }}
-              className="block w-full text-left font-sans font-medium px-4 py-2 text-gray-400 hover:bg-gray-100"
-            >
-              {`Widget`}
-            </button>
-            <p className="block w-full text-left font-sans text-bold font-medium px-4 py-2 text-gray-800 mt-4">
-              Need help?
-            </p>
+        {/* Navigation */}
+        <div className="flex items-center">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-4">
             <a
               href={telegramLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full text-left font-sans font-medium px-4 py-2 text-gray-400 hover:bg-gray-100"
+              className="text-black hover:text-[#4B6BFB] font-medium"
             >
-              {`Contact us`}
+              Contact us
             </a>
-            <button
-              onClick={() => {
-                setMenuOpen(false);
-                router.push("/terms");
-              }}
-              className="block w-full text-left font-sans font-medium px-4 py-2 text-gray-400 hover:bg-gray-100"
-            >
-              Terms of Service
-            </button>
-            <button
-              onClick={() => {
-                setMenuOpen(false);
-                router.push("/policy");
-              }}
-              className="block w-full text-left font-sans font-medium px-4 py-2 text-gray-400 hover:bg-gray-100"
-            >
-              Privacy Policy
-            </button>
+            {isDashboard ? (
+              <>
+                <button
+                  onClick={() => router.push("/")}
+                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full font-medium hover:bg-[#3b56e6] transition-colors"
+                >
+                  Home
+                </button>
+                <button
+                  onClick={() => router.push("/widget")}
+                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full font-medium hover:bg-[#3b56e6] transition-colors"
+                >
+                  Integrate Woop
+                </button>
+              </>
+            ) : isWidget ? (
+              <>
+                <button
+                  onClick={() => router.push("/")}
+                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full font-medium hover:bg-[#3b56e6] transition-colors"
+                >
+                  Home
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => router.push("/dashboard")}
+                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full font-medium hover:bg-[#3b56e6] transition-colors"
+                >
+                  Dashboard
+                </button>
+                <button
+                  onClick={() => router.push("/widget")}
+                  className="bg-[#4B6BFB] text-white px-6 py-2 rounded-full font-medium hover:bg-[#3b56e6] transition-colors"
+                >
+                  Integrate Woop
+                </button>
+              </>
+            )}
           </div>
-        )}
-      </div>
 
-      {/* Wallet Section */}
-      <Wallet />
-    </div>
+          {/* Mobile Menu Button */}
+          <div className="md:hidden" ref={menuRef}>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="flex items-center focus:outline-none"
+            >
+              {menuOpen ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                  stroke="currentColor"
+                  className="h-6 w-6 text-gray-900"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                  stroke="currentColor"
+                  className="h-6 w-6 text-gray-900"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 8h16M4 16h16"
+                  />
+                </svg>
+              )}
+            </button>
+
+            {/* Mobile Dropdown Menu */}
+            {menuOpen && (
+              <div className="absolute left-0 top-[79px] w-full bg-[#F8F9FF] border-t border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.1)] z-50">
+                <div className="max-w-7xl mx-auto px-7 py-8">
+                  <nav className="flex flex-col gap-6">
+                    {isDashboard ? (
+                      <>
+                        <button
+                          onClick={() => {
+                            setMenuOpen(false);
+                            router.push("/");
+                          }}
+                          className="text-lg font-medium text-white bg-[#4B6BFB] hover:bg-[#3b56e6] px-6 py-2 rounded-full transition-colors w-fit"
+                        >
+                          Home
+                        </button>
+                        <button
+                          onClick={() => {
+                            setMenuOpen(false);
+                            router.push("/widget");
+                          }}
+                          className="text-lg font-medium text-white bg-[#4B6BFB] hover:bg-[#3b56e6] px-6 py-2 rounded-full transition-colors w-fit"
+                        >
+                          Integrate Woop
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => {
+                            setMenuOpen(false);
+                            router.push("/dashboard");
+                          }}
+                          className="text-lg font-medium text-white bg-[#4B6BFB] hover:bg-[#3b56e6] px-6 py-2 rounded-full transition-colors w-fit"
+                        >
+                          Dashboard
+                        </button>
+                        <button
+                          onClick={() => {
+                            setMenuOpen(false);
+                            router.push("/widget");
+                          }}
+                          className="text-lg font-medium text-white bg-[#4B6BFB] hover:bg-[#3b56e6] px-6 py-2 rounded-full transition-colors w-fit"
+                        >
+                          Integrate Woop
+                        </button>
+                      </>
+                    )}
+                    <a
+                      href={telegramLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-lg font-medium text-black hover:text-[#4B6BFB] transition-colors"
+                    >
+                      Contact us
+                    </a>
+                  </nav>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 

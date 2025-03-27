@@ -2,8 +2,6 @@ import * as React from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import Box from "@mui/material/Box";
-import MenuItem from "@mui/material/MenuItem";
-import Confetti from "react-confetti";
 import useWindowSize from "./../../hooks/useWindowSize/useWindowSize";
 import {
   useSimulateContract,
@@ -60,7 +58,7 @@ const Request = () => {
     Optimism: string | null;
     Arbitrum: string | null;
     Base: string | null;
-  }>(tokensDetails[0]);
+  }>(tokensDetails[2]);
   const [ensName, setEnsName] = React.useState<string>("");
   const [network, setNetwork] = React.useState<string>("");
   const [networkName, setNetworkName] = React.useState<string>("");
@@ -104,8 +102,10 @@ const Request = () => {
       setRecipient(json.from);
       setNetwork(json.network);
       setNetworkName(json.networkName);
-      setDescription(json.description);
+      setDescription(json.selectedDescription);
       setTokenAddress(json.tokenAddress);
+
+      console.log(json);
 
       if (json.value == "allowPayerSelectAmount") {
         setAllowPayerSelectAmount(true);
@@ -266,7 +266,7 @@ const Request = () => {
     }
 
     if (chain) {
-      setSelectedToken(tokensDetails[0]);
+      setSelectedToken(tokensDetails[2]);
       setChainId(chain.name);
     }
   }, [chain, id]);
@@ -418,8 +418,8 @@ const Request = () => {
           alt={coin.label}
           src={coin.logo}
           className=""
-          width={20}
-          height={20}
+          width={28}
+          height={28}
         />
       )
     );
@@ -428,54 +428,51 @@ const Request = () => {
   return (
     <>
       <SEO
-        title={"Woop | Payment Request"}
-        rrssImg="./RRSS.jpg"
-        description={"You've been requested to send a crypto payment"}
+        title="Woop | Add More Ways For Using Your Crypto Wallet"
+        description="We help crypto wallet providers expand their features. Woop Widget enables seamless integration of payment, investment, and NFT capabilities."
+        rrssImg="./RRSS.svg"
       />
-      <Layout>
+      <Layout showNavigation={false} activeTab="receive">
         {hydrated ? (
           <div className={"w-full flex justify-center items-center"}>
-            {isSuccess || isSuccessNative ? (
-              <Confetti
-                colors={colors}
-                className="z-10"
-                width={width}
-                height={height}
-              />
-            ) : null}
-
             <Box
               component="form"
               className={cx(styles.containerBox, "rounded z-20")}
             >
               <div className="justify-items-left font-base text-slate-600">
-                <div
-                  className={cx(
-                    styles.topContainer,
-                    "pl-4 pr-4 pt-2 pb-2 mb-2 w-full flex justify-between items-center"
-                  )}
-                >
-                  <p className="font-base font-bold text-2xl">
-                    {badRequest
-                      ? "No Woop to pay here"
-                      : isNativeTx
-                      ? isSuccessNative
+                <div className="relative w-full px-4 pt-4 pb-2">
+                  <div className="flex justify-end mb-4">
+                    <Image
+                      alt="Woop Logo"
+                      src="/woop_logo.png"
+                      width={80}
+                      height={20}
+                      className="inline-block"
+                    />
+                  </div>
+                  <div className="">
+                    <p className="font-base font-bold text-2xl">
+                      {badRequest
+                        ? "No Woop to pay here"
+                        : isNativeTx
+                        ? isSuccessNative
+                          ? "Paid successfully!"
+                          : `For ${description}`
+                          ? `For ${
+                              description.charAt(0).toUpperCase() +
+                              description.slice(1)
+                            }`
+                          : "Payment requested!"
+                        : isSuccess
                         ? "Paid successfully!"
-                        : description
-                        ? `${
+                        : `For ${description}`
+                        ? `For ${
                             description.charAt(0).toUpperCase() +
                             description.slice(1)
                           }`
-                        : "Payment requested!"
-                      : isSuccess
-                      ? "Paid successfully!"
-                      : description
-                      ? `${
-                          description.charAt(0).toUpperCase() +
-                          description.slice(1)
-                        }`
-                      : "Payment requested!"}
-                  </p>
+                        : "Payment requested!"}
+                    </p>
+                  </div>
                 </div>
                 {badRequest ? (
                   <>
@@ -498,7 +495,7 @@ const Request = () => {
                       <div className="absolute top-0 right-3 p-1">
                         {request && findIcon(request?.tokenName)}
                       </div>
-                      <p className="font-medium font-base text-sm text-slate-600 mb-2 flex items-center">
+                      <p className="font-medium font-base text-base text-slate-600 mb-2 flex items-center">
                         <a
                           className="underline underline-offset-4"
                           href={`${setEtherscanAddress(
@@ -508,16 +505,18 @@ const Request = () => {
                         >
                           {ensName ? (
                             <p className="flex items-center">
-                              <span className="mr-1 font-bold">{ensName}</span>
+                              <span className="text-lg font-bold">
+                                {ensName}
+                              </span>
                             </p>
                           ) : (
-                            <span className="font-bold">
+                            <span className="text-lg font-bold">
                               {request?.from.slice(0, 4)}...
                               {request?.from.slice(-4)}
                             </span>
                           )}
                         </a>
-                        <span className="ml-1">{"requested:"}</span>
+                        <span className="ml-2 text-base">{"requested:"}</span>
                       </p>
                       <div className="mt-3 md:text-6xl text-5xl font-bold my-6">
                         {request?.value == "allowPayerSelectAmount"
@@ -837,51 +836,87 @@ const Request = () => {
                         </div>
 
                         {selectorVisibility && (
-                          <section className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen z-30">
+                          <>
                             <div
-                              onClick={() =>
-                                setSelectorVisibility(!selectorVisibility)
-                              }
-                              className="fixed top-0 left-0 w-screen h-screen bg-slate-900 opacity-30"
-                            ></div>
-                            <div className="z-20 bg-white rounded shadow-xl py-4 px-6 md:w-80 w-full m-5">
-                              <p className="font-base font-semibold text-slate-700 pb-3 border-b mb-3">
-                                Select currency
-                              </p>
-                              {tokensDetails
-                                .filter((token) => {
-                                  if (["USD", "EURO"].includes(token.label))
-                                    return false;
-                                  if (chainId === "Base")
-                                    return token.label !== "WBTC";
-                                  return token.label !== "cbBTC";
-                                })
-                                .map((token, i) => (
-                                  <MenuItem
-                                    key={token.label}
-                                    onClick={() => {
-                                      setSelectedToken(token);
-                                      setSelectorVisibility(
-                                        !selectorVisibility
-                                      );
-                                    }}
-                                    value={token.label}
-                                    className="cursor-pointer hover:bg-gray-100 px-4 py-2 rounded-md flex items-center"
-                                  >
-                                    <Image
-                                      alt={token.label}
-                                      src={token.logo}
-                                      className="mr-3"
-                                      width={30}
-                                      height={30}
-                                    />
-                                    <span className="text-gray-800 font-medium">
-                                      {token.label}
-                                    </span>
-                                  </MenuItem>
-                                ))}
+                              className="fixed inset-x-0 top-[0px] z-30 mx-auto"
+                              style={{ maxWidth: "480px" }}
+                            >
+                              <div className="bg-white rounded-2xl shadow-xl w-full">
+                                <div className="p-4">
+                                  <div className="flex items-center mb-4">
+                                    <button
+                                      onClick={() =>
+                                        setSelectorVisibility(false)
+                                      }
+                                      className="p-2 hover:bg-gray-100 rounded-full mr-2"
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="text-gray-600"
+                                      >
+                                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                                      </svg>
+                                    </button>
+                                    <p className="font-base font-semibold text-slate-700">
+                                      Select asset
+                                    </p>
+                                  </div>
+                                  <div className="max-h-[450px] overflow-y-auto">
+                                    {tokensDetails
+                                      .filter((token) => {
+                                        if (
+                                          ["USD", "EURO"].includes(token.label)
+                                        )
+                                          return false;
+                                        if (chainId === "Base")
+                                          return token.label !== "WBTC";
+                                        return token.label !== "cbBTC";
+                                      })
+                                      .map((token, i) => (
+                                        <div
+                                          key={token.label}
+                                          onClick={() => {
+                                            setSelectedToken(token);
+                                            setSelectorVisibility(false);
+                                          }}
+                                          className={`flex items-center p-3 hover:bg-gray-50 cursor-pointer rounded-lg ${
+                                            i !== 0 ? "mt-1" : ""
+                                          }`}
+                                        >
+                                          <Image
+                                            alt={token.label}
+                                            src={token.logo}
+                                            width={32}
+                                            height={32}
+                                            className="rounded-full"
+                                          />
+                                          <div className="ml-3">
+                                            <div className="font-medium text-gray-800">
+                                              {token.label}
+                                            </div>
+                                            <div className="text-sm text-gray-500">
+                                              {chain?.name || "Ethereum"}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ))}
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                          </section>
+                            <div
+                              onClick={() => setSelectorVisibility(false)}
+                              className="fixed inset-0 bg-black bg-opacity-30 z-20"
+                            />
+                          </>
                         )}
                       </div>
                     </>

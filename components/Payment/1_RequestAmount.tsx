@@ -49,7 +49,7 @@ export default function RequestAmount({
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
   const [allowPayerSelectAmount, setAllowPayerSelectAmount] =
     React.useState<boolean>(false);
-  const { chain } = useAccount();
+  const { chain, address } = useAccount();
   const [selectorVisibility, setSelectorVisibility] =
     React.useState<boolean>(false);
   const [badRequest, setBadRequest] = useState<any>("");
@@ -104,109 +104,103 @@ export default function RequestAmount({
   return (
     <>
       {selectorVisibility && (
-        <section className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen z-30">
+        <div className="absolute top-0 left-0 right-0 z-30">
           <div
-            onClick={() => setSelectorVisibility(!selectorVisibility)}
-            className={`fixed top-0 left-0 w-screen h-screen ${
-              theme === "dark" ? "bg-slate-900" : "bg-slate-100"
-            } opacity-30`}
-          ></div>
-          <div
-            className={`z-20 ${
+            className={`${
               theme === "dark" ? "bg-gray-800" : "bg-white"
-            } rounded shadow-xl py-4 px-6 md:w-80 w-full m-5`}
+            } rounded-2xl shadow-xl w-full`}
           >
-            <p
-              className={`font-base font-semibold ${
-                theme === "dark" ? "text-gray-200" : "text-slate-700"
-              } pb-3 border-b mb-2`}
-            >
-              Select currency
-            </p>
-            {tokensDetails
-              .filter((token) => {
-                // Default to showing all tokens if currencies is undefined or empty
-                const isCurrencySelected =
-                  !currencies ||
-                  currencies.length === 0 ||
-                  currencies.includes(token.label);
-
-                if (!isCurrencySelected) return false;
-                if (chainId === "Base" && token.label === "WBTC") return false;
-                if (chainId !== "Base" && token.label === "cbBTC") return false;
-
-                return true;
-              })
-              .map((token, i) => {
-                return (
-                  <MenuItem
-                    key={token.label}
-                    onClick={() => {
-                      setSelectedToken(token);
-                      setSelectorVisibility(!selectorVisibility);
-                    }}
-                    value={token.label}
-                    sx={{
-                      marginBottom: tokensDetails.length - 1 === i ? 0 : 1,
-                    }}
-                    className={`cursor-pointer hover:$
-                      {theme === "dark" ? "bg-gray-700" : "bg-gray-300"} px-4 py-2 rounded-md flex items-center`}
+            <div className="p-4">
+              <div className="flex items-center mb-4">
+                <button
+                  onClick={() => setSelectorVisibility(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full mr-2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className={`${
+                      theme === "dark" ? "text-gray-200" : "text-gray-600"
+                    }`}
                   >
-                    <Image
-                      alt={token.label}
-                      src={token.logo}
-                      className="mr-3"
-                      width={30}
-                      height={30}
-                    />
-                    <span
-                      className={`${
-                        theme === "dark" ? "text-gray-300" : "text-gray-800"
-                      } font-medium`}
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <p
+                  className={`font-base font-semibold ${
+                    theme === "dark" ? "text-gray-200" : "text-slate-700"
+                  }`}
+                >
+                  Select asset
+                </p>
+              </div>
+              <div className="max-h-[450px] overflow-y-auto">
+                {tokensDetails
+                  .filter((token) => {
+                    // Default to showing all tokens if currencies is undefined or empty
+                    const isCurrencySelected =
+                      !currencies ||
+                      currencies.length === 0 ||
+                      currencies.includes(token.label);
+
+                    if (!isCurrencySelected) return false;
+                    if (chainId === "Base" && token.label === "WBTC")
+                      return false;
+                    if (chainId !== "Base" && token.label === "cbBTC")
+                      return false;
+
+                    return true;
+                  })
+                  .map((token, i) => (
+                    <div
+                      key={token.label}
+                      onClick={() => {
+                        setSelectedToken(token);
+                        setSelectorVisibility(false);
+                      }}
+                      className={`flex items-center p-3 hover:bg-gray-50 cursor-pointer rounded-lg ${
+                        i !== 0 ? "mt-1" : ""
+                      }`}
                     >
-                      {token.label}
-                    </span>
-                  </MenuItem>
-                );
-              })}
+                      <Image
+                        alt={token.label}
+                        src={token.logo}
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
+                      <div className="ml-3">
+                        <div
+                          className={`font-medium ${
+                            theme === "dark" ? "text-gray-300" : "text-gray-800"
+                          }`}
+                        >
+                          {token.label}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {chain?.name || "Ethereum"}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
           </div>
-        </section>
+          <div
+            onClick={() => setSelectorVisibility(false)}
+            className="fixed inset-0 bg-black bg-opacity-30 z-[-1]"
+          />
+        </div>
       )}
 
       <div className="p-2 flex flex-col w-full">
-        {/*Logo*/}
-        <div className="flex justify-center items-center mt-2 mb-2">
-          <Image
-            alt="Logo"
-            src={logo || "/woop_logo.png"}
-            width={70}
-            height={50}
-          />
-        </div>
-
-        {/* Menu Selection */}
-        <div className="flex items-center justify-center mt-2 mb-2 border border-gray-600 rounded-md overflow-hidden">
-          {/* Receive Button */}
-          <div
-            className={`flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 text-white transition-all`}
-            style={{ backgroundColor: buttonColor ? buttonColor : "#007BFF" }}
-          >
-            Receive
-          </div>
-
-          {/* Track Button */}
-          <Link
-            href="/dashboard"
-            className={`flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/2 h-7 ${
-              theme === "dark"
-                ? "text-gray-400 hover:bg-gray-700"
-                : "text-black hover:bg-gray-300"
-            } transition-all`}
-          >
-            Track
-          </Link>
-        </div>
-
         {/* Amount Input Section */}
         <p
           className={`font-sans text-base leading-snug font-medium ${

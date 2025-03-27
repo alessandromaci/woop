@@ -1,12 +1,9 @@
 import * as React from "react";
 import { useState } from "react";
 import Image from "next/image";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Share } from "../Share/Share";
 import ErrorsUi from "../ErrorsUi/ErrorsUi";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import styles from "./payment.module.scss";
-import cx from "classnames";
 import { useAccount } from "wagmi";
 import { isAddress } from "viem";
 import { uploadIpfs } from "../../utils/ipfs";
@@ -101,45 +98,72 @@ export default function SelectReceiptMethod({
   }
 
   const chainSelectionMenu = (
-    <section className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen z-30">
+    <div className="fixed inset-x-0 top-0 z-30 min-h-screen">
       <div
-        className={`fixed top-0 left-0 w-screen h-screen ${
-          theme === "dark" ? "bg-slate-900" : "bg-slate-100"
-        } opacity-30`}
-      ></div>
-      <div
-        className={`z-20 ${
+        className={`${
           theme === "dark" ? "bg-gray-800" : "bg-white"
-        } rounded shadow-xl py-4 px-6 md:w-80 w-full m-5`}
+        } w-full rounded-3xl`}
       >
-        <p
-          className={`font-base font-semibold ${
-            theme === "dark" ? "text-gray-200" : "text-slate-700"
-          } pb-3 border-b mb-2`}
-        >
-          Select chain
-        </p>
-        {Object.keys(chainLogos).map((chainName) => (
-          <button
-            key={chainName}
-            type="button"
-            className={`flex items-center w-full px-4 py-3 hover:bg-gray-200 ${
-              theme === "dark" ? "hover:bg-gray-700" : ""
-            }`}
-            onClick={() => handleChainChange(chainName)}
-          >
-            <Image
-              src={getLogo(chainName)}
-              alt={`${chainName} logo`}
-              className="h-7 w-7 mr-2"
-            />
-            <span className="font-medium">
-              {chainName === "Any_Chain" ? "Any Network" : chainName}
-            </span>
-          </button>
-        ))}
+        <div className="p-4">
+          <div className="flex items-center mb-4">
+            <button
+              onClick={() => setIsEditingChain(false)}
+              className="p-2 hover:bg-gray-100 rounded-full mr-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`${
+                  theme === "dark" ? "text-gray-200" : "text-gray-600"
+                }`}
+              >
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <p
+              className={`font-base font-semibold ${
+                theme === "dark" ? "text-gray-200" : "text-slate-700"
+              }`}
+            >
+              Select chain
+            </p>
+          </div>
+          <div className="max-h-[450px] overflow-y-auto">
+            {Object.keys(chainLogos).map((chainName) => (
+              <div
+                key={chainName}
+                onClick={() => handleChainChange(chainName)}
+                className="flex items-center p-3 hover:bg-gray-50 cursor-pointer rounded-lg mt-1"
+              >
+                <Image
+                  src={getLogo(chainName)}
+                  alt={`${chainName} logo`}
+                  className="h-8 w-8 rounded-full"
+                />
+                <span
+                  className={`ml-3 font-medium ${
+                    theme === "dark" ? "text-gray-300" : "text-gray-800"
+                  }`}
+                >
+                  {chainName === "Any_Chain" ? "Any Network" : chainName}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </section>
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 -z-10"
+        onClick={() => setIsEditingChain(false)}
+      />
+    </div>
   );
 
   // Function to handle chain selection
@@ -318,69 +342,35 @@ export default function SelectReceiptMethod({
   return (
     <>
       <div className="p-2 flex flex-col w-full">
-        <div className="flex justify-between items-center mt-2 mb-2">
-          {/*Logo*/}
-          <div className="flex justify-center items-center mt-2 mb-2">
+        {/* Payment Details */}
+        <div className="rounded-xl relative p-4 w-full bg-white border border-gray-200">
+          {/* Amount with Token Logo */}
+          <div className="flex items-center mb-3">
             <Image
-              alt="Logo"
-              src={logo || "/woop_logo.png"}
-              width={90}
-              height={70}
+              alt={selectedToken.label}
+              src={selectedToken.logo}
+              width={32}
+              height={32}
+              className="rounded-full mr-3"
             />
-          </div>
-          {/* Back */}
-          <div className="flex items-center">
-            <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-2xl">
-              <button
-                className="flex"
-                onClick={() => {
-                  onBack();
-                }}
-                type="button"
-              >
-                <ArrowBackIcon />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex bg-gray-100 mt-4">
-          {/* Payment Details */}
-          <div className="rounded-3xl relative p-4 w-4/5 items-center bg-gray-100">
-            {/* Amount */}
-            <div className="flex items-center whitespace-nowrap">
-              <span className="font-sans font-semibold text-lg text-gray-500">
-                Requested:
-              </span>
-              <span className="text-lg ml-1 font-sans font-semibold text-gray-500">
-                {selectedAmount === "allowPayerSelectAmount"
-                  ? "any"
-                  : selectedAmount || "N/A"}{" "}
-                {selectedToken?.label}{" "}
-              </span>
-            </div>
             <div className="flex items-center">
-              {/* Description */}
-              <span className="font-sans text-base font-semibold text-gray-500">
-                Message:
+              <span className="text-lg font-medium text-gray-500 mr-2">
+                You will receive
               </span>
-              {selectedDescription ? (
-                <h3
-                  className={`text-base ml-1 font-sans font-semibold text-gray-500 ${
-                    selectedDescription && selectedDescription.length > 30
-                      ? "w-3/4"
-                      : "w-auto"
-                  }`}
-                >
-                  {selectedDescription}
-                </h3>
-              ) : (
-                <h3 className="text-base ml-1 font-sans font-semibold text-gray-500 w-auto">
-                  new request
-                </h3>
-              )}
+              <span className="text-lg font-bold text-gray-900">
+                {selectedAmount === "allowPayerSelectAmount"
+                  ? "Any amount"
+                  : `${selectedAmount} ${selectedToken?.label}`}
+              </span>
             </div>
           </div>
+
+          {/* Message */}
+          {selectedDescription && (
+            <div className="text-lg font-semibold text-gray-700 mt-2">
+              For {selectedDescription}
+            </div>
+          )}
         </div>
 
         {/* Payment Methods */}
@@ -924,28 +914,29 @@ export default function SelectReceiptMethod({
       </div>
 
       {isShareActive && (
-        <section className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen z-30">
+        <div className="absolute top-0 left-0 right-0 z-30">
           <div
-            onClick={() => setIsShareActive(!isShareActive)}
-            className="fixed top-0 left-0 w-screen h-screen bg-slate-900 opacity-30"
-          ></div>
-          <div
-            className={cx(
-              styles.shareBackground,
-              "z-20 rounded-3xl shadow-xl py-2 px-2 md:w-96 m-5"
-            )}
+            className={`${
+              theme === "dark" ? "bg-gray-800" : "bg-white"
+            } rounded-2xl shadow-xl w-full`}
           >
-            <Share
-              visibility={setIsShareActive}
-              path={path}
-              amount={selectedAmount}
-              description={selectedDescription}
-              token={selectedToken.label}
-              network={chainId}
-              address={recipientAddress}
-            />
+            <div className="p-4">
+              <Share
+                visibility={setIsShareActive}
+                path={path}
+                amount={selectedAmount}
+                description={selectedDescription}
+                token={selectedToken.label}
+                network={chainId}
+                address={recipientAddress}
+              />
+            </div>
           </div>
-        </section>
+          <div
+            onClick={() => setIsShareActive(false)}
+            className="fixed inset-0 bg-black bg-opacity-30 z-[-1]"
+          />
+        </div>
       )}
 
       <div className="flex justify-center items-center mt-5 mb-2">
