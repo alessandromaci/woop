@@ -170,11 +170,11 @@ export default function Layout({
         <div
           className="relative z-10"
           style={{
-            transform: shouldScale ? "scale(0.8)" : "none",
+            transform: shouldScale ? "scale(0.8)" : "scale(0.75)",
             transformOrigin: "top center",
-            marginTop: shouldScale ? "3rem" : "0",
+            marginTop: "3rem",
             position: "relative",
-            top: shouldScale ? "2rem" : "0",
+            top: "2rem",
           }}
         >
           {/* Wallet Header */}
