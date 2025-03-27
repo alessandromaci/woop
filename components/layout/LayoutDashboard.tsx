@@ -25,12 +25,23 @@ const wallets = [
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [currentWalletIndex, setCurrentWalletIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [shouldScale, setShouldScale] = useState(false);
   const router = useRouter();
 
-  const getNextWalletIndex = (current: number) =>
-    (current + 1) % wallets.length;
-  const getPrevWalletIndex = (current: number) =>
-    (current - 1 + wallets.length) % wallets.length;
+  useEffect(() => {
+    const checkHeight = () => {
+      const isMobile = window.innerWidth <= 768;
+      const needsScaling = window.innerHeight < 780;
+      setShouldScale(isMobile && needsScaling);
+    };
+
+    // Initial check
+    checkHeight();
+
+    // Add resize listener
+    window.addEventListener("resize", checkHeight);
+    return () => window.removeEventListener("resize", checkHeight);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -44,10 +55,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     return () => clearInterval(interval);
   }, []);
 
+  const getNextWalletIndex = (current: number) =>
+    (current + 1) % wallets.length;
+  const getPrevWalletIndex = (current: number) =>
+    (current - 1 + wallets.length) % wallets.length;
+
   return (
     <div className="min-h-screen w-full flex flex-col bg-[#F8F9FF]">
       <Header isDashboard={true} />
-      <main className="flex-1 flex flex-col justify-center items-center relative pt-16 sm:py-8">
+      <main
+        className={`flex-1 flex flex-col justify-center items-center relative ${
+          shouldScale ? "pt-2" : "pt-16 sm:py-8"
+        }`}
+      >
         {/* Preview Widgets - Hidden on mobile */}
         <div className="absolute w-full h-full hidden lg:flex justify-center items-center pointer-events-none">
           {/* Left Preview Widget */}
@@ -162,7 +182,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Main Widget */}
-        <div className="relative lg:transform lg:scale-[0.75] z-10 mt-12 sm:mt-0">
+        <div
+          className="relative z-10"
+          style={{
+            transform: shouldScale ? "scale(0.8)" : "none",
+            transformOrigin: "top center",
+            marginTop: shouldScale ? "3rem" : "0",
+            position: "relative",
+            top: shouldScale ? "2rem" : "0",
+          }}
+        >
           {/* Wallet Header */}
           <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
             <div

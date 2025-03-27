@@ -35,6 +35,22 @@ export default function Layout({
 }: LayoutProps) {
   const [currentWalletIndex, setCurrentWalletIndex] = React.useState(0);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
+  const [shouldScale, setShouldScale] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkHeight = () => {
+      const isMobile = window.innerWidth <= 768;
+      const needsScaling = window.innerHeight < 780;
+      setShouldScale(isMobile && needsScaling);
+    };
+
+    // Initial check
+    checkHeight();
+
+    // Add resize listener
+    window.addEventListener("resize", checkHeight);
+    return () => window.removeEventListener("resize", checkHeight);
+  }, []);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -58,7 +74,7 @@ export default function Layout({
       <Header isDashboard={false} />
       <main
         className={`flex-1 flex flex-col justify-center items-center relative ${
-          !showNavigation ? "pt-16 sm:pt-8" : "py-8"
+          !showNavigation ? "pt-16 sm:pt-8" : shouldScale ? "pt-2" : "py-8"
         }`}
       >
         {/* Preview Widgets - Hidden on mobile */}
@@ -152,9 +168,14 @@ export default function Layout({
 
         {/* Main Widget */}
         <div
-          className={`relative lg:transform lg:scale-[0.70] z-10 ${
-            !showNavigation ? "mt-12 sm:mt-0" : ""
-          }`}
+          className="relative z-10"
+          style={{
+            transform: shouldScale ? "scale(0.8)" : "none",
+            transformOrigin: "top center",
+            marginTop: shouldScale ? "3rem" : "0",
+            position: "relative",
+            top: shouldScale ? "2rem" : "0",
+          }}
         >
           {/* Wallet Header */}
           <div className="absolute w-full h-[100px] top-[-90px] rounded-t-2xl overflow-hidden shadow-lg">
