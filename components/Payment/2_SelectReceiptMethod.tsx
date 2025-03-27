@@ -1,12 +1,9 @@
 import * as React from "react";
 import { useState } from "react";
 import Image from "next/image";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Share } from "../Share/Share";
 import ErrorsUi from "../ErrorsUi/ErrorsUi";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import styles from "./payment.module.scss";
-import cx from "classnames";
 import { useAccount } from "wagmi";
 import { isAddress } from "viem";
 import { uploadIpfs } from "../../utils/ipfs";

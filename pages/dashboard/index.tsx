@@ -162,28 +162,28 @@ const Dashboard = () => {
                     </div>
 
                     {currentModal === index && isShareActive && (
-                      <section className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen z-40">
+                      <div className="fixed inset-x-0 top-0 z-40">
                         <div
-                          onClick={() => setIsShareActive(!isShareActive)}
-                          className="fixed top-0 left-0 w-screen h-screen bg-slate-900 opacity-30"
-                        ></div>
-                        <div
-                          className={cx(
-                            styles.shareBackground,
-                            "z-20 py-5 px-5 w-full max-w-md m-5 flex flex-col items-center"
-                          )}
+                          className="bg-white w-full rounded-3xl"
+                          style={{ maxHeight: "85vh", overflowY: "auto" }}
                         >
-                          <Share
-                            visibility={setIsShareActive}
-                            path={currentWoopId}
-                            amount={currentAmount}
-                            description={currentDescription}
-                            token={tokenName}
-                            network={networkName}
-                            address={address as string}
-                          />
+                          <div className="p-4">
+                            <Share
+                              visibility={setIsShareActive}
+                              path={currentWoopId}
+                              amount={currentAmount}
+                              description={currentDescription}
+                              token={tokenName}
+                              network={networkName}
+                              address={address as string}
+                            />
+                          </div>
                         </div>
-                      </section>
+                        <div
+                          className="fixed inset-0 bg-black bg-opacity-50 -z-10"
+                          onClick={() => setIsShareActive(false)}
+                        />
+                      </div>
                     )}
                   </Box>
                 );
