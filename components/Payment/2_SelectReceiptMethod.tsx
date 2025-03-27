@@ -101,45 +101,72 @@ export default function SelectReceiptMethod({
   }
 
   const chainSelectionMenu = (
-    <section className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen z-30">
+    <div className="fixed inset-x-0 top-0 z-30 min-h-screen">
       <div
-        className={`fixed top-0 left-0 w-screen h-screen ${
-          theme === "dark" ? "bg-slate-900" : "bg-slate-100"
-        } opacity-30`}
-      ></div>
-      <div
-        className={`z-20 ${
+        className={`${
           theme === "dark" ? "bg-gray-800" : "bg-white"
-        } rounded shadow-xl py-4 px-6 md:w-80 w-full m-5`}
+        } w-full rounded-3xl`}
       >
-        <p
-          className={`font-base font-semibold ${
-            theme === "dark" ? "text-gray-200" : "text-slate-700"
-          } pb-3 border-b mb-2`}
-        >
-          Select chain
-        </p>
-        {Object.keys(chainLogos).map((chainName) => (
-          <button
-            key={chainName}
-            type="button"
-            className={`flex items-center w-full px-4 py-3 hover:bg-gray-200 ${
-              theme === "dark" ? "hover:bg-gray-700" : ""
-            }`}
-            onClick={() => handleChainChange(chainName)}
-          >
-            <Image
-              src={getLogo(chainName)}
-              alt={`${chainName} logo`}
-              className="h-7 w-7 mr-2"
-            />
-            <span className="font-medium">
-              {chainName === "Any_Chain" ? "Any Network" : chainName}
-            </span>
-          </button>
-        ))}
+        <div className="p-4">
+          <div className="flex items-center mb-4">
+            <button
+              onClick={() => setIsEditingChain(false)}
+              className="p-2 hover:bg-gray-100 rounded-full mr-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`${
+                  theme === "dark" ? "text-gray-200" : "text-gray-600"
+                }`}
+              >
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <p
+              className={`font-base font-semibold ${
+                theme === "dark" ? "text-gray-200" : "text-slate-700"
+              }`}
+            >
+              Select chain
+            </p>
+          </div>
+          <div className="max-h-[450px] overflow-y-auto">
+            {Object.keys(chainLogos).map((chainName) => (
+              <div
+                key={chainName}
+                onClick={() => handleChainChange(chainName)}
+                className="flex items-center p-3 hover:bg-gray-50 cursor-pointer rounded-lg mt-1"
+              >
+                <Image
+                  src={getLogo(chainName)}
+                  alt={`${chainName} logo`}
+                  className="h-8 w-8 rounded-full"
+                />
+                <span
+                  className={`ml-3 font-medium ${
+                    theme === "dark" ? "text-gray-300" : "text-gray-800"
+                  }`}
+                >
+                  {chainName === "Any_Chain" ? "Any Network" : chainName}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </section>
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 -z-10"
+        onClick={() => setIsEditingChain(false)}
+      />
+    </div>
   );
 
   // Function to handle chain selection
