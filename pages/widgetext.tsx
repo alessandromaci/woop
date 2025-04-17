@@ -5,6 +5,7 @@ import RequestAmount from "../components/Payment/1_RequestAmount";
 import SelectReceiptMethod from "../components/Payment/2_SelectReceiptMethod";
 import Navigation from "../components/common/Navigation";
 import { tokensDetails } from "../utils/constants";
+import Image from "next/image";
 
 // Add prop types for components
 type NavigationProps = {
@@ -36,6 +37,14 @@ interface SelectReceiptMethodProps extends PaymentComponentProps {
   selectedAmount: string;
   selectedToken: string;
   selectedDescription: string;
+  networks: {
+    mainnet?: boolean;
+    sepolia?: boolean;
+    polygon?: boolean;
+    optimism?: boolean;
+    arbitrum?: boolean;
+    base?: boolean;
+  };
 }
 
 interface WidgetConfig {
@@ -176,56 +185,108 @@ export default function WidgetExt() {
 
   return (
     <>
-      <SEO title="Woop Widget" description="Woop Payment Widget" />
+      <SEO title="Woop Widget" description="Woop Widget" />
       <div
-        className={`rounded ${
-          config.theme === "dark" ? "bg-black" : "bg-white"
+        className={`flex flex-col max-w-md mx-auto ${
+          config.theme === "dark" ? "bg-gray-900 text-white" : "bg-white"
         }`}
+        style={{
+          backgroundColor: config.theme === "dark" ? "#111827" : "#fff",
+        }}
       >
-        {/* Navigation Menu */}
-        <Navigation
-          modules={config.modules}
-          activeModule={activeModule}
-          setActiveModule={setActiveModule}
-          theme={config.theme}
-        />
+        {/* Header Section */}
+        <div className={`flex justify-between items-center py-5 px-4 `}>
+          {/* Logo */}
+          <Image
+            src={config.logo || DEFAULT_CONFIG.logo}
+            alt="Logo"
+            width={100}
+            height={24}
+            className="h-6 object-contain"
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_CONFIG.logo;
+            }}
+          />
 
-        {/* Widget Content based on active module */}
-        {activeModule === "receive" && (
-          <>
-            {currentStep === 1 && (
-              <RequestAmount
-                onContinue={(amount: any, token: any, description: string) => {
-                  setSelectedAmount(amount);
-                  setSelectedToken(token);
-                  setSelectedDescription(description);
-                  setCurrentStep(2);
-                }}
-                theme={config.theme}
-                logo={config.logo}
-                buttonColor={config.buttonColor}
-                currencies={config.assets}
-                chainId={chainId}
-                setChainId={setChainId}
-              />
+          {/* Back Button - Only show in step 2 */}
+          {currentStep === 2 && (
+            <button
+              onClick={() => setCurrentStep(1)}
+              className={`p-2 rounded-full hover:bg-opacity-10 hover:bg-gray-500`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={
+                  config.theme === "dark" ? "text-gray-300" : "text-gray-600"
+                }
+              >
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+            </button>
+          )}
+        </div>
+
+        <div className="px-4 flex-1 flex flex-col max-w-md mx-auto w-full">
+          {" "}
+          {/* Added max-width container */}
+          {/* Navigation Menu */}
+          <Navigation
+            modules={config.modules}
+            activeModule={activeModule}
+            setActiveModule={setActiveModule}
+            theme={config.theme}
+          />
+          {/* Widget Content */}
+          <div className="flex-1">
+            {activeModule === "receive" && (
+              <>
+                {currentStep === 1 && (
+                  <RequestAmount
+                    onContinue={(
+                      amount: any,
+                      token: any,
+                      description: string
+                    ) => {
+                      setSelectedAmount(amount);
+                      setSelectedToken(token);
+                      setSelectedDescription(description);
+                      setCurrentStep(2);
+                    }}
+                    theme={config.theme}
+                    logo={config.logo}
+                    buttonColor={config.buttonColor}
+                    currencies={config.assets}
+                    chainId={chainId}
+                    setChainId={setChainId}
+                  />
+                )}
+                {currentStep === 2 && (
+                  <SelectReceiptMethod
+                    onBack={() => setCurrentStep(1)}
+                    selectedAmount={selectedAmount}
+                    selectedToken={selectedToken}
+                    selectedDescription={selectedDescription}
+                    theme={config.theme}
+                    logo={config.logo}
+                    buttonColor={config.buttonColor}
+                    currencies={config.assets}
+                    chainId={chainId}
+                    setChainId={setChainId}
+                    networks={config.networks}
+                  />
+                )}
+              </>
             )}
-            {currentStep === 2 && (
-              <SelectReceiptMethod
-                onBack={() => setCurrentStep(1)}
-                selectedAmount={selectedAmount}
-                selectedToken={selectedToken}
-                selectedDescription={selectedDescription}
-                theme={config.theme}
-                logo={config.logo}
-                buttonColor={config.buttonColor}
-                currencies={config.assets}
-                chainId={chainId}
-                setChainId={setChainId}
-              />
-            )}
-          </>
-        )}
-        {/* Add other module components here (invest, NFTs, etc.) */}
+          </div>
+        </div>
       </div>
     </>
   );
