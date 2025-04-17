@@ -25,6 +25,15 @@ import { QrCode } from "@mui/icons-material";
 import { TelegramIcon } from "next-share";
 import InstantOffRampEventsSDK from "../Transak";
 
+// Add type for network keys
+type NetworkKey =
+  | "mainnet"
+  | "sepolia"
+  | "polygon"
+  | "optimism"
+  | "arbitrum"
+  | "base";
+
 export default function SelectReceiptMethod({
   onBack,
   selectedAmount,
@@ -35,6 +44,7 @@ export default function SelectReceiptMethod({
   buttonColor,
   chainId,
   setChainId,
+  networks,
 }: {
   onBack: () => void;
   selectedAmount: any;
@@ -46,6 +56,9 @@ export default function SelectReceiptMethod({
   currencies: any;
   chainId: string;
   setChainId: any;
+  networks?: {
+    [K in NetworkKey]?: boolean;
+  };
 }) {
   const [path, setPath] = React.useState<string>("");
   const [ipfsLoading, setIpfsLoading] = React.useState<boolean>(false);
@@ -136,26 +149,34 @@ export default function SelectReceiptMethod({
             </p>
           </div>
           <div className="max-h-[450px] overflow-y-auto">
-            {Object.keys(chainLogos).map((chainName) => (
-              <div
-                key={chainName}
-                onClick={() => handleChainChange(chainName)}
-                className="flex items-center p-3 hover:bg-gray-50 cursor-pointer rounded-lg mt-1"
-              >
-                <Image
-                  src={getLogo(chainName)}
-                  alt={`${chainName} logo`}
-                  className="h-8 w-8 rounded-full"
-                />
-                <span
-                  className={`ml-3 font-medium ${
-                    theme === "dark" ? "text-gray-300" : "text-gray-800"
-                  }`}
+            {Object.keys(chainLogos)
+              .filter((chainName) => {
+                // Always show Any_Chain option
+                if (chainName === "Any_Chain") return true;
+                // Check if network is enabled in config
+                const networkKey = chainName.toLowerCase() as NetworkKey;
+                return networks?.[networkKey] !== false;
+              })
+              .map((chainName) => (
+                <div
+                  key={chainName}
+                  onClick={() => handleChainChange(chainName)}
+                  className="flex items-center p-3 hover:bg-gray-50 cursor-pointer rounded-lg mt-1"
                 >
-                  {chainName === "Any_Chain" ? "Any Network" : chainName}
-                </span>
-              </div>
-            ))}
+                  <Image
+                    src={getLogo(chainName)}
+                    alt={`${chainName} logo`}
+                    className="h-8 w-8 rounded-full"
+                  />
+                  <span
+                    className={`ml-3 font-medium ${
+                      theme === "dark" ? "text-gray-300" : "text-gray-800"
+                    }`}
+                  >
+                    {chainName === "Any_Chain" ? "Any Network" : chainName}
+                  </span>
+                </div>
+              ))}
           </div>
         </div>
       </div>
@@ -631,9 +652,12 @@ export default function SelectReceiptMethod({
                 <div className="relative flex items-center w-full">
                   {/* Network Label */}
                   <div
-                    className={`font-sans text-base leading-snug font-medium mb-2 text-gray-600`}
+                    className={`font-sans text-xs leading-snug text-gray-600 mt-1`}
                   >
-                    Your bank associated crypto address
+                    {`*This wallet address is linked to your bank account through
+                    Transak. Any crypto sent to this address will be
+                    automatically converted and deposited into your bank
+                    account.`}
                   </div>
                 </div>
 
