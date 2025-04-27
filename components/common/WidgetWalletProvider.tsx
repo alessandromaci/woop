@@ -47,11 +47,11 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      // In development, you might want to allow localhost
       const allowedOrigins = [
-        "https://your-wallet-sdk-client.com",
         "http://localhost:3000",
         "http://localhost:8000",
+        "https://www.app.woopwidget.com",
+        "https://app.woopwidget.com",
       ];
 
       if (!allowedOrigins.includes(event.origin)) {
