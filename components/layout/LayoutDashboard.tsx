@@ -26,6 +26,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [currentWalletIndex, setCurrentWalletIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [shouldScale, setShouldScale] = useState(false);
+  const [activeModule, setActiveModule] = useState("receive");
   const router = useRouter();
 
   useEffect(() => {
@@ -109,7 +110,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       priority
                     />
                   </div>
-                  <Navigation activeTab="receive" />
+                  <Navigation
+                    modules={{
+                      enableReceive: true,
+                      enableInvest: true,
+                      enableNFTs: true,
+                    }}
+                    activeModule={activeModule}
+                    setActiveModule={setActiveModule}
+                    theme="light"
+                  />
                   {/* Placeholder Content */}
                   <div className="space-y-4">
                     <div className="h-12 bg-gray-100 rounded-xl animate-pulse"></div>
@@ -164,7 +174,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       priority
                     />
                   </div>
-                  <Navigation activeTab="receive" />
+                  <Navigation
+                    modules={{
+                      enableReceive: true,
+                      enableInvest: true,
+                      enableNFTs: true,
+                    }}
+                    activeModule={activeModule}
+                    setActiveModule={setActiveModule}
+                    theme="light"
+                  />
                   {/* Placeholder Content */}
                   <div className="space-y-4">
                     <div className="h-12 bg-gray-100 rounded-xl animate-pulse"></div>
