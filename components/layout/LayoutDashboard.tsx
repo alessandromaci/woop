@@ -26,7 +26,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [currentWalletIndex, setCurrentWalletIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [shouldScale, setShouldScale] = useState(false);
-  const [activeModule, setActiveModule] = useState("receive");
+  const [activeModule, setActiveModule] = useState<
+    "receive" | "invest" | "nfts"
+  >("receive");
   const router = useRouter();
 
   useEffect(() => {
