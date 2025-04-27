@@ -23,6 +23,7 @@ interface WidgetWalletContextType {
   chainId: string | null;
   provider: WidgetWalletProvider | null;
   isConnected: boolean;
+  requestWallet: (method: string, params?: any) => Promise<any>;
 }
 
 const WidgetWalletContext = createContext<WidgetWalletContextType | null>(null);
@@ -104,6 +105,28 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
+  // Relay utility for wallet actions
+  function requestWallet(method: string, params?: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const id = Math.random().toString(36).slice(2);
+      function handleResponse(event: MessageEvent) {
+        if (
+          event.data.type === "WOOP_WALLET_RESPONSE" &&
+          event.data.id === id
+        ) {
+          window.removeEventListener("message", handleResponse);
+          if (event.data.error) reject(event.data.error);
+          else resolve(event.data.result);
+        }
+      }
+      window.addEventListener("message", handleResponse);
+      window.parent.postMessage(
+        { type: "WOOP_WALLET_REQUEST", method, params, id },
+        "*"
+      );
+    });
+  }
+
   return (
     <WidgetWalletContext.Provider
       value={{
@@ -111,6 +134,7 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         chainId,
         provider,
         isConnected,
+        requestWallet,
       }}
     >
       {children}
