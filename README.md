@@ -1,15 +1,6 @@
-# Woop Pay
+# Woop Widget
 
-Woop Pay is a web application that simplifies cryptocurrency payment requests. You can connect your wallet to create a payment request and share it. Woop Pay supports native tokens ETHER and MATIC, and popular ERC20 tokens such as DAI, USDC, TETHER, WETH, and WBTC. It also supports multiple networks within the Ethereum ecosystem: Mainnet, Goerli, Arbitrum, Optimism, and Polygon.
-
-### Libraries
-
-- NextJs
-- Wagmi
-- Rainbow Kit
-- Tailwind CSS
-- ipfs-http
-- Next-share
+Woop is a plug-and-play widget that lets crypto wallets integrate seamless crypto payment requests, NFTs, and investments user flows.
 
 ### Setup
 
@@ -45,16 +36,16 @@ npm run dev
 
 5. 📱 Open http://localhost:3000 to see the app
 
-## Integrating with Woop Pay API
+## Integrating Woop Widget SDK
 
-It is possible to integrate Woop Pay with your application by using the Woop Pay API. The API allows you to create a woop paymenent request link.
+The Woop SDK allows you to easily integrate the Woop widget into your application, providing a seamless way to connect with various wallets and manage assets.
 
-Documentation and examples are available hereç https://documenter.getpostman.com/view/7734029/2s8ZDR7QoS
+Documentation and examples are available hereç https://www.npmjs.com/package/@woopwidget/sdk
 
-In case of questions, please send a message to hello@wooppay.xyz
+In case of questions, please send a message to alessandromaci96@gmail.com
 
 ## Production
 
 Live deployment is made via Github / Vercel integration from master branch.
 
-Open [Woop Pay](https://wooppay.xyz)
+Open [Woop Widget](https://woopwidget.com)
