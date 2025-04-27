@@ -34,6 +34,10 @@ const WidgetLayout = ({
 }: any) => {
   const [currentWalletIndex, setCurrentWalletIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [shouldScale, setShouldScale] = useState(false);
+  const [activeModule, setActiveModule] = useState<
+    "receive" | "invest" | "nfts"
+  >("receive");
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -158,7 +162,16 @@ const WidgetLayout = ({
                         priority
                       />
                     </div>
-                    <Navigation activeTab="receive" />
+                    <Navigation
+                      modules={{
+                        enableReceive: true,
+                        enableInvest: true,
+                        enableNFTs: true,
+                      }}
+                      activeModule={activeModule}
+                      setActiveModule={setActiveModule}
+                      theme={theme}
+                    />
                     {/* Placeholder Content */}
                     <div className="p-6 space-y-4">
                       <div className="h-12 bg-gray-100 rounded-xl animate-pulse"></div>
@@ -215,7 +228,16 @@ const WidgetLayout = ({
                         priority
                       />
                     </div>
-                    <Navigation activeTab="receive" />
+                    <Navigation
+                      modules={{
+                        enableReceive: true,
+                        enableInvest: true,
+                        enableNFTs: true,
+                      }}
+                      activeModule={activeModule}
+                      setActiveModule={setActiveModule}
+                      theme={theme}
+                    />
                     {/* Placeholder Content */}
                     <div className="p-6 space-y-4">
                       <div className="h-12 bg-gray-100 rounded-xl animate-pulse"></div>
@@ -271,7 +293,16 @@ const WidgetLayout = ({
                     priority
                   />
                 </div>
-                <Navigation activeTab="receive" />
+                <Navigation
+                  modules={{
+                    enableReceive: true,
+                    enableInvest: true,
+                    enableNFTs: true,
+                  }}
+                  activeModule={activeModule}
+                  setActiveModule={setActiveModule}
+                  theme={theme}
+                />
                 {children}
               </div>
             </div>
