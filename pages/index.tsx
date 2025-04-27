@@ -4,6 +4,7 @@ import RequestAmount from "../components/Payment/1_RequestAmount";
 import SelectReceiptMethod from "../components/Payment/2_SelectReceiptMethod";
 import SEO from "../components/common/Seo";
 import { tokensDetails } from "../utils/constants";
+import { useState } from "react";
 
 export default function Home() {
   const [theme] = React.useState("white");
@@ -13,20 +14,24 @@ export default function Home() {
   const [currencies] = React.useState(
     tokensDetails.map((token) => token.label)
   );
-  const [currentStep, setCurrentStep] = React.useState(1);
+  const [currentStep, setCurrentStep] = useState(1);
   const [selectedAmount, setSelectedAmount] = React.useState("");
   const [selectedToken, setSelectedToken] = React.useState();
   const [selectedDescription, setSelectedDescription] = React.useState("");
+  const [activeModule, setActiveModule] = useState<
+    "receive" | "invest" | "nfts"
+  >("receive");
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col bg-[#F8F9FF]">
       <SEO
         title="Woop | Add More Ways For Using Your Crypto Wallet"
         description="We help crypto wallet providers expand their features. Woop Widget enables seamless integration of payment, investment, and NFT capabilities."
         rrssImg="./RRSS.svg"
       />
       <Layout
-        activeTab="receive"
+        activeModule={activeModule}
+        setActiveModule={setActiveModule}
         onBack={currentStep === 2 ? () => setCurrentStep(1) : undefined}
       >
         {currentStep === 1 && (
@@ -60,6 +65,6 @@ export default function Home() {
           />
         )}
       </Layout>
-    </>
+    </div>
   );
 }

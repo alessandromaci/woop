@@ -84,6 +84,9 @@ const Request = () => {
   const MIXPANEL_ID = process.env.NEXT_PUBLIC_MIXPANEL_ID;
   const pinataURL = process.env.NEXT_PUBLIC_PINATA_URL;
   const [hydrated, setHydrated] = React.useState(false);
+  const [activeModule, setActiveModule] = React.useState<
+    "receive" | "invest" | "nfts"
+  >("receive");
 
   // initiate tracking activity
   if (MIXPANEL_ID) {
@@ -428,11 +431,15 @@ const Request = () => {
   return (
     <>
       <SEO
-        title="Woop | Add More Ways For Using Your Crypto Wallet"
+        title="Pay Woop | Add More Ways For Using Your Crypto Wallet"
         description="We help crypto wallet providers expand their features. Woop Widget enables seamless integration of payment, investment, and NFT capabilities."
         rrssImg="./RRSS.svg"
       />
-      <Layout showNavigation={false} activeTab="receive">
+      <Layout
+        showNavigation={false}
+        activeModule={activeModule}
+        setActiveModule={setActiveModule}
+      >
         {hydrated ? (
           <div className={"w-full flex justify-center items-center"}>
             <Box
