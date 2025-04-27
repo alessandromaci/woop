@@ -20,19 +20,23 @@ const wallets = [
   },
 ];
 
-interface LayoutProps {
+interface LayoutPaymentProps {
+  activeModule: "receive" | "invest" | "nfts";
+  setActiveModule: React.Dispatch<
+    React.SetStateAction<"receive" | "invest" | "nfts">
+  >;
   children: React.ReactNode;
-  activeTab: "receive" | "invest" | "nfts";
   showNavigation?: boolean;
   onBack?: () => void;
 }
 
-export default function Layout({
+export default function LayoutPayment({
+  activeModule,
+  setActiveModule,
   children,
-  activeTab,
   showNavigation = true,
   onBack,
-}: LayoutProps) {
+}: LayoutPaymentProps) {
   const [currentWalletIndex, setCurrentWalletIndex] = React.useState(0);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
   const [shouldScale, setShouldScale] = React.useState(false);
@@ -108,6 +112,16 @@ export default function Layout({
               </div>
               <div className="w-[380px] h-[400px] bg-white rounded-2xl shadow-xl overflow-hidden">
                 <div className="p-8">
+                  <Navigation
+                    modules={{
+                      enableReceive: true,
+                      enableInvest: true,
+                      enableNFTs: true,
+                    }}
+                    activeModule={activeModule}
+                    setActiveModule={setActiveModule}
+                    theme="light"
+                  />
                   <div className="space-y-4">
                     <div className="h-12 bg-gray-100 rounded-xl animate-pulse"></div>
                     <div className="space-y-3">
@@ -151,6 +165,16 @@ export default function Layout({
               </div>
               <div className="w-[380px] h-[400px] bg-white rounded-2xl shadow-xl overflow-hidden">
                 <div className="p-8">
+                  <Navigation
+                    modules={{
+                      enableReceive: true,
+                      enableInvest: true,
+                      enableNFTs: true,
+                    }}
+                    activeModule={activeModule}
+                    setActiveModule={setActiveModule}
+                    theme="light"
+                  />
                   <div className="space-y-4">
                     <div className="h-12 bg-gray-100 rounded-xl animate-pulse"></div>
                     <div className="space-y-3">
@@ -250,7 +274,16 @@ export default function Layout({
                       </div>
                     )}
                   </div>
-                  <Navigation activeTab={activeTab} />
+                  <Navigation
+                    modules={{
+                      enableReceive: true,
+                      enableInvest: true,
+                      enableNFTs: true,
+                    }}
+                    activeModule={activeModule}
+                    setActiveModule={setActiveModule}
+                    theme="light"
+                  />
                 </div>
               )}
               {children}

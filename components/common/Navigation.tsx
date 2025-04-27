@@ -6,8 +6,10 @@ interface NavigationProps {
     enableInvest: boolean;
     enableNFTs: boolean;
   };
-  activeModule: string;
-  setActiveModule: React.Dispatch<React.SetStateAction<string>>;
+  activeModule: "receive" | "invest" | "nfts";
+  setActiveModule: React.Dispatch<
+    React.SetStateAction<"receive" | "invest" | "nfts">
+  >;
   theme: "light" | "dark" | "system";
 }
 
