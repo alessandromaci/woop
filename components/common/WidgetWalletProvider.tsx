@@ -47,11 +47,11 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      // In development, you might want to allow localhost
       const allowedOrigins = [
-        "https://your-wallet-sdk-client.com",
         "http://localhost:3000",
         "http://localhost:8000",
+        "https://www.app.woopwidget.com",
+        "https://app.woopwidget.com",
       ];
 
       if (!allowedOrigins.includes(event.origin)) {
@@ -59,7 +59,7 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
 
-      const { type, payload } = event.data;
+      const { type, payload, method, params, id } = event.data;
 
       if (type === "WOOP_CONNECT") {
         const { address, chainId: newChainId, provider } = payload;
@@ -72,6 +72,28 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
         // Store provider in window for component access
         (window as any).ethereum = provider;
+      }
+
+      // Relay wallet requests from iframe to provider
+      if (type === "WOOP_WALLET_REQUEST" && provider) {
+        (async () => {
+          let result, error;
+          try {
+            result = await provider.request({ method, params });
+          } catch (e) {
+            error = e;
+          }
+          event.source?.postMessage(
+            {
+              type: "WOOP_WALLET_RESPONSE",
+              method,
+              result,
+              error,
+              id,
+            },
+            event.origin as any
+          );
+        })();
       }
     };
 
