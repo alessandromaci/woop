@@ -3,6 +3,9 @@ import Layout from "../components/layout/LayoutPayment";
 import SEO from "../components/common/Seo";
 
 export default function NFTs() {
+  const [activeModule, setActiveModule] = React.useState<
+    "receive" | "invest" | "nfts"
+  >("receive");
   return (
     <>
       <SEO
@@ -10,7 +13,7 @@ export default function NFTs() {
         description="Explore and trade NFTs with Woop. Coming soon!"
         rrssImg="./RRSS.jpg"
       />
-      <Layout activeTab="nfts">
+      <Layout activeModule={activeModule} setActiveModule={setActiveModule}>
         <div className="flex flex-col items-center justify-center p-8 text-center">
           <h1 className="text-2xl font-bold mb-4">Coming Soon!</h1>
           <p className="text-gray-600">
