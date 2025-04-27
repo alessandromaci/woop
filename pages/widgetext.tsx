@@ -6,6 +6,11 @@ import SelectReceiptMethod from "../components/Payment/2_SelectReceiptMethod";
 import Navigation from "../components/common/Navigation";
 import { tokensDetails } from "../utils/constants";
 import Image from "next/image";
+import {
+  WidgetWalletProvider,
+  useWidgetWallet,
+} from "../components/common/WidgetWalletProvider";
+import WidgetWallet from "../components/common/WidgetWallet";
 
 // Add prop types for components
 type NavigationProps = {
@@ -102,26 +107,15 @@ const DEFAULT_CONFIG: WidgetConfig = {
   logo: "/woop_logo.png",
 };
 
-export default function WidgetExt() {
-  const router = useRouter();
-  const [config, setConfig] = useState<WidgetConfig>(DEFAULT_CONFIG);
-  const [wallet, setWallet] = useState<WalletConnection | null>(null);
-  const [isIframe, setIsIframe] = useState(false);
-
-  // Existing widget state
+function WidgetContent() {
+  const { address, chainId, isConnected } = useWidgetWallet();
   const [currentStep, setCurrentStep] = React.useState(1);
   const [selectedAmount, setSelectedAmount] = React.useState("");
   const [selectedToken, setSelectedToken] = React.useState();
   const [selectedDescription, setSelectedDescription] = React.useState("");
-  const [chainId, setChainId] = React.useState<string>("");
-
-  // Navigation state
   const [activeModule, setActiveModule] = React.useState("receive");
-
-  // Check if we're in an iframe
-  useEffect(() => {
-    setIsIframe(window !== window.parent);
-  }, []);
+  const [config, setConfig] = useState<WidgetConfig>(DEFAULT_CONFIG);
+  const router = useRouter();
 
   // Parse URL parameters and set initial config
   useEffect(() => {
@@ -131,7 +125,7 @@ export default function WidgetExt() {
       router.query;
 
     // Only update config if we're in an iframe and have parameters
-    if (isIframe && appCode) {
+    if (window !== window.parent && appCode) {
       setConfig({
         appCode: appCode as string,
         assets: (assets as string)?.split(",") || DEFAULT_CONFIG.assets,
@@ -146,42 +140,7 @@ export default function WidgetExt() {
         logo: (logo as string) || DEFAULT_CONFIG.logo,
       });
     }
-  }, [router.isReady, router.query, isIframe]);
-
-  // Handle postMessage communication
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      // In development, you might want to allow localhost
-      const allowedOrigins = [
-        "https://your-wallet-sdk-client.com",
-        "http://localhost:3000",
-        "http://localhost:8000",
-      ];
-
-      if (!allowedOrigins.includes(event.origin)) {
-        console.warn("Unauthorized origin:", event.origin);
-        return;
-      }
-
-      const { type, payload } = event.data;
-
-      if (type === "WOOP_CONNECT") {
-        const { address, chainId: newChainId, provider } = payload;
-        console.log("Received wallet info:", { address, chainId: newChainId });
-
-        setWallet({ address, chainId: newChainId, provider });
-        setChainId(newChainId);
-
-        // Store provider in window for component access
-        (window as any).ethereum = provider;
-      }
-    };
-
-    if (isIframe) {
-      window.addEventListener("message", handleMessage);
-      return () => window.removeEventListener("message", handleMessage);
-    }
-  }, [isIframe]);
+  }, [router.isReady, router.query]);
 
   return (
     <>
@@ -232,11 +191,11 @@ export default function WidgetExt() {
               </svg>
             </button>
           )}
+          {/* Wallet Info */}
+          <WidgetWallet />
         </div>
 
         <div className="px-4 flex-1 flex flex-col max-w-md mx-auto w-full">
-          {" "}
-          {/* Added max-width container */}
           {/* Navigation Menu */}
           <Navigation
             modules={config.modules}
@@ -264,8 +223,8 @@ export default function WidgetExt() {
                     logo={config.logo}
                     buttonColor={config.buttonColor}
                     currencies={config.assets}
-                    chainId={chainId}
-                    setChainId={setChainId}
+                    chainId={chainId || ""}
+                    setChainId={() => {}}
                   />
                 )}
                 {currentStep === 2 && (
@@ -278,8 +237,8 @@ export default function WidgetExt() {
                     logo={config.logo}
                     buttonColor={config.buttonColor}
                     currencies={config.assets}
-                    chainId={chainId}
-                    setChainId={setChainId}
+                    chainId={chainId || ""}
+                    setChainId={() => {}}
                     networks={config.networks}
                   />
                 )}
@@ -289,5 +248,13 @@ export default function WidgetExt() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function WidgetExt() {
+  return (
+    <WidgetWalletProvider>
+      <WidgetContent />
+    </WidgetWalletProvider>
   );
 }
