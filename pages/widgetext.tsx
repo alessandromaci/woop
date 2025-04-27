@@ -113,7 +113,9 @@ function WidgetContent() {
   const [selectedAmount, setSelectedAmount] = React.useState("");
   const [selectedToken, setSelectedToken] = React.useState();
   const [selectedDescription, setSelectedDescription] = React.useState("");
-  const [activeModule, setActiveModule] = React.useState("receive");
+  const [activeModule, setActiveModule] = React.useState<
+    "receive" | "invest" | "nfts"
+  >("receive");
   const [config, setConfig] = useState<WidgetConfig>(DEFAULT_CONFIG);
   const router = useRouter();
 
@@ -199,7 +201,7 @@ function WidgetContent() {
           {/* Navigation Menu */}
           <Navigation
             modules={config.modules}
-            activeModule={activeModule}
+            activeModule={activeModule as "receive" | "invest" | "nfts"}
             setActiveModule={setActiveModule}
             theme={config.theme}
           />
