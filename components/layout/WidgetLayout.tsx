@@ -170,6 +170,7 @@ const WidgetLayout = ({
                       }}
                       activeModule={activeModule}
                       setActiveModule={setActiveModule}
+                      theme={theme}
                     />
                     {/* Placeholder Content */}
                     <div className="p-6 space-y-4">
@@ -235,6 +236,7 @@ const WidgetLayout = ({
                       }}
                       activeModule={activeModule}
                       setActiveModule={setActiveModule}
+                      theme={theme}
                     />
                     {/* Placeholder Content */}
                     <div className="p-6 space-y-4">
@@ -299,6 +301,7 @@ const WidgetLayout = ({
                   }}
                   activeModule={activeModule}
                   setActiveModule={setActiveModule}
+                  theme={theme}
                 />
                 {children}
               </div>
