@@ -54,6 +54,7 @@ export default function SelectReceiptMethod({
   theme: string;
   logo: any;
   buttonColor: string;
+  currencies: any;
   chainId: string;
   setChainId: (chainId: string) => void;
   networks?: {
