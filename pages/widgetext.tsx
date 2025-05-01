@@ -237,7 +237,6 @@ function WidgetContent() {
             </button>
           )}
           {/* Wallet Info */}
-          <div className="text-gray-600">{headerText}</div>
           <WidgetWallet />
         </div>
 

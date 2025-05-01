@@ -58,8 +58,21 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const { type, payload, method, params, id } = event.data;
 
       if (type === "WOOP_CONNECT") {
-        const { address, chainId: newChainId, provider } = payload;
-        console.log("Received wallet info:", { address, chainId: newChainId });
+        const { address, chainId: newChainId, provider: newProvider } = payload;
+        console.log("Received WOOP_CONNECT:", {
+          address,
+          chainId: newChainId,
+          hasProvider: !!newProvider,
+          origin: event.origin,
+        });
+
+        if (!address || !newChainId) {
+          console.warn("Missing required wallet info:", {
+            address,
+            chainId: newChainId,
+          });
+          return;
+        }
 
         // Convert chainId to decimal if it's in hex format
         const normalizedChainId = newChainId.startsWith("0x")
@@ -68,11 +81,12 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
         setAddress(address);
         setChainId(normalizedChainId);
-        setProvider(provider);
+        if (newProvider) {
+          setProvider(newProvider);
+          // Store provider in window for component access
+          (window as any).ethereum = newProvider;
+        }
         setIsConnected(true);
-
-        // Store provider in window for component access
-        (window as any).ethereum = provider;
       }
 
       // Relay wallet requests from iframe to provider
@@ -91,8 +105,6 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
               result,
               error,
               id,
-              address,
-              chainId,
             },
             event.origin as any
           );
