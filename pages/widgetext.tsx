@@ -181,6 +181,12 @@ function WidgetContent() {
     }
   };
 
+  // Remove the "Waiting for wallet connection" message when we have an address
+  const headerText = address ? "" : "Waiting for wallet connection...";
+
+  // Convert null to undefined for the widget address prop
+  const safeAddress = address || undefined;
+
   return (
     <>
       <SEO title="Woop Widget" description="Woop Widget" />
@@ -231,6 +237,7 @@ function WidgetContent() {
             </button>
           )}
           {/* Wallet Info */}
+          <div className="text-gray-600">{headerText}</div>
           <WidgetWallet />
         </div>
 
@@ -266,11 +273,10 @@ function WidgetContent() {
                     theme={config.theme}
                     logo={config.logo}
                     buttonColor={config.buttonColor}
-                    currencies={config.assets}
                     chainId={chainId || ""}
                     setChainId={setChainId}
                     networks={config.networks}
-                    widgetAddress={address || ""}
+                    widgetAddress={safeAddress}
                   />
                 )}
               </>

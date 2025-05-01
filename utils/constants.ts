@@ -137,7 +137,7 @@ export const setEtherscanAddress = (
   }
 };
 
-export const baseUrl: string = "https://app.woop.ink/woop/";
+export const baseUrl: string = "https://app.woopwidget.com/woop/";
 
 export const telegramLink: string = "https://t.me/woop_pay";
 
