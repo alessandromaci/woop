@@ -273,6 +273,7 @@ function WidgetContent() {
                     theme={config.theme}
                     logo={config.logo}
                     buttonColor={config.buttonColor}
+                    currencies={config.assets}
                     chainId={chainId || ""}
                     setChainId={setChainId}
                     networks={config.networks}
