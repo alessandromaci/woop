@@ -444,6 +444,14 @@ export default function SelectReceiptMethod({
     }
   }, [recipientNetworkTransak]);
 
+  // Ensure recipientAddress and newAddress are always in sync with effectiveAddress
+  React.useEffect(() => {
+    if (effectiveAddress) {
+      setRecipientAddress(effectiveAddress);
+      setNewAddress(effectiveAddress);
+    }
+  }, [effectiveAddress]);
+
   return (
     <>
       <div className="p-2 flex flex-col w-full">
