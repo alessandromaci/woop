@@ -9,8 +9,6 @@ interface WidgetWalletProvider {
   request: (args: RequestArguments) => Promise<unknown>;
   on?: (event: string, callback: any) => void;
   removeListener?: (event: string, callback: any) => void;
-  isMetaMask?: boolean;
-  isCoinbaseWallet?: boolean;
 }
 
 interface WidgetWalletContextType {
@@ -82,11 +80,17 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
         setAddress(address);
         setChainId(normalizedChainId);
-        if (newProvider) {
-          setProvider(newProvider);
-          // Store provider in window for component access
-          (window as any).ethereum = newProvider;
-        }
+
+        // Create a generic proxy provider that will relay requests to the parent
+        const proxyProvider: WidgetWalletProvider = {
+          request: (args: RequestArguments) => {
+            return requestWallet(args.method, args.params);
+          },
+        };
+
+        setProvider(proxyProvider);
+        // Store provider in window for component access
+        (window as any).ethereum = proxyProvider;
         setIsConnected(true);
       }
 
