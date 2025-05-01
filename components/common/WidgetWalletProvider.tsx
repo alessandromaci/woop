@@ -48,6 +48,7 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         "http://localhost:8000",
         "https://www.app.woopwidget.com",
         "https://app.woopwidget.com",
+        "https://woop-git-handlewalletconnectionwidget-woop-pay.vercel.app",
       ];
 
       if (!allowedOrigins.includes(event.origin)) {
