@@ -6,16 +6,6 @@ export default function WidgetWallet() {
   const [accounts, setAccounts] = useState<string[]>([]);
   const [error, setError] = useState<string>("");
 
-  const handleGetAccounts = async () => {
-    setError("");
-    try {
-      const result = await requestWallet("eth_accounts");
-      setAccounts(result);
-    } catch (err: any) {
-      setError(err?.message || "Failed to fetch accounts");
-    }
-  };
-
   return (
     <div className="flex flex-col items-start">
       <div className="flex items-center">
@@ -31,13 +21,6 @@ export default function WidgetWallet() {
           </div>
         )}
       </div>
-      <button
-        className="mt-2 px-3 py-1 bg-blue-500 text-white rounded text-xs"
-        onClick={handleGetAccounts}
-        disabled={!isConnected}
-      >
-        Get Accounts (via relay)
-      </button>
       {accounts.length > 0 && (
         <div className="mt-1 text-xs text-gray-700">
           Accounts: {accounts.join(", ")}

@@ -1,10 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-interface ProviderRpcError extends Error {
-  code: number;
-  data?: unknown;
-}
-
 interface RequestArguments {
   readonly method: string;
   readonly params?: readonly unknown[] | object;
