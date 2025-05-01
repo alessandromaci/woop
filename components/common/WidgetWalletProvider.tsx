@@ -78,8 +78,10 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           ? parseInt(newChainId, 16).toString()
           : newChainId;
 
+        // Update state atomically to avoid race conditions
         setAddress(address);
         setChainId(normalizedChainId);
+        setIsConnected(true);
 
         // Create a generic proxy provider that will relay requests to the parent
         const proxyProvider: WidgetWalletProvider = {
@@ -89,12 +91,19 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         };
 
         setProvider(proxyProvider);
+
         // Store provider in window for component access
         (window as any).ethereum = proxyProvider;
-        setIsConnected(true);
+
+        // Notify any listeners that wallet is connected
+        window.dispatchEvent(
+          new CustomEvent("walletConnected", {
+            detail: { address, chainId: normalizedChainId },
+          })
+        );
       }
 
-      // Relay wallet requests from iframe to provider
+      // Handle wallet requests
       if (type === "WOOP_WALLET_REQUEST" && provider) {
         (async () => {
           let result, error;
@@ -102,7 +111,10 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
             result = await provider.request({ method, params });
           } catch (e) {
             error = e;
+            console.error("Wallet request failed:", e);
           }
+
+          // Always include current wallet state in response
           event.source?.postMessage(
             {
               type: "WOOP_WALLET_RESPONSE",
@@ -110,6 +122,12 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
               result,
               error,
               id,
+              // Include current wallet state
+              walletState: {
+                address,
+                chainId,
+                isConnected,
+              },
             },
             event.origin as any
           );
