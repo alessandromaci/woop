@@ -11,6 +11,8 @@ import {
   selectToken,
   selectTokenDecimals,
   baseUrl,
+  getNetworkName,
+  tokensDetails,
 } from "../../utils/constants";
 import mixpanel from "mixpanel-browser";
 import { sendNotificationRequest } from "../../utils/push";
@@ -45,6 +47,7 @@ export default function SelectReceiptMethod({
   chainId,
   setChainId,
   networks,
+  widgetAddress,
 }: {
   onBack: () => void;
   selectedAmount: any;
@@ -59,6 +62,7 @@ export default function SelectReceiptMethod({
   networks?: {
     [K in NetworkKey]?: boolean;
   };
+  widgetAddress?: string;
 }) {
   const [path, setPath] = React.useState<string>("");
   const [ipfsLoading, setIpfsLoading] = React.useState<boolean>(false);
@@ -67,9 +71,9 @@ export default function SelectReceiptMethod({
     React.useState(false);
   const [isBankPaymentMethod, setIsBankPaymentMethod] = React.useState(false);
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
-  const { isConnected: connected, address } = useAccount();
+  const { isConnected: connected, address: walletAddress } = useAccount();
   const [recipientAddress, setRecipientAddress] = React.useState<string>(
-    address || ""
+    widgetAddress || walletAddress || ""
   );
   const [recipientAddressTransak, setRecipientAddressTransak] =
     React.useState("");
@@ -84,7 +88,9 @@ export default function SelectReceiptMethod({
   const [paymentRequest, setPaymentRequest] = React.useState("");
   const [isEditingRecipient, setIsEditingRecipient] =
     React.useState<boolean>(false);
-  const [newAddress, setNewAddress] = React.useState<string>(address || "");
+  const [newAddress, setNewAddress] = React.useState<string>(
+    widgetAddress || walletAddress || ""
+  );
   const { chain } = useAccount();
   const [recipientChain, setRecipientChain] = React.useState<any>(chain || "");
   const [isShareActive, setIsShareActive] = useState<boolean>(false);
@@ -258,7 +264,7 @@ export default function SelectReceiptMethod({
           Token: selectedToken.label,
           Network: chain ? chain?.name : "",
           Amount: selectedAmount,
-          Address: address,
+          Address: recipientAddress,
           Link: path,
         });
         sendNotificationRequest(
@@ -321,18 +327,17 @@ export default function SelectReceiptMethod({
   };
 
   React.useEffect(() => {
-    if (connected) {
+    if (connected && recipientAddress) {
       setIsConnected(true);
       mixpanel.track("visit_woop_create_request", {
-        Address: address,
+        Address: recipientAddress,
       });
-      setRecipientAddress(address as string);
       setIsEditingRecipient(false);
-      setNewAddress(address as string);
+      setNewAddress(recipientAddress);
     } else {
       setIsConnected(false);
     }
-  }, [connected]);
+  }, [connected, recipientAddress]);
 
   React.useEffect(() => {
     if (recipientAddressTransak) {

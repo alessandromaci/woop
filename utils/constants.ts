@@ -212,3 +212,21 @@ export const darkenColor = (color: string, amount: number): string => {
   const b = Math.max(0, (num & 0x0000ff) - amount);
   return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
 };
+
+export const CHAIN_ID_TO_NETWORK: { [key: string]: string } = {
+  "0x1": "Ethereum",
+  "0xaa36a7": "Sepolia",
+  "0xa": "Optimism",
+  "0xa4b1": "Arbitrum",
+  "0x2105": "Base",
+  "11155111": "Sepolia",
+  "1": "Ethereum",
+  "10": "Optimism",
+  "42161": "Arbitrum",
+  "8453": "Base",
+};
+
+export const getNetworkName = (chainId: string | number): string => {
+  const chainIdStr = chainId.toString();
+  return CHAIN_ID_TO_NETWORK[chainIdStr] || chainIdStr;
+};

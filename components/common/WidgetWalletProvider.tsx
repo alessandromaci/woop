@@ -61,8 +61,13 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         const { address, chainId: newChainId, provider } = payload;
         console.log("Received wallet info:", { address, chainId: newChainId });
 
+        // Convert chainId to decimal if it's in hex format
+        const normalizedChainId = newChainId.startsWith("0x")
+          ? parseInt(newChainId, 16).toString()
+          : newChainId;
+
         setAddress(address);
-        setChainId(newChainId);
+        setChainId(normalizedChainId);
         setProvider(provider);
         setIsConnected(true);
 
@@ -86,6 +91,8 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
               result,
               error,
               id,
+              address,
+              chainId,
             },
             event.origin as any
           );

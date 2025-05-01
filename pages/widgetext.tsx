@@ -4,7 +4,7 @@ import SEO from "../components/common/Seo";
 import RequestAmount from "../components/Payment/1_RequestAmount";
 import SelectReceiptMethod from "../components/Payment/2_SelectReceiptMethod";
 import Navigation from "../components/common/Navigation";
-import { tokensDetails } from "../utils/constants";
+import { tokensDetails, getNetworkName } from "../utils/constants";
 import Image from "next/image";
 import {
   WidgetWalletProvider,
@@ -50,6 +50,7 @@ interface SelectReceiptMethodProps extends PaymentComponentProps {
     arbitrum?: boolean;
     base?: boolean;
   };
+  widgetAddress: string;
 }
 
 interface WidgetConfig {
@@ -111,7 +112,7 @@ function WidgetContent() {
   const { address, chainId, isConnected } = useWidgetWallet();
   const [currentStep, setCurrentStep] = React.useState(1);
   const [selectedAmount, setSelectedAmount] = React.useState("");
-  const [selectedToken, setSelectedToken] = React.useState();
+  const [selectedToken, setSelectedToken] = React.useState<string>("");
   const [selectedDescription, setSelectedDescription] = React.useState("");
   const [activeModule, setActiveModule] = React.useState<
     "receive" | "invest" | "nfts"
@@ -143,6 +144,42 @@ function WidgetContent() {
       });
     }
   }, [router.isReady, router.query]);
+
+  const handleRequestAmountContinue = (
+    amount: string,
+    token: string,
+    description: string
+  ) => {
+    setSelectedAmount(amount);
+    setSelectedToken(token);
+    setSelectedDescription(description);
+    setCurrentStep(2);
+  };
+
+  const handleBack = () => {
+    setCurrentStep(1);
+  };
+
+  const setChainId = (chainId: string) => {
+    if (!chainId) return;
+
+    // Convert chainId to network name if needed
+    const networkName = getNetworkName(
+      chainId
+    ).toLowerCase() as keyof typeof config.networks;
+
+    // Update the chain ID in the widget state
+    if (config.networks && config.networks[networkName]) {
+      window.parent.postMessage(
+        {
+          type: "WOOP_NETWORK_CHANGE",
+          chainId: chainId,
+          networkName: networkName,
+        },
+        "*"
+      );
+    }
+  };
 
   return (
     <>
@@ -211,27 +248,18 @@ function WidgetContent() {
               <>
                 {currentStep === 1 && (
                   <RequestAmount
-                    onContinue={(
-                      amount: any,
-                      token: any,
-                      description: string
-                    ) => {
-                      setSelectedAmount(amount);
-                      setSelectedToken(token);
-                      setSelectedDescription(description);
-                      setCurrentStep(2);
-                    }}
+                    onContinue={handleRequestAmountContinue}
                     theme={config.theme}
                     logo={config.logo}
                     buttonColor={config.buttonColor}
                     currencies={config.assets}
                     chainId={chainId || ""}
-                    setChainId={() => {}}
+                    setChainId={setChainId}
                   />
                 )}
                 {currentStep === 2 && (
                   <SelectReceiptMethod
-                    onBack={() => setCurrentStep(1)}
+                    onBack={handleBack}
                     selectedAmount={selectedAmount}
                     selectedToken={selectedToken}
                     selectedDescription={selectedDescription}
@@ -240,8 +268,9 @@ function WidgetContent() {
                     buttonColor={config.buttonColor}
                     currencies={config.assets}
                     chainId={chainId || ""}
-                    setChainId={() => {}}
+                    setChainId={setChainId}
                     networks={config.networks}
+                    widgetAddress={address || ""}
                   />
                 )}
               </>
