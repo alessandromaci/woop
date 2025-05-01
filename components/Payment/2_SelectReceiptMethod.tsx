@@ -161,7 +161,7 @@ export default function SelectReceiptMethod({
                 theme === "dark" ? "text-gray-200" : "text-slate-700"
               }`}
             >
-              Select chainS
+              Select chain
             </p>
           </div>
           <div className="max-h-[450px] overflow-y-auto">
