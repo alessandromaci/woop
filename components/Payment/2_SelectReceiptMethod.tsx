@@ -238,6 +238,13 @@ export default function SelectReceiptMethod({
         name: selectedChain.name,
         displayName: selectedChain.displayName,
       });
+
+      // Ensure address persists when changing networks
+      if (!recipientAddress && effectiveAddress) {
+        setRecipientAddress(effectiveAddress);
+        setNewAddress(effectiveAddress);
+      }
+
       setIsEditingChain(false);
     } else {
       setBadRequest("Invalid chain selected");
@@ -510,6 +517,11 @@ export default function SelectReceiptMethod({
               onClick={() => {
                 setIsBankPaymentMethod(false);
                 setIsCryptoPaymentMethod(true);
+                // Initialize address if not set
+                if (!recipientAddress && effectiveAddress) {
+                  setRecipientAddress(effectiveAddress);
+                  setNewAddress(effectiveAddress);
+                }
               }}
             >
               <div className="flex items-center">
@@ -654,7 +666,7 @@ export default function SelectReceiptMethod({
                     className="flex items-center justify-between w-full h-full text-left"
                   >
                     <span className="font-medium">
-                      {recipientChainData
+                      {recipientAddress
                         ? `${recipientAddress.slice(
                             0,
                             5
