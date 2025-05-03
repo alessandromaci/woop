@@ -43,7 +43,7 @@ interface SelectReceiptMethodProps extends PaymentComponentProps {
   selectedToken: string;
   selectedDescription: string;
   networks: {
-    mainnet?: boolean;
+    ethereum?: boolean;
     sepolia?: boolean;
     polygon?: boolean;
     optimism?: boolean;
@@ -62,7 +62,7 @@ interface WidgetConfig {
     enableNFTs: boolean;
   };
   networks?: {
-    mainnet?: boolean;
+    ethereum?: boolean;
     sepolia?: boolean;
     polygon?: boolean;
     optimism?: boolean;

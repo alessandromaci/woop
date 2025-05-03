@@ -27,7 +27,7 @@ import InstantOffRampEventsSDK from "../Transak";
 
 // Add type for network keys
 type NetworkKey =
-  | "mainnet"
+  | "ethereum"
   | "sepolia"
   | "polygon"
   | "optimism"
