@@ -10,6 +10,16 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  // --- CORS HEADERS START ---
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000"); // Change to your prod domain for production
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return;
+  }
+  // --- CORS HEADERS END ---
+
   const { code } = req.query;
   if (!code || typeof code !== "string") {
     return res.status(400).json({ valid: false, error: "No code provided" });
