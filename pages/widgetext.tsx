@@ -120,29 +120,56 @@ function WidgetContent() {
   const [config, setConfig] = useState<WidgetConfig>(DEFAULT_CONFIG);
   const router = useRouter();
 
-  // Parse URL parameters and set initial config
+  // Handle both URL parameters and config update events
   useEffect(() => {
-    if (!router.isReady) return;
+    // Function to update config
+    const updateConfig = (newConfig: Partial<WidgetConfig>) => {
+      setConfig((prevConfig) => ({
+        ...prevConfig,
+        ...newConfig,
+        assets: newConfig.assets || prevConfig.assets,
+        modules:
+          typeof newConfig.modules === "string"
+            ? JSON.parse(newConfig.modules)
+            : newConfig.modules || prevConfig.modules,
+        networks:
+          typeof newConfig.networks === "string"
+            ? JSON.parse(newConfig.networks)
+            : newConfig.networks || prevConfig.networks,
+        theme: newConfig.theme || prevConfig.theme,
+        buttonColor: newConfig.buttonColor || prevConfig.buttonColor,
+        logo: newConfig.logo || prevConfig.logo,
+      }));
+    };
 
-    const { appCode, assets, modules, networks, theme, buttonColor, logo } =
-      router.query;
+    // Handle URL parameters
+    if (router.isReady) {
+      const { appCode, assets, modules, networks, theme, buttonColor, logo } =
+        router.query;
 
-    // Only update config if we're in an iframe and have parameters
-    if (window !== window.parent && appCode) {
-      setConfig({
-        appCode: appCode as string,
-        assets: (assets as string)?.split(",") || DEFAULT_CONFIG.assets,
-        modules: modules
-          ? JSON.parse(modules as string)
-          : DEFAULT_CONFIG.modules,
-        networks: networks
-          ? JSON.parse(networks as string)
-          : DEFAULT_CONFIG.networks,
-        theme: (theme as "light" | "dark" | "system") || DEFAULT_CONFIG.theme,
-        buttonColor: (buttonColor as string) || DEFAULT_CONFIG.buttonColor,
-        logo: (logo as string) || DEFAULT_CONFIG.logo,
-      });
+      // Only update config if we're in an iframe and have parameters
+      if (window !== window.parent && appCode) {
+        updateConfig({
+          appCode: appCode as string,
+          assets: (assets as string)?.split(","),
+          modules: modules ? JSON.parse(modules as string) : undefined,
+          networks: networks ? JSON.parse(networks as string) : undefined,
+          theme: theme as "light" | "dark" | "system",
+          buttonColor: buttonColor as string,
+          logo: logo as string,
+        });
+      }
     }
+
+    // Handle config update events
+    const handleConfigUpdate = (event: MessageEvent) => {
+      if (event.data.type === "WOOP_CONFIG_UPDATE") {
+        updateConfig(event.data.payload);
+      }
+    };
+
+    window.addEventListener("message", handleConfigUpdate);
+    return () => window.removeEventListener("message", handleConfigUpdate);
   }, [router.isReady, router.query]);
 
   const handleRequestAmountContinue = (
