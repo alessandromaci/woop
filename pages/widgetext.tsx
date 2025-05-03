@@ -96,7 +96,7 @@ const DEFAULT_CONFIG: WidgetConfig = {
     enableNFTs: true,
   },
   networks: {
-    mainnet: true,
+    ethereum: true,
     sepolia: true,
     polygon: true,
     optimism: true,
