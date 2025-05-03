@@ -170,9 +170,11 @@ export default function SelectReceiptMethod({
               .filter((chainName) => {
                 // Always show Any_Chain option
                 if (chainName === "Any_Chain") return true;
-                // Check if network is enabled in config
+                // If no networks prop, show all
+                if (!networks) return true;
+                // Otherwise, only show enabled networks
                 const networkKey = chainName.toLowerCase() as NetworkKey;
-                return networks?.[networkKey] !== false;
+                return networks[networkKey] === true;
               })
               .map((chainName) => (
                 <div
