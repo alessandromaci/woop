@@ -34,7 +34,6 @@ const WidgetLayout = ({
 }: any) => {
   const [currentWalletIndex, setCurrentWalletIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [shouldScale, setShouldScale] = useState(false);
   const [activeModule, setActiveModule] = useState<
     "receive" | "invest" | "nfts"
   >("receive");
@@ -311,68 +310,58 @@ const WidgetLayout = ({
 
         {/* Right Integration Details */}
         <div className="w-[280px] bg-white py-6 px-6 border-l border-gray-200 relative z-10">
-          {/* Integration Steps */}
-          <div>
-            <p className="text-sm text-gray-600 mb-6">
-              {`Fill in your company name and Telegram handle above and click
-              Deploy.`}
-            </p>
-            <p className="text-sm text-gray-600 mb-6">
-              {`We'll send you a custom code snippet via email that's ready to
-              use.`}
-            </p>
-            <p className="text-sm text-gray-600">
-              {`Simply add the code snippet to your website's HTML and you're
-              ready to go!`}
-            </p>
-          </div>
-          <div className="mt-8">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const data = new FormData(e.target as HTMLFormElement);
-                const leadDetails = {
-                  company: data.get("company"),
-                  telegram: data.get("telegram"),
-                };
-                window.location.href = `mailto:hello@woop.ink?subject=Widget Deployment Request&body=${encodeURIComponent(
-                  `Hi, I would like to integrate the Woop widget. Here is my data:
+          <div className="p-0 flex flex-col gap-4">
+            <h2 className="text-lg font-semibold mb-2">
+              Integrate Woop Widget
+            </h2>
+            <ul className="mb-4 space-y-2">
+              <li className="flex items-start gap-2">
+                <span className="text-green-500">✔</span>
+                <span>1-click integration – launch in minutes</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-500">✔</span>
+                <span>
+                  Plug & play Web3 features: Payments, DeFi, NFTs, and more –
+                  all in one widget
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-500">✔</span>
+                <span>Customizable, audited, and revenue-generating</span>
+              </li>
+            </ul>
+            <div className="flex gap-2 justify-center mt-2">
+              <a
+                href="https://www.npmjs.com/package/@woopwidget/sdk"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 bg-black text-white rounded-full px-6 py-1 text-center flex items-center justify-center font-semibold shadow hover:bg-gray-700 transition"
+              >
+                Docs
+              </a>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  window.location.href = `mailto:hello@woop.ink?subject=Request for Woop Widget&body=${encodeURIComponent(
+                    `Hi, I would like to integrate the Woop Widget. Here is my data:
 
-Company: ${leadDetails.company}
-Telegram: ${leadDetails.telegram}
+Company: 
+Telegram: 
 
 Thanks!`
-                )}`;
-              }}
-              className="space-y-4"
-            >
-              <div className="space-y-3">
-                {/* Company Name Input */}
-                <input
-                  type="text"
-                  name="company"
-                  placeholder="Company Name"
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-lg text-sm"
-                />
-                {/* Telegram Handle Input */}
-                <input
-                  type="text"
-                  name="telegram"
-                  placeholder="Telegram Handle"
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-lg text-sm"
-                />
-              </div>
-
-              {/* Deploy Button */}
-              <button
-                type="submit"
-                className="w-full bg-[#4B6BFB] text-white text-sm py-2 rounded-full font-sans font-medium hover:bg-[#3b56e6] transition-colors"
+                  )}`;
+                }}
+                className="flex-1"
               >
-                Deploy
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  className="w-full bg-black text-white rounded-full px-6 py-1 text-center font-semibold shadow hover:bg-gray-700 transition"
+                >
+                  Integrate Now
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
