@@ -2,23 +2,27 @@ import React from "react";
 import SEO from "../components/common/Seo";
 import WidgetLayout from "../components/layout/WidgetLayout";
 import RequestAmount from "../components/Payment/1_RequestAmount";
-import SelectReceiptMethod from "../components/Payment/2_SelectReceiptMethod";
-//import Payment from "../components/Payment/Payment";
 import { tokensDetails } from "../utils/constants";
 
 export default function WidgetPage() {
   const [theme, setTheme] = React.useState("white");
   const [logo, setLogo] = React.useState("");
   const [buttonColor, setButtonColor] = React.useState("#007BFF");
-
   const [currencies, setCurrencies] = React.useState(
     tokensDetails.map((token) => token.label)
   );
   const [chainId, setChainId] = React.useState<string>("");
-  const [currentStep, setCurrentStep] = React.useState(1);
   const [selectedAmount, setSelectedAmount] = React.useState("");
   const [selectedToken, setSelectedToken] = React.useState();
   const [selectedDescription, setSelectedDescription] = React.useState("");
+  const [demoMessage, setDemoMessage] = React.useState("");
+  const [continueDisabled, setContinueDisabled] = React.useState(false);
+
+  // Handler for demo continue
+  const handleDemoContinue = () => {
+    setContinueDisabled(true);
+    setDemoMessage("This is a demo. The continue button is disabled.");
+  };
 
   return (
     <>
@@ -36,36 +40,35 @@ export default function WidgetPage() {
         <div
           className={`rounded ${theme === "dark" ? "bg-black" : "bg-white"}`}
         >
-          {currentStep === 1 && (
-            <RequestAmount
-              onContinue={(amount: any, token: any, description: string) => {
-                setSelectedAmount(amount);
-                setSelectedToken(token);
-                setSelectedDescription(description);
-                setCurrentStep(2);
-              }}
-              theme={theme}
-              logo={logo}
-              buttonColor={buttonColor}
-              currencies={currencies}
-              chainId={chainId}
-              setChainId={setChainId}
-            />
+          {continueDisabled && (
+            <div className="flex items-center justify-center mt-4">
+              <span className="inline-flex items-center gap-2 bg-yellow-50 text-yellow-800 px-4 py-2 rounded-full text-sm font-medium border border-yellow-200 shadow-sm">
+                <svg
+                  className="w-4 h-4 text-yellow-500"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"
+                  />
+                </svg>
+                This is a demo. Continue is disabled.
+              </span>
+            </div>
           )}
-          {currentStep === 2 && (
-            <SelectReceiptMethod
-              onBack={() => setCurrentStep(1)}
-              selectedAmount={selectedAmount}
-              selectedToken={selectedToken}
-              selectedDescription={selectedDescription}
-              theme={theme}
-              logo={logo}
-              buttonColor={buttonColor}
-              currencies={currencies}
-              chainId={chainId}
-              setChainId={setChainId}
-            />
-          )}
+          <RequestAmount
+            onContinue={handleDemoContinue}
+            theme={theme}
+            logo={logo}
+            buttonColor={buttonColor}
+            currencies={currencies}
+            chainId={chainId}
+            setChainId={setChainId}
+          />
         </div>
       </WidgetLayout>
     </>
