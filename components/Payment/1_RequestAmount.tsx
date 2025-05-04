@@ -1,9 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import ErrorsUi from "../ErrorsUi/ErrorsUi";
-import MenuItem from "@mui/material/MenuItem";
 import styles from "./payment.module.scss";
 import cx from "classnames";
 import { useAccount } from "wagmi";
@@ -49,7 +47,7 @@ export default function RequestAmount({
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
   const [allowPayerSelectAmount, setAllowPayerSelectAmount] =
     React.useState<boolean>(false);
-  const { chain, address } = useAccount();
+  const { chain } = useAccount();
   const [selectorVisibility, setSelectorVisibility] =
     React.useState<boolean>(false);
   const [badRequest, setBadRequest] = useState<any>("");

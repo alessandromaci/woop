@@ -12,9 +12,6 @@ export default function WidgetPage() {
     tokensDetails.map((token) => token.label)
   );
   const [chainId, setChainId] = React.useState<string>("");
-  const [selectedAmount, setSelectedAmount] = React.useState("");
-  const [selectedToken, setSelectedToken] = React.useState();
-  const [selectedDescription, setSelectedDescription] = React.useState("");
   const [demoMessage, setDemoMessage] = React.useState("");
   const [continueDisabled, setContinueDisabled] = React.useState(false);
 
