@@ -8,7 +8,6 @@ import SEO from "../../components/common/Seo";
 import Layout from "../../components/layout/LayoutDashboard";
 import { Share } from "../../components/Share/Share";
 import Link from "next/link";
-import Image from "next/image";
 
 const icons = ["🍕", "🎁", "🍹", "🎉"];
 

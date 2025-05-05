@@ -26,6 +26,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [currentWalletIndex, setCurrentWalletIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [shouldScale, setShouldScale] = useState(false);
+  const [buttonColor] = React.useState("#007BFF");
   const [activeModule, setActiveModule] = useState<
     "receive" | "invest" | "nfts"
   >("receive");
@@ -120,6 +121,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     }}
                     activeModule={activeModule}
                     setActiveModule={setActiveModule}
+                    buttonColor={buttonColor}
                     theme="light"
                   />
                   {/* Placeholder Content */}
@@ -184,6 +186,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     }}
                     activeModule={activeModule}
                     setActiveModule={setActiveModule}
+                    buttonColor={buttonColor}
                     theme="light"
                   />
                   {/* Placeholder Content */}

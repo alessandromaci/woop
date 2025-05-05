@@ -273,6 +273,7 @@ function WidgetContent() {
             modules={config.modules}
             activeModule={activeModule as "receive" | "invest" | "nfts"}
             setActiveModule={setActiveModule}
+            buttonColor={config.buttonColor}
             theme={config.theme}
           />
           {/* Widget Content */}
