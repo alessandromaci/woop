@@ -11,17 +11,25 @@ interface NavigationProps {
     React.SetStateAction<"receive" | "invest" | "nfts">
   >;
   theme: "light" | "dark" | "system";
+  buttonColor: string;
 }
 
 export default function Navigation({
   modules,
   activeModule,
   setActiveModule,
+  buttonColor,
   theme,
 }: NavigationProps) {
   return (
     <div className="flex items-center justify-between gap-2 mt-2 mb-2">
-      <div className="flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/3 h-10 rounded-lg bg-[#4285F4] text-white">
+      <div
+        className={`flex justify-center items-center font-sans text-sm leading-snug font-medium w-1/3 h-10 rounded-lg text-white`}
+        style={{
+          backgroundColor: buttonColor,
+          borderColor: buttonColor,
+        }}
+      >
         Receive
       </div>
       {/* Invest - Coming Soon */}

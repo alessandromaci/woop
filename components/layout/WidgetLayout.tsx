@@ -173,6 +173,7 @@ const WidgetLayout = ({
                       }}
                       activeModule={activeModule}
                       setActiveModule={setActiveModule}
+                      buttonColor={buttonColor}
                       theme={theme}
                     />
                     {/* Placeholder Content */}
@@ -243,6 +244,7 @@ const WidgetLayout = ({
                       }}
                       activeModule={activeModule}
                       setActiveModule={setActiveModule}
+                      buttonColor={buttonColor}
                       theme={theme}
                     />
                     {/* Placeholder Content */}
@@ -311,6 +313,7 @@ const WidgetLayout = ({
                   }}
                   activeModule={activeModule}
                   setActiveModule={setActiveModule}
+                  buttonColor={buttonColor}
                   theme={theme}
                 />
                 {children}
