@@ -2,6 +2,7 @@ import * as React from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import Box from "@mui/material/Box";
+import useWindowSize from "./../../hooks/useWindowSize/useWindowSize";
 import {
   useSimulateContract,
   useWriteContract,
