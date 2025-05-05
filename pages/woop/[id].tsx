@@ -80,13 +80,13 @@ const Request = () => {
   const { isConnected: connected, address } = useAccount();
   const { chain } = useAccount();
   const { openConnectModal } = useConnectModal();
-  const { width, height } = useWindowSize();
   const MIXPANEL_ID = process.env.NEXT_PUBLIC_MIXPANEL_ID;
   const pinataURL = process.env.NEXT_PUBLIC_PINATA_URL;
   const [hydrated, setHydrated] = React.useState(false);
   const [activeModule, setActiveModule] = React.useState<
     "receive" | "invest" | "nfts"
   >("receive");
+  const [buttonColor, setButtonColor] = React.useState("#007BFF");
 
   // initiate tracking activity
   if (MIXPANEL_ID) {
@@ -439,6 +439,7 @@ const Request = () => {
         showNavigation={false}
         activeModule={activeModule}
         setActiveModule={setActiveModule}
+        buttonColor={buttonColor}
       >
         {hydrated ? (
           <div className={"w-full flex justify-center items-center"}>
