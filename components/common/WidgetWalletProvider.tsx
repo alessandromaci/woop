@@ -1,10 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-interface ProviderRpcError extends Error {
-  code: number;
-  data?: unknown;
-}
-
 interface RequestArguments {
   readonly method: string;
   readonly params?: readonly unknown[] | object;
@@ -14,8 +9,6 @@ interface WidgetWalletProvider {
   request: (args: RequestArguments) => Promise<unknown>;
   on?: (event: string, callback: any) => void;
   removeListener?: (event: string, callback: any) => void;
-  isMetaMask?: boolean;
-  isCoinbaseWallet?: boolean;
 }
 
 interface WidgetWalletContextType {
@@ -53,6 +46,7 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         "http://localhost:8000",
         "https://www.app.woopwidget.com",
         "https://app.woopwidget.com",
+        "https://woop-git-handlewalletconnectionwidget-woop-pay.vercel.app",
       ];
 
       if (!allowedOrigins.includes(event.origin)) {
@@ -63,19 +57,53 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const { type, payload, method, params, id } = event.data;
 
       if (type === "WOOP_CONNECT") {
-        const { address, chainId: newChainId, provider } = payload;
-        console.log("Received wallet info:", { address, chainId: newChainId });
+        const { address, chainId: newChainId, provider: newProvider } = payload;
+        console.log("Received WOOP_CONNECT:", {
+          address,
+          chainId: newChainId,
+          hasProvider: !!newProvider,
+          origin: event.origin,
+        });
 
+        if (!address || !newChainId) {
+          console.warn("Missing required wallet info:", {
+            address,
+            chainId: newChainId,
+          });
+          return;
+        }
+
+        // Convert chainId to decimal if it's in hex format
+        const normalizedChainId = newChainId.startsWith("0x")
+          ? parseInt(newChainId, 16).toString()
+          : newChainId;
+
+        // Update state atomically to avoid race conditions
         setAddress(address);
-        setChainId(newChainId);
-        setProvider(provider);
+        setChainId(normalizedChainId);
         setIsConnected(true);
 
+        // Create a generic proxy provider that will relay requests to the parent
+        const proxyProvider: WidgetWalletProvider = {
+          request: (args: RequestArguments) => {
+            return requestWallet(args.method, args.params);
+          },
+        };
+
+        setProvider(proxyProvider);
+
         // Store provider in window for component access
-        (window as any).ethereum = provider;
+        (window as any).ethereum = proxyProvider;
+
+        // Notify any listeners that wallet is connected
+        window.dispatchEvent(
+          new CustomEvent("walletConnected", {
+            detail: { address, chainId: normalizedChainId },
+          })
+        );
       }
 
-      // Relay wallet requests from iframe to provider
+      // Handle wallet requests
       if (type === "WOOP_WALLET_REQUEST" && provider) {
         (async () => {
           let result, error;
@@ -83,7 +111,10 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
             result = await provider.request({ method, params });
           } catch (e) {
             error = e;
+            console.error("Wallet request failed:", e);
           }
+
+          // Always include current wallet state in response
           event.source?.postMessage(
             {
               type: "WOOP_WALLET_RESPONSE",
@@ -91,6 +122,12 @@ export const WidgetWalletProvider: React.FC<{ children: React.ReactNode }> = ({
               result,
               error,
               id,
+              // Include current wallet state
+              walletState: {
+                address,
+                chainId,
+                isConnected,
+              },
             },
             event.origin as any
           );

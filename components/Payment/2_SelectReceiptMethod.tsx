@@ -27,7 +27,7 @@ import InstantOffRampEventsSDK from "../Transak";
 
 // Add type for network keys
 type NetworkKey =
-  | "mainnet"
+  | "ethereum"
   | "sepolia"
   | "polygon"
   | "optimism"
@@ -42,9 +42,10 @@ export default function SelectReceiptMethod({
   theme,
   logo,
   buttonColor,
-  chainId,
-  setChainId,
+  chainId: parentChainId,
+  setChainId: setParentChainId,
   networks,
+  widgetAddress,
 }: {
   onBack: () => void;
   selectedAmount: any;
@@ -55,10 +56,11 @@ export default function SelectReceiptMethod({
   buttonColor: string;
   currencies: any;
   chainId: string;
-  setChainId: any;
+  setChainId: (chainId: string) => void;
   networks?: {
     [K in NetworkKey]?: boolean;
   };
+  widgetAddress?: string;
 }) {
   const [path, setPath] = React.useState<string>("");
   const [ipfsLoading, setIpfsLoading] = React.useState<boolean>(false);
@@ -67,9 +69,25 @@ export default function SelectReceiptMethod({
     React.useState(false);
   const [isBankPaymentMethod, setIsBankPaymentMethod] = React.useState(false);
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
-  const { isConnected: connected, address } = useAccount();
+  const {
+    chain: walletChain,
+    isConnected: connected,
+    address: walletAddress,
+  } = useAccount();
+
+  // Use parent chain or fallback to connected wallet's chain
+  const [currentChainId, setCurrentChainId] = React.useState<string>(
+    parentChainId || walletChain?.name || ""
+  );
+  const [recipientChainData, setRecipientChainData] = React.useState<any>(
+    walletChain || ""
+  );
+
+  // Use widget address or fallback to wallet address
+  const effectiveAddress = widgetAddress || walletAddress;
+
   const [recipientAddress, setRecipientAddress] = React.useState<string>(
-    address || ""
+    effectiveAddress || ""
   );
   const [recipientAddressTransak, setRecipientAddressTransak] =
     React.useState("");
@@ -84,12 +102,11 @@ export default function SelectReceiptMethod({
   const [paymentRequest, setPaymentRequest] = React.useState("");
   const [isEditingRecipient, setIsEditingRecipient] =
     React.useState<boolean>(false);
-  const [newAddress, setNewAddress] = React.useState<string>(address || "");
-  const { chain } = useAccount();
-  const [recipientChain, setRecipientChain] = React.useState<any>(chain || "");
+  const [newAddress, setNewAddress] = React.useState<string>(
+    effectiveAddress || ""
+  );
   const [isShareActive, setIsShareActive] = useState<boolean>(false);
   const [badRequest, setBadRequest] = useState<any>("");
-  const [hydrated, setHydrated] = useState(false);
   const MIXPANEL_ID = process.env.NEXT_PUBLIC_MIXPANEL_ID;
 
   // start tracking activity
@@ -153,9 +170,11 @@ export default function SelectReceiptMethod({
               .filter((chainName) => {
                 // Always show Any_Chain option
                 if (chainName === "Any_Chain") return true;
-                // Check if network is enabled in config
+                // If no networks prop, show all
+                if (!networks) return true;
+                // Otherwise, only show enabled networks
                 const networkKey = chainName.toLowerCase() as NetworkKey;
-                return networks?.[networkKey] !== false;
+                return networks[networkKey] === true;
               })
               .map((chainName) => (
                 <div
@@ -187,25 +206,47 @@ export default function SelectReceiptMethod({
     </div>
   );
 
-  // Function to handle chain selection
-  const handleChainChange = (selectedChainName: string) => {
-    const chainData: Record<string, { id: number; name: string }> = {
-      Ethereum: { id: 1, name: "Ethereum" },
-      Base: { id: 8453, name: "Base" },
-      Optimism: { id: 10, name: "OP Mainnet" },
-      Arbitrum: { id: 42161, name: "Arbitrum One" },
-      Sepolia: { id: 11155111, name: "Sepolia" },
-      Any_Chain: { id: 0, name: "Any" },
-    };
+  // Update chain data mapping to be consistent
+  const chainData: Record<
+    string,
+    { id: number; name: string; displayName: string }
+  > = {
+    Ethereum: { id: 1, name: "Ethereum", displayName: "Ethereum" },
+    Base: { id: 8453, name: "Base", displayName: "Base" },
+    Optimism: { id: 10, name: "Optimism", displayName: "Optimism" },
+    Arbitrum: { id: 42161, name: "Arbitrum", displayName: "Arbitrum" },
+    Sepolia: { id: 11155111, name: "Sepolia", displayName: "Sepolia" },
+    Any_Chain: { id: 0, name: "Any", displayName: "Any Network" },
+  };
 
+  // Function to get chain name from ID
+  const getChainNameFromId = (chainId: number): string => {
+    const chain = Object.values(chainData).find((c) => c.id === chainId);
+    return chain
+      ? Object.keys(chainData).find((key) => chainData[key].id === chainId) ||
+          ""
+      : "";
+  };
+
+  // Handle chain changes
+  const handleChainChange = (selectedChainName: string) => {
     const selectedChain = chainData[selectedChainName];
 
     if (selectedChain) {
-      setChainId(selectedChainName);
-      setRecipientChain({
+      setCurrentChainId(selectedChainName);
+      setParentChainId(selectedChainName);
+      setRecipientChainData({
         id: selectedChain.id,
         name: selectedChain.name,
+        displayName: selectedChain.displayName,
       });
+
+      // Ensure address persists when changing networks
+      if (!recipientAddress && effectiveAddress) {
+        setRecipientAddress(effectiveAddress);
+        setNewAddress(effectiveAddress);
+      }
+
       setIsEditingChain(false);
     } else {
       setBadRequest("Invalid chain selected");
@@ -236,103 +277,166 @@ export default function SelectReceiptMethod({
 
     if (isEditingRecipient) {
       setBadRequest("Enter a valid Ethereum address");
-    } else {
-      try {
-        setIpfsLoading(true);
-        const data = {
-          version: "1.0.0",
-          from: recipientAddress,
-          value: selectedAmount,
-          selectedDescription: selectedDescription,
-          decimals: selectTokenDecimals(selectedToken.label),
-          network: recipientChain.id,
-          networkName: recipientChain.name,
-          tokenName: selectedToken.label,
-          tokenAddress: selectToken(selectedToken.label, chain?.name),
-        };
+      return null;
+    }
 
-        const path = await uploadIpfs(data).finally(() => {
-          setIpfsLoading(false);
-        });
-        mixpanel.track("create_woop", {
-          Token: selectedToken.label,
-          Network: chain ? chain?.name : "",
-          Amount: selectedAmount,
-          Address: address,
-          Link: path,
-        });
-        sendNotificationRequest(
-          recipientAddress,
-          chain?.name,
-          selectedAmount,
-          selectedDescription,
-          selectedToken.label,
-          path
-        );
-        setPath(path);
-        return path;
-      } catch (error) {
-        console.error(error);
-        setBadRequest("Oops! Something went wrong. Please try again later.");
+    // Validate required data before proceeding
+    if (!recipientAddress || !recipientChainData || !selectedToken) {
+      setBadRequest("Missing required data for request creation");
+      return null;
+    }
+
+    try {
+      setIpfsLoading(true);
+      const data = {
+        version: "1.0.0",
+        from: recipientAddress,
+        value: selectedAmount,
+        selectedDescription: selectedDescription,
+        decimals: selectTokenDecimals(selectedToken.label),
+        network: recipientChainData.id,
+        networkName: recipientChainData.name,
+        tokenName: selectedToken.label,
+        tokenAddress: selectToken(selectedToken.label, recipientChainData.name),
+      };
+
+      const path = await uploadIpfs(data).finally(() => {
         setIpfsLoading(false);
+      });
+
+      if (!path) {
+        setBadRequest("Failed to generate payment link");
         return null;
       }
+
+      mixpanel.track("create_woop", {
+        Token: selectedToken.label,
+        Network: recipientChainData.name,
+        Amount: selectedAmount,
+        Address: recipientAddress,
+        Link: path,
+      });
+
+      sendNotificationRequest(
+        recipientAddress,
+        recipientChainData.name,
+        selectedAmount,
+        selectedDescription,
+        selectedToken.label,
+        path
+      );
+
+      setPath(path);
+      return path;
+    } catch (error) {
+      console.error("Request creation error:", error);
+      setBadRequest("Oops! Something went wrong. Please try again later.");
+      setIpfsLoading(false);
+      return null;
     }
   };
 
   const handleButtonClick = async (action: any) => {
-    if (!recipientAddress) return;
+    if (!recipientAddress) {
+      setBadRequest("Recipient address is required");
+      return;
+    }
 
     setLoadingButton(action);
     try {
-      const requestPath = await createRequest(); // Ensure request is created first
+      const requestPath = await createRequest();
+      if (!requestPath) {
+        return;
+      }
+
       const fullRequestUrl = `${baseUrl}${requestPath}`;
       setPaymentRequest(fullRequestUrl);
+
+      const messageText = `Hey, can you please send me ${selectedAmount} ${
+        selectedToken.label
+      } ${
+        selectedDescription ? `for ${selectedDescription}` : ""
+      } using the Woop link.`;
 
       if (action === "telegram") {
         window.open(
           `https://t.me/share/url?url=${encodeURIComponent(
             fullRequestUrl
-          )}&text=${encodeURIComponent(
-            `Hey, can you please send me ${selectedAmount} ${
-              selectedToken.label
-            } ${
-              selectedDescription ? `for ${selectedDescription}` : ""
-            } using the Woop link.`
-          )}`
+          )}&text=${encodeURIComponent(messageText)}`
         );
       } else if (action === "copy") {
-        await navigator.share({
-          title: "Payment Request",
-          text: `Hey, can you please send me ${selectedAmount} ${
-            selectedToken.label
-          } ${
-            selectedDescription ? `for ${selectedDescription}` : ""
-          } using the Woop link.`,
-          url: paymentRequest,
-        });
+        try {
+          await navigator.share({
+            title: "Payment Request",
+            text: messageText,
+            url: fullRequestUrl, // Use the newly generated URL
+          });
+        } catch (shareError) {
+          // Fallback for browsers that don't support share API
+          try {
+            await navigator.clipboard.writeText(
+              `${messageText}\n${fullRequestUrl}`
+            );
+            // Optionally show a success message
+            setBadRequest("Link copied to clipboard!");
+            setTimeout(() => setBadRequest(""), 2000);
+          } catch (clipboardError) {
+            console.error("Clipboard write failed:", clipboardError);
+            setBadRequest("Failed to copy link");
+          }
+        }
       } else if (action === "qr") {
         setIsShareActive(true);
       }
     } catch (error) {
-      console.error("Error creating payment request", error);
+      console.error("Error creating payment request:", error);
+      setBadRequest("Failed to create payment request");
     }
     setLoadingButton(null);
   };
 
+  // Initialize chain data when wallet chain changes
   React.useEffect(() => {
-    if (connected) {
+    if (walletChain) {
+      const chainName = getChainNameFromId(walletChain.id);
+      if (chainName) {
+        setCurrentChainId(chainName);
+        setParentChainId(chainName);
+        setRecipientChainData({
+          id: walletChain.id,
+          name: chainName,
+          displayName: chainData[chainName].displayName,
+        });
+      }
+    }
+  }, [walletChain, setParentChainId]);
+
+  // Update when parent chain ID changes
+  React.useEffect(() => {
+    if (parentChainId && chainData[parentChainId]) {
+      setCurrentChainId(parentChainId);
+      setRecipientChainData({
+        id: chainData[parentChainId].id,
+        name: parentChainId,
+        displayName: chainData[parentChainId].displayName,
+      });
+    }
+  }, [parentChainId]);
+
+  // Update states when address changes
+  React.useEffect(() => {
+    if (effectiveAddress) {
       setIsConnected(true);
       mixpanel.track("visit_woop_create_request", {
-        Address: address,
+        Address: effectiveAddress,
       });
-      setRecipientAddress(address as string);
+      setRecipientAddress(effectiveAddress);
       setIsEditingRecipient(false);
-      setNewAddress(address as string);
+      setNewAddress(effectiveAddress);
     } else {
       setIsConnected(false);
     }
-  }, [connected]);
+  }, [effectiveAddress]);
 
   React.useEffect(() => {
     if (recipientAddressTransak) {
@@ -349,20 +453,21 @@ export default function SelectReceiptMethod({
     }
   }, [recipientNetworkTransak]);
 
+  // Ensure recipientAddress and newAddress are always in sync with effectiveAddress
   React.useEffect(() => {
-    if (chain) {
-      setChainId(chain.name);
-      setRecipientChain(chain);
+    if (effectiveAddress) {
+      setRecipientAddress(effectiveAddress);
+      setNewAddress(effectiveAddress);
     }
-  }, [chain]);
-
-  React.useEffect(() => {
-    setHydrated(true);
-  }, []);
+  }, [effectiveAddress]);
 
   return (
     <>
-      <div className="p-2 flex flex-col w-full">
+      <div
+        className={`p-2 flex flex-col w-full ${
+          theme === "dark" ? "bg-[#23262F]" : "bg-white"
+        }`}
+      >
         {/* Payment Details */}
         <div className="rounded-xl relative p-4 w-full bg-white border border-gray-200">
           {/* Amount with Token Logo */}
@@ -418,6 +523,11 @@ export default function SelectReceiptMethod({
               onClick={() => {
                 setIsBankPaymentMethod(false);
                 setIsCryptoPaymentMethod(true);
+                // Initialize address if not set
+                if (!recipientAddress && effectiveAddress) {
+                  setRecipientAddress(effectiveAddress);
+                  setNewAddress(effectiveAddress);
+                }
               }}
             >
               <div className="flex items-center">
@@ -519,16 +629,14 @@ export default function SelectReceiptMethod({
                 <div className="flex items-center">
                   {/* Display logo next to chain name */}
                   <Image
-                    src={getLogo(chainId) || allChainsLogo}
-                    alt={`${chainId} logo`}
+                    src={getLogo(currentChainId) || allChainsLogo}
+                    alt={`${currentChainId} logo`}
                     className="h-7 w-7 mr-2"
                   />
                   <span className="font-medium">
-                    {!chainId
+                    {!currentChainId
                       ? "Select Network"
-                      : chainId === "Any_Chain"
-                      ? "Any Network"
-                      : chainId}
+                      : recipientChainData?.displayName || "Select Network"}
                   </span>
                 </div>
                 <svg
@@ -564,7 +672,7 @@ export default function SelectReceiptMethod({
                     className="flex items-center justify-between w-full h-full text-left"
                   >
                     <span className="font-medium">
-                      {hydrated
+                      {recipientAddress
                         ? `${recipientAddress.slice(
                             0,
                             5
@@ -677,7 +785,7 @@ export default function SelectReceiptMethod({
 
                   {/* Address */}
                   <div className="text-gray-700 text-lg basis-1/2 text-right">
-                    {hydrated
+                    {recipientChainData
                       ? `${recipientAddress.slice(
                           0,
                           5
@@ -951,7 +1059,7 @@ export default function SelectReceiptMethod({
                 amount={selectedAmount}
                 description={selectedDescription}
                 token={selectedToken.label}
-                network={chainId}
+                network={currentChainId}
                 address={recipientAddress}
               />
             </div>
@@ -963,7 +1071,11 @@ export default function SelectReceiptMethod({
         </div>
       )}
 
-      <div className="flex justify-center items-center mt-5 mb-2">
+      <div
+        className={`flex justify-center items-center mt-5 mb-2 ${
+          theme === "dark" ? "bg-[#23262F]" : "bg-white"
+        }`}
+      >
         <span
           className={`text-xs mr-1 ${
             theme === "dark" ? "text-gray-500" : "text-gray-400"

@@ -32,6 +32,7 @@ export default function Home() {
       <Layout
         activeModule={activeModule}
         setActiveModule={setActiveModule}
+        buttonColor={buttonColor}
         onBack={currentStep === 2 ? () => setCurrentStep(1) : undefined}
       >
         {currentStep === 1 && (

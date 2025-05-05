@@ -25,6 +25,7 @@ interface LayoutPaymentProps {
   setActiveModule: React.Dispatch<
     React.SetStateAction<"receive" | "invest" | "nfts">
   >;
+  buttonColor: string;
   children: React.ReactNode;
   showNavigation?: boolean;
   onBack?: () => void;
@@ -33,6 +34,7 @@ interface LayoutPaymentProps {
 export default function LayoutPayment({
   activeModule,
   setActiveModule,
+  buttonColor,
   children,
   showNavigation = true,
   onBack,
@@ -120,6 +122,7 @@ export default function LayoutPayment({
                     }}
                     activeModule={activeModule}
                     setActiveModule={setActiveModule}
+                    buttonColor={buttonColor}
                     theme="light"
                   />
                   <div className="space-y-4">
@@ -173,6 +176,7 @@ export default function LayoutPayment({
                     }}
                     activeModule={activeModule}
                     setActiveModule={setActiveModule}
+                    buttonColor={buttonColor}
                     theme="light"
                   />
                   <div className="space-y-4">
@@ -282,6 +286,7 @@ export default function LayoutPayment({
                     }}
                     activeModule={activeModule}
                     setActiveModule={setActiveModule}
+                    buttonColor={buttonColor}
                     theme="light"
                   />
                 </div>

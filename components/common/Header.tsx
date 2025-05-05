@@ -33,25 +33,11 @@ const Header = ({ isDashboard, isWidget }: HeaderProps) => {
     <>
       <div className="w-full flex justify-between px-5 py-4 z-30 items-center bg-transparent border-b border-gray-200">
         {/* Logo */}
+
         <div className="flex items-center">
-          {isWidget ? (
-            <div className="flex items-center">
-              <Link href="/">
-                <Image alt="woop" src={Logo} width={140} height={120} />
-              </Link>
-              <span className="bg-[#4B6BFB] text-white text-sm px-3 py-1 ml-2 rounded-full font-sans font-medium">
-                widget
-              </span>
-            </div>
-          ) : (
-            !isWidget && (
-              <div className="flex items-center">
-                <Link href="/">
-                  <Image alt="woop" src={Logo} width={140} height={120} />
-                </Link>
-              </div>
-            )
-          )}
+          <Link href="/">
+            <Image alt="woop" src={Logo} width={140} height={120} />
+          </Link>
         </div>
 
         {/* Navigation */}
