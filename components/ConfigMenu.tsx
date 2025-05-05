@@ -1,7 +1,5 @@
 import React from "react";
-import Wallet from "./common/Wallet";
 import Image from "next/image";
-import woopLogo from "../public/woop_logo.png";
 import { tokensDetails } from "../utils/constants";
 
 interface ConfigMenuProps {

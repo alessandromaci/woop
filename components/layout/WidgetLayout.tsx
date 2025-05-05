@@ -155,9 +155,9 @@ const WidgetLayout = ({
                     <div className="flex justify-center mb-6">
                       <Image
                         alt="Logo"
-                        src="/woop_logo.png"
-                        width={90}
-                        height={70}
+                        src={logo || "/woop_logo.png"}
+                        width={70}
+                        height={50}
                         priority
                       />
                     </div>
@@ -221,9 +221,9 @@ const WidgetLayout = ({
                     <div className="flex justify-center mb-6">
                       <Image
                         alt="Logo"
-                        src="/woop_logo.png"
-                        width={90}
-                        height={70}
+                        src={logo || "/woop_logo.png"}
+                        width={70}
+                        height={50}
                         priority
                       />
                     </div>
@@ -274,7 +274,6 @@ const WidgetLayout = ({
                       />
                     </div>
                   </div>
-                  <Wallet />
                 </div>
               </div>
             </div>
@@ -286,9 +285,9 @@ const WidgetLayout = ({
                 <div className="flex justify-center mt-4 mb-6">
                   <Image
                     alt="Logo"
-                    src="/woop_logo.png"
-                    width={90}
-                    height={70}
+                    src={logo || "/woop_logo.png"}
+                    width={70}
+                    height={50}
                     priority
                   />
                 </div>
@@ -331,12 +330,12 @@ const WidgetLayout = ({
                 <span>Customizable, audited, and revenue-generating</span>
               </li>
             </ul>
-            <div className="flex gap-2 justify-center mt-2">
+            <div className="flex gap-2 justify-center mt-1">
               <a
                 href="https://www.npmjs.com/package/@woopwidget/sdk"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 bg-black text-white rounded-full px-6 py-1 text-center flex items-center justify-center font-semibold shadow hover:bg-gray-700 transition"
+                className="flex-1 bg-[#4B6BFB] text-white px-4 h-10 rounded-full font-medium hover:bg-[#3b56e6] transition-colors text-sm whitespace-nowrap flex items-center justify-center"
               >
                 Docs
               </a>
@@ -356,7 +355,7 @@ Thanks!`
               >
                 <button
                   type="submit"
-                  className="w-full bg-black text-white rounded-full px-6 py-1 text-center font-semibold shadow hover:bg-gray-700 transition"
+                  className="bg-[#4B6BFB] text-white px-4 h-10 rounded-full font-medium hover:bg-[#3b56e6] transition-colors text-sm whitespace-nowrap flex items-center justify-center w-full"
                 >
                   Integrate Now
                 </button>
