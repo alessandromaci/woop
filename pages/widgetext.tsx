@@ -219,7 +219,7 @@ function WidgetContent() {
       <SEO title="Woop Widget" description="Woop Widget" />
       <div
         className={`flex flex-col max-w-md mx-auto ${
-          config.theme === "dark" ? "bg-gray-900 text-white" : "bg-white"
+          config.theme === "dark" ? "bg-[#23262F] text-white" : "bg-white"
         }`}
         style={{
           backgroundColor: config.theme === "dark" ? "#111827" : "#fff",

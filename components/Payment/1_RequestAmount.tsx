@@ -105,7 +105,7 @@ export default function RequestAmount({
         <div className="absolute top-0 left-0 right-0 z-30">
           <div
             className={`${
-              theme === "dark" ? "bg-gray-800" : "bg-white"
+              theme === "dark" ? "bg-[#23262F]" : "bg-white"
             } rounded-2xl shadow-xl w-full`}
           >
             <div className="p-4">
@@ -198,7 +198,11 @@ export default function RequestAmount({
         </div>
       )}
 
-      <div className="p-2 flex flex-col w-full">
+      <div
+        className={`min-h-full flex flex-col w-full ${
+          theme === "dark" ? "bg-[#23262F]" : "bg-white"
+        }`}
+      >
         {/* Amount Input Section */}
         <p
           className={`font-sans text-base leading-snug font-medium ${
@@ -431,7 +435,11 @@ export default function RequestAmount({
         <ErrorsUi errorMsg={badRequest} errorNtk={""} />
       </div>
 
-      <div className="flex justify-center items-center mt-5 mb-2">
+      <div
+        className={`flex justify-center items-center mt-5 mb-2 ${
+          theme === "dark" ? "bg-[#23262F]" : "bg-white"
+        }`}
+      >
         <span
           className={`text-xs mr-1 ${
             theme === "dark" ? "text-gray-500" : "text-gray-400"

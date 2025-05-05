@@ -29,7 +29,7 @@ export default function Navigation({
         <div
           className={`flex justify-center items-center font-sans text-sm leading-snug font-medium h-10 rounded-lg ${
             theme === "dark"
-              ? "bg-gray-800 text-gray-400"
+              ? "bg-gray-700 text-gray-400"
               : "bg-[#F5F5F5] text-[#666666]"
           } opacity-75`}
         >
@@ -44,7 +44,7 @@ export default function Navigation({
         <div
           className={`flex justify-center items-center font-sans text-sm leading-snug font-medium h-10 rounded-lg ${
             theme === "dark"
-              ? "bg-gray-800 text-gray-400"
+              ? "bg-gray-700 text-gray-400"
               : "bg-[#F5F5F5] text-[#666666]"
           } opacity-75`}
         >

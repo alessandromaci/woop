@@ -35,7 +35,9 @@ export default function WidgetPage() {
         setCurrencies={setCurrencies}
       >
         <div
-          className={`rounded ${theme === "dark" ? "bg-black" : "bg-white"}`}
+          className={`rounded ${
+            theme === "dark" ? "bg-[#23262F]" : "bg-white"
+          }`}
         >
           {continueDisabled && (
             <div className="flex items-center justify-center mt-4">

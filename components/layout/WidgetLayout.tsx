@@ -149,7 +149,11 @@ const WidgetLayout = ({
                     </div>
                   </div>
                 </div>
-                <div className="w-[380px] h-[400px] bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div
+                  className={`w-[380px] h-[400px] ${
+                    theme === "dark" ? "bg-[#23262F]" : "bg-white"
+                  } rounded-2xl shadow-xl overflow-hidden`}
+                >
                   <div className="p-8">
                     {/* Woop Logo */}
                     <div className="flex justify-center mb-6">
@@ -215,7 +219,11 @@ const WidgetLayout = ({
                     </div>
                   </div>
                 </div>
-                <div className="w-[380px] h-[400px] bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div
+                  className={`w-[380px] h-[400px] ${
+                    theme === "dark" ? "bg-[#23262F]" : "bg-white"
+                  } rounded-2xl shadow-xl overflow-hidden`}
+                >
                   <div className="p-8">
                     {/* Woop Logo */}
                     <div className="flex justify-center mb-6">
@@ -279,7 +287,11 @@ const WidgetLayout = ({
             </div>
 
             {/* Widget Content */}
-            <div className="w-[380px] tablet:w-[450px] p-4 bg-white rounded-2xl relative shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden">
+            <div
+              className={`w-[380px] tablet:w-[450px] p-4 rounded-2xl relative shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden ${
+                theme === "dark" ? "bg-[#23262F] text-white" : "bg-white"
+              }`}
+            >
               <div className="flex flex-col w-full">
                 {/* Woop Logo */}
                 <div className="flex justify-center mt-4 mb-6">
