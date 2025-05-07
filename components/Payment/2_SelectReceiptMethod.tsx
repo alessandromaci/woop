@@ -551,20 +551,24 @@ export default function SelectReceiptMethod({
                   ? "border-gray-700 text-gray-200"
                   : "border-black text-slate-600"
               } ${
-                selectedToken.label === "USD" || selectedToken.label === "EURO"
+                (selectedToken.label === "USD" ||
+                  selectedToken.label === "EURO") &&
+                Number(selectedAmount) >= 10
                   ? "cursor-pointer hover:bg-gray-300"
                   : "cursor-not-allowed opacity-50"
               } ${
                 isBankPaymentMethod &&
                 (selectedToken.label === "USD" ||
-                  selectedToken.label === "EURO")
+                  selectedToken.label === "EURO") &&
+                Number(selectedAmount) >= 10
                   ? "bg-blue-100 text-black"
                   : "bg-transparent"
               }`}
               onClick={() => {
                 if (
-                  selectedToken.label === "USD" ||
-                  selectedToken.label === "EURO"
+                  (selectedToken.label === "USD" ||
+                    selectedToken.label === "EURO") &&
+                  Number(selectedAmount) >= 10
                 ) {
                   setIsBankPaymentMethod(true);
                   setIsCryptoPaymentMethod(false);
