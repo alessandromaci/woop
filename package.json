@@ -37,6 +37,7 @@
     "react-confetti": "^6.1.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.11.0",
+    "recharts": "^2.15.3",
     "sass": "^1.67.0",
     "smartlook-client": "^8.2.0",
     "typescript": "^5.2.2",
