@@ -550,14 +550,7 @@ export default function SelectReceiptMethod({
                 theme === "dark"
                   ? "border-gray-700 text-gray-200"
                   : "border-black text-slate-600"
-              } relative`}
-              /*                          
-            <div
-            className={`flex items-center justify-between basis-1/2 h-12 border rounded font-medium px-2 ${
-              theme === "dark"
-                ? "border-gray-700 text-gray-200"
-                : "border-black text-slate-600"
-                            } ${
+              } ${
                 selectedToken.label === "USD" || selectedToken.label === "EURO"
                   ? "cursor-pointer hover:bg-gray-300"
                   : "cursor-not-allowed opacity-50"
@@ -568,7 +561,6 @@ export default function SelectReceiptMethod({
                   ? "bg-blue-100 text-black"
                   : "bg-transparent"
               }`}
-
               onClick={() => {
                 if (
                   selectedToken.label === "USD" ||
@@ -578,7 +570,6 @@ export default function SelectReceiptMethod({
                   setIsCryptoPaymentMethod(false);
                 }
               }}
-              */
             >
               <div className="flex items-center">
                 {/* Display logo next to bank card */}
@@ -588,9 +579,6 @@ export default function SelectReceiptMethod({
                   className="h-7 w-7 mr-2"
                 />
                 <span className="font-medium">Bank Card</span>
-              </div>
-              <div className="absolute right-0 top-0 -translate-y-1/2 px-2 py-1 bg-blue-400 text-white text-xs rounded-full">
-                Coming Soon
               </div>
             </div>
           </div>
@@ -757,18 +745,6 @@ export default function SelectReceiptMethod({
 
               {/* Labels for Network and Address */}
               <div className="mt-4">
-                <div className="relative flex items-center w-full">
-                  {/* Network Label */}
-                  <div
-                    className={`font-sans text-xs leading-snug text-gray-600 mt-1`}
-                  >
-                    {`*This wallet address is linked to your bank account through
-                    Transak. Any crypto sent to this address will be
-                    automatically converted and deposited into your bank
-                    account.`}
-                  </div>
-                </div>
-
                 {/* Network & Wallet Address */}
                 <div className="relative flex items-center w-full p-4 bg-white border rounded-lg">
                   {/* Chain */}

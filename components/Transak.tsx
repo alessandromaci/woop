@@ -19,11 +19,11 @@ const InstantOffRampEventsSDK: React.FC<InstantOffRampProps> = ({
   React.useEffect(() => {
     const transak = new Transak({
       apiKey: globalStagingAPIKey,
-      environment: Transak.ENVIRONMENTS.STAGING,
+      environment: Transak.ENVIRONMENTS.PRODUCTION,
       isTransakStreamOffRamp: true,
       cryptoCurrencyCode: "USDC",
-      networks: "ethereum,arbitrum,optimism,base",
-      redirectURL: "https://www.woop.ink/",
+      networks: "base,ethereum,arbitrum,optimism",
+      redirectURL: "https://www.app.woopwidget.com/",
     });
 
     transak.init();
