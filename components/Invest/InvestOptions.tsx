@@ -1,9 +1,13 @@
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import { tokensDetails } from "../../utils/constants";
+import { useAccount, useWalletClient } from "wagmi";
+import { LidoSDK } from "@lidofinance/lido-ethereum-sdk";
+import { supabase } from "../../utils/supabaseClient";
 
 const ETH_LOGO = "/ethereum.svg";
 const MORPHO_LOGO = "/morpho.png";
+const LIDO_LOGO = "/lido.png";
 
 interface InvestOptionsProps {
   theme: string;
@@ -29,6 +33,16 @@ function calculateEarnings(amount: number, apy: string, months: number) {
 // Example: dynamic investment options per token
 const tokenInvestmentOptions: Record<string, any[]> = {
   ETH: [
+    {
+      platformLogo: LIDO_LOGO,
+      platformName: "Lido Staking",
+      name: "Lido Staking",
+      description: "Stake ETH and receive stETH with Lido.",
+      apy: "3.5%",
+      risk: "Low",
+      minAmount: "0.01",
+      action: "lido-stake",
+    },
     {
       platformLogo: ETH_LOGO,
       platformName: "ETH Staking",
@@ -118,6 +132,11 @@ export default function InvestOptions({
   const [amount, setAmount] = useState<string>("");
   const [selectedToken, setSelectedToken] = useState(cryptoTokens[0]);
   const [selectorVisibility, setSelectorVisibility] = useState<boolean>(false);
+  const { address, chain } = useAccount();
+  const { data: walletClient } = useWalletClient();
+  const [loadingAction, setLoadingAction] = useState<string | null>(null);
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -132,6 +151,66 @@ export default function InvestOptions({
     tokenInvestmentOptions.default;
 
   const parsedAmount = parseFloat(amount) || 0;
+
+  // Modular action handler
+  async function handleInvestmentAction(option: any) {
+    setError(null);
+    setLoadingAction(option.action);
+    try {
+      if (option.action === "lido-stake") {
+        // Only allow on mainnet or sepolia
+        if (!chain || (chain.id !== 1 && chain.id !== 11155111)) {
+          setError("Lido staking is only available on Mainnet and Sepolia.");
+          setLoadingAction(null);
+          return;
+        }
+        if (!walletClient || !address) {
+          setError("Connect your wallet to stake.");
+          setLoadingAction(null);
+          return;
+        }
+        // Lido SDK setup
+        const lidoSDK = new LidoSDK({
+          chainId: chain.id,
+          rpcUrls: [walletClient.chain.rpcUrls.default.http[0]],
+          web3Provider:
+            typeof window !== "undefined" ? window.ethereum : undefined,
+        });
+        // Prepare value in wei
+        const value = BigInt(Math.floor(Number(amount) * 1e18));
+        // Get populated tx data
+        const { to, data } = await lidoSDK.stake.stakeEthPopulateTx({
+          value,
+          account: address,
+        });
+        // Send transaction
+        const hash = await walletClient.sendTransaction({
+          to,
+          data,
+          value,
+        });
+        setTxHash(hash);
+        // Save to Supabase
+        await supabase.from("investments").insert([
+          {
+            address,
+            amount: Number(amount),
+            token: "ETH",
+            protocol: "Lido",
+            tx_hash: hash,
+            chain_id: chain.id,
+            created_at: new Date().toISOString(),
+          },
+        ]);
+      } else {
+        setError("This investment action is not yet implemented.");
+      }
+    } catch (e: any) {
+      setError(e.message || "Transaction failed");
+    } finally {
+      setLoadingAction(null);
+    }
+  }
 
   return (
     <div
@@ -250,9 +329,31 @@ export default function InvestOptions({
                     </div>
                   </div>
                 </div>
+                {/* Action Button (if available) */}
+                {option.action && (
+                  <button
+                    className={`ml-4 px-5 py-2 rounded-full font-bold text-white ${
+                      loadingAction === option.action
+                        ? "bg-blue-300"
+                        : "bg-blue-600 hover:bg-blue-700"
+                    }`}
+                    disabled={loadingAction === option.action}
+                    onClick={() => handleInvestmentAction(option)}
+                  >
+                    {loadingAction === option.action
+                      ? "Processing..."
+                      : "Stake"}
+                  </button>
+                )}
               </div>
             );
           })}
+          {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+          {txHash && (
+            <div className="text-green-600 text-xs mt-2 break-all">
+              Staked! Tx: {txHash}
+            </div>
+          )}
         </div>
       </div>
 
