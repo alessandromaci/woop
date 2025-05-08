@@ -59,8 +59,12 @@ export default function InvestOverview({ onInvestClick }: InvestOverviewProps) {
   const [selectedRange, setSelectedRange] = useState<TimeRange>("1M");
 
   useEffect(() => {
-    setFormattedInvested(totalInvested.toLocaleString());
-    setFormattedReturn(totalReturn.toLocaleString());
+    setFormattedInvested(
+      totalInvested.toLocaleString("en-US", { maximumFractionDigits: 2 })
+    );
+    setFormattedReturn(
+      totalReturn.toLocaleString("en-US", { maximumFractionDigits: 2 })
+    );
   }, []);
 
   // Format Y axis as round $Xk (no decimals)

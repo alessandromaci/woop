@@ -2,16 +2,36 @@ import { useState, useMemo } from "react";
 import Image from "next/image";
 import { tokensDetails } from "../../utils/constants";
 
+const ETH_LOGO = "/ethereum.svg";
+const MORPHO_LOGO = "/morpho.png";
+
 interface InvestOptionsProps {
   theme: string;
   buttonColor: string;
   onBack: () => void;
 }
 
+// Helper to parse APY string like "4-7%" or "2-4%" to a number (use min for conservative estimate)
+function parseApy(apy: string) {
+  if (!apy) return 0;
+  const match = apy.match(/(\d+(?:\.\d+)?)/);
+  return match ? parseFloat(match[1]) : 0;
+}
+
+// Helper to calculate earnings
+function calculateEarnings(amount: number, apy: string, months: number) {
+  const apyNum = parseApy(apy);
+  if (!amount || !apyNum) return 0;
+  // Simple interest for now: (amount * apy% * months/12)
+  return ((amount * apyNum) / 100) * (months / 12);
+}
+
 // Example: dynamic investment options per token
 const tokenInvestmentOptions: Record<string, any[]> = {
   ETH: [
     {
+      platformLogo: ETH_LOGO,
+      platformName: "ETH Staking",
       name: "Staking",
       description: "Earn passive income by staking ETH",
       apy: "4-7%",
@@ -19,8 +39,10 @@ const tokenInvestmentOptions: Record<string, any[]> = {
       minAmount: "0.1",
     },
     {
-      name: "Liquidity Pool",
-      description: "Provide ETH liquidity to earn trading fees",
+      platformLogo: MORPHO_LOGO,
+      platformName: "Morpho Lending",
+      name: "Lending",
+      description: "Lend ETH on Morpho for yield",
       apy: "7-12%",
       risk: "Medium",
       minAmount: "0.5",
@@ -35,6 +57,8 @@ const tokenInvestmentOptions: Record<string, any[]> = {
   ],
   USDC: [
     {
+      platformLogo: MORPHO_LOGO,
+      platformName: "Morpho Lending",
       name: "Lending",
       description: "Lend USDC to earn interest",
       apy: "2-4%",
@@ -42,6 +66,8 @@ const tokenInvestmentOptions: Record<string, any[]> = {
       minAmount: "100",
     },
     {
+      platformLogo: ETH_LOGO,
+      platformName: "Stable Pool",
       name: "Stable Pool",
       description: "Provide USDC liquidity for stable returns",
       apy: "4-7%",
@@ -49,25 +75,11 @@ const tokenInvestmentOptions: Record<string, any[]> = {
       minAmount: "500",
     },
   ],
-  MATIC: [
-    {
-      name: "Staking",
-      description: "Stake MATIC for network rewards",
-      apy: "5-10%",
-      risk: "Low",
-      minAmount: "10",
-    },
-    {
-      name: "Liquidity Pool",
-      description: "Provide MATIC liquidity to earn fees",
-      apy: "8-15%",
-      risk: "Medium",
-      minAmount: "50",
-    },
-  ],
   // fallback for other tokens
   default: [
     {
+      platformLogo: ETH_LOGO,
+      platformName: "Staking",
       name: "Staking",
       description: "Earn passive income by staking your assets",
       apy: "5-12%",
@@ -75,8 +87,10 @@ const tokenInvestmentOptions: Record<string, any[]> = {
       minAmount: "100",
     },
     {
-      name: "Liquidity Pool",
-      description: "Provide liquidity to earn trading fees",
+      platformLogo: MORPHO_LOGO,
+      platformName: "Morpho Lending",
+      name: "Lending",
+      description: "Lend assets for yield",
       apy: "8-15%",
       risk: "Medium",
       minAmount: "500",
@@ -116,6 +130,8 @@ export default function InvestOptions({
   const investmentOptions =
     tokenInvestmentOptions[selectedToken.label] ||
     tokenInvestmentOptions.default;
+
+  const parsedAmount = parseFloat(amount) || 0;
 
   return (
     <div
@@ -180,69 +196,63 @@ export default function InvestOptions({
 
         {/* Investment Options */}
         <div className="space-y-4">
-          {investmentOptions.map((option, index) => (
-            <div
-              key={index}
-              className={`border rounded-lg p-4 cursor-pointer transition-all hover:border-blue-500 ${
-                theme === "dark" ? "border-gray-700" : "border-gray-200"
-              }`}
-            >
-              <div className="flex justify-between items-start mb-2">
-                <h3
-                  className={`font-semibold text-lg ${
-                    theme === "dark" ? "text-gray-200" : "text-slate-700"
-                  }`}
-                >
-                  {option.name}
-                </h3>
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    option.risk === "Low"
-                      ? "bg-green-100 text-green-800"
-                      : option.risk === "Medium"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
-                >
-                  {option.risk} Risk
-                </span>
-              </div>
-              <p
-                className={`text-sm mb-2 ${
-                  theme === "dark" ? "text-gray-400" : "text-slate-500"
+          {investmentOptions.map((option, index) => {
+            const earn1m = calculateEarnings(parsedAmount, option.apy, 1);
+            const earn1y = calculateEarnings(parsedAmount, option.apy, 12);
+            return (
+              <div
+                key={index}
+                className={`flex items-center border rounded-lg p-4 gap-4 transition-all hover:border-blue-500 ${
+                  theme === "dark" ? "border-gray-700" : "border-gray-200"
                 }`}
               >
-                {option.description}
-              </p>
-              <div className="flex justify-between items-center">
-                <div>
-                  <span
-                    className={`text-sm font-medium ${
-                      theme === "dark" ? "text-gray-400" : "text-slate-500"
-                    }`}
-                  >
-                    APY:{" "}
-                  </span>
-                  <span
-                    className={`font-semibold ${
-                      theme === "dark" ? "text-green-400" : "text-green-600"
-                    }`}
-                  >
-                    {option.apy}
-                  </span>
+                {/* Platform Logo */}
+                <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 bg-gray-50 rounded-xl">
+                  <Image
+                    src={option.platformLogo || selectedToken.logo}
+                    alt={option.platformName}
+                    width={40}
+                    height={40}
+                    className="rounded-xl"
+                  />
                 </div>
-                <div>
-                  <span
-                    className={`text-sm font-medium ${
-                      theme === "dark" ? "text-gray-400" : "text-slate-500"
-                    }`}
-                  >
-                    Min: {option.minAmount} {selectedToken.label}
-                  </span>
+                {/* Info */}
+                <div className="flex flex-col flex-1">
+                  <div className="flex justify-between items-center mb-1">
+                    <div className="font-semibold text-base text-slate-700">
+                      {option.platformName}
+                    </div>
+                    <div className="font-bold text-blue-600 text-lg">
+                      {option.apy} APY
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-500 mb-1">
+                    {option.description}
+                  </div>
+                  <div className="flex gap-6 mt-1">
+                    <div className="text-xs text-gray-500">
+                      <span className="font-semibold text-slate-700">
+                        Earn in 1M:
+                      </span>{" "}
+                      $
+                      {earn1m.toLocaleString("en-US", {
+                        maximumFractionDigits: 2,
+                      })}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      <span className="font-semibold text-slate-700">
+                        in 1Y:
+                      </span>{" "}
+                      $
+                      {earn1y.toLocaleString("en-US", {
+                        maximumFractionDigits: 2,
+                      })}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

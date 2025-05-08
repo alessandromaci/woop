@@ -37,10 +37,17 @@ export default function InvestPositions() {
             </div>
             <div className="text-right">
               <div className="font-bold text-gray-800">
-                ${pos.invested.toLocaleString()}
+                $
+                {pos.invested.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                })}
               </div>
               <div className="text-green-500 text-xs">
-                (+${pos.return.toLocaleString()})
+                (+$
+                {pos.return.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                })}
+                )
               </div>
             </div>
           </div>
