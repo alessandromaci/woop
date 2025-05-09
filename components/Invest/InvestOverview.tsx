@@ -94,8 +94,20 @@ export default function InvestOverview({
         return;
       }
       setOpenInvestments(data || []);
-      console.log("Open investments for total:", data);
-      const totalUSD = getTotalOpenInvestmentUSD(data || []);
+      // Aggregate by protocol+token before calculating total
+      const aggregated = Object.values(
+        (data || []).reduce((agg, pos) => {
+          const key = `${pos.protocol}_${pos.token}`;
+          if (!agg[key]) {
+            agg[key] = { ...pos, amount: Number(pos.amount) };
+          } else {
+            agg[key].amount += Number(pos.amount);
+          }
+          return agg;
+        }, {} as Record<string, { amount: number; token: string }>)
+      );
+      console.log("Aggregated open investments for total:", aggregated);
+      const totalUSD = getTotalOpenInvestmentUSD(aggregated);
       console.log("Total USD calculated:", totalUSD);
       setTotalInvested(totalUSD);
       setLoading(false);
