@@ -8,9 +8,13 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { tokensDetails } from "../../utils/constants";
+import { useAccount } from "wagmi";
+import { supabase } from "../../utils/supabaseClient";
+import { getTotalOpenInvestmentUSD } from "./InvestPositions";
 
 interface InvestOverviewProps {
   onInvestClick: () => void;
+  refreshKey?: any; // pass txHash or similar to trigger refresh
 }
 
 const chartData = {
@@ -50,13 +54,54 @@ const chartData = {
 const timeRanges = ["1D", "1W", "1M", "3M", "1Y"] as const;
 type TimeRange = (typeof timeRanges)[number];
 
-export default function InvestOverview({ onInvestClick }: InvestOverviewProps) {
-  const totalInvested = 3123.67;
-  const totalReturn = 768.98;
+// Helper to get token price in USD
+function getTokenPriceUSD(tokenLabel: string): number {
+  if (tokenLabel === "ETH") return 2200;
+  if (tokenLabel === "BTC") return 100000;
+  return 1; // fallback for other tokens
+}
+
+export default function InvestOverview({
+  onInvestClick,
+  refreshKey,
+}: InvestOverviewProps) {
+  const { address } = useAccount();
+  const [totalInvested, setTotalInvested] = useState(0);
+  const [openInvestments, setOpenInvestments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const totalReturn = 768.98; // TODO: calculate from investments if needed
 
   const [formattedInvested, setFormattedInvested] = useState("");
   const [formattedReturn, setFormattedReturn] = useState("");
   const [selectedRange, setSelectedRange] = useState<TimeRange>("1M");
+
+  // Fetch open investments for the connected address
+  useEffect(() => {
+    async function fetchInvestments() {
+      if (!address) return;
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("investments")
+        .select(
+          "amount, token, protocol, tx_hash, chain_id, created_at, status"
+        )
+        .eq("address", address?.toLowerCase())
+        .eq("status", "open");
+      if (error) {
+        setOpenInvestments([]);
+        setTotalInvested(0);
+        setLoading(false);
+        return;
+      }
+      setOpenInvestments(data || []);
+      console.log("Open investments for total:", data);
+      const totalUSD = getTotalOpenInvestmentUSD(data || []);
+      console.log("Total USD calculated:", totalUSD);
+      setTotalInvested(totalUSD);
+      setLoading(false);
+    }
+    fetchInvestments();
+  }, [address, refreshKey]);
 
   useEffect(() => {
     setFormattedInvested(
@@ -65,7 +110,7 @@ export default function InvestOverview({ onInvestClick }: InvestOverviewProps) {
     setFormattedReturn(
       totalReturn.toLocaleString("en-US", { maximumFractionDigits: 2 })
     );
-  }, []);
+  }, [totalInvested, totalReturn]);
 
   // Format Y axis as round $Xk (no decimals)
   const formatYAxis = (value: number) => {

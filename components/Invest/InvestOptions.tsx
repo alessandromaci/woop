@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { tokensDetails } from "../../utils/constants";
 import { useAccount, useWalletClient } from "wagmi";
 import { LidoSDK } from "@lidofinance/lido-ethereum-sdk";
 import { supabase } from "../../utils/supabaseClient";
+import { useRouter } from "next/router";
 
 const ETH_LOGO = "/ethereum.svg";
 const MORPHO_LOGO = "/morpho.png";
@@ -26,8 +27,16 @@ function parseApy(apy: string) {
 function calculateEarnings(amount: number, apy: string, months: number) {
   const apyNum = parseApy(apy);
   if (!amount || !apyNum) return 0;
-  // Simple interest for now: (amount * apy% * months/12)
-  return ((amount * apyNum) / 100) * (months / 12);
+  // Compound interest: amount * ((1 + apy/100)^(months/12) - 1)
+  const factor = Math.pow(1 + apyNum / 100, months / 12) - 1;
+  return amount * factor;
+}
+
+// Helper to get token price in USD
+function getTokenPriceUSD(tokenLabel: string): number {
+  if (tokenLabel === "ETH") return 2200;
+  if (tokenLabel === "BTC") return 100000;
+  return 1; // fallback for other tokens
 }
 
 // Example: dynamic investment options per token
@@ -39,18 +48,8 @@ const tokenInvestmentOptions: Record<string, any[]> = {
       name: "Lido Staking",
       description: "Stake ETH and receive stETH with Lido.",
       apy: "3.5%",
-      risk: "Low",
       minAmount: "0.01",
       action: "lido-stake",
-    },
-    {
-      platformLogo: ETH_LOGO,
-      platformName: "ETH Staking",
-      name: "Staking",
-      description: "Earn passive income by staking ETH",
-      apy: "4-7%",
-      risk: "Low",
-      minAmount: "0.1",
     },
     {
       platformLogo: MORPHO_LOGO,
@@ -58,15 +57,7 @@ const tokenInvestmentOptions: Record<string, any[]> = {
       name: "Lending",
       description: "Lend ETH on Morpho for yield",
       apy: "7-12%",
-      risk: "Medium",
       minAmount: "0.5",
-    },
-    {
-      name: "Yield Farming",
-      description: "Maximize ETH returns through yield optimization",
-      apy: "12-20%",
-      risk: "High",
-      minAmount: "1",
     },
   ],
   USDC: [
@@ -137,6 +128,8 @@ export default function InvestOptions({
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const router = useRouter();
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -151,6 +144,8 @@ export default function InvestOptions({
     tokenInvestmentOptions.default;
 
   const parsedAmount = parseFloat(amount) || 0;
+  const tokenPriceUSD = getTokenPriceUSD(selectedToken.label);
+  const usdValue = parsedAmount * tokenPriceUSD;
 
   // Modular action handler
   async function handleInvestmentAction(option: any) {
@@ -189,19 +184,21 @@ export default function InvestOptions({
           data,
           value,
         });
-        setTxHash(hash);
         // Save to Supabase
         await supabase.from("investments").insert([
           {
-            address,
+            address: address.toLowerCase(),
             amount: Number(amount),
             token: "ETH",
             protocol: "Lido",
             tx_hash: hash,
             chain_id: chain.id,
             created_at: new Date().toISOString(),
+            status: "open",
           },
         ]);
+        // Redirect to investment overview
+        router.push("/invest/overview");
       } else {
         setError("This investment action is not yet implemented.");
       }
@@ -271,87 +268,97 @@ export default function InvestOptions({
               </span>
             </button>
           </div>
+          <div
+            className={`mt-1 text-xs ${
+              theme === "dark" ? "text-gray-400" : "text-gray-500"
+            }`}
+          >
+            ≈ ${usdValue.toLocaleString("en-US", { maximumFractionDigits: 2 })}{" "}
+            USD
+          </div>
         </div>
 
         {/* Investment Options */}
         <div className="space-y-4">
           {investmentOptions.map((option, index) => {
-            const earn1m = calculateEarnings(parsedAmount, option.apy, 1);
-            const earn1y = calculateEarnings(parsedAmount, option.apy, 12);
+            const earn1mToken = calculateEarnings(parsedAmount, option.apy, 1);
+            const earn1m = earn1mToken * tokenPriceUSD;
+            const earn1yToken = calculateEarnings(parsedAmount, option.apy, 12);
+            const earn1y = earn1yToken * tokenPriceUSD;
             return (
               <div
                 key={index}
-                className={`flex items-center border rounded-lg p-4 gap-4 transition-all hover:border-blue-500 ${
-                  theme === "dark" ? "border-gray-700" : "border-gray-200"
+                className={`border rounded-xl p-4 transition-all cursor-pointer relative ${
+                  theme === "dark"
+                    ? "border-gray-700 bg-gray-900"
+                    : "border-gray-200 bg-white"
+                } ${
+                  selectedIndex === index ? "ring-2 ring-blue-500 mb-4" : "mb-4"
                 }`}
+                onClick={() => setSelectedIndex(index)}
               >
-                {/* Platform Logo */}
-                <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 bg-gray-50 rounded-xl">
-                  <Image
-                    src={option.platformLogo || selectedToken.logo}
-                    alt={option.platformName}
-                    width={40}
-                    height={40}
-                    className="rounded-xl"
-                  />
-                </div>
-                {/* Info */}
-                <div className="flex flex-col flex-1">
-                  <div className="flex justify-between items-center mb-1">
-                    <div className="font-semibold text-base text-slate-700">
+                <div className="flex items-center gap-4">
+                  {/* Logo */}
+                  <div className="flex-shrink-0 flex items-center justify-center w-16 h-16 bg-gray-100 rounded-2xl">
+                    <Image
+                      src={option.platformLogo || selectedToken.logo}
+                      alt={option.platformName}
+                      width={56}
+                      height={56}
+                      className="rounded-2xl"
+                    />
+                  </div>
+                  {/* Center: Name and Network */}
+                  <div className="flex flex-col flex-1 justify-center">
+                    <div className="font-bold text-lg text-slate-800">
                       {option.platformName}
                     </div>
-                    <div className="font-bold text-blue-600 text-lg">
-                      {option.apy} APY
+                    <div className="text-xs text-gray-500 mt-1">
+                      {option.network || "Ethereum"}
                     </div>
                   </div>
-                  <div className="text-sm text-gray-500 mb-1">
-                    {option.description}
-                  </div>
-                  <div className="flex gap-6 mt-1">
-                    <div className="text-xs text-gray-500">
-                      <span className="font-semibold text-slate-700">
-                        Earn in 1M:
-                      </span>{" "}
+                  {/* Right: Earnings and APR */}
+                  <div className="flex flex-col items-end min-w-[90px]">
+                    <div className="font-bold text-2xl text-slate-900">
                       $
                       {earn1m.toLocaleString("en-US", {
                         maximumFractionDigits: 2,
                       })}
                     </div>
-                    <div className="text-xs text-gray-500">
-                      <span className="font-semibold text-slate-700">
-                        in 1Y:
-                      </span>{" "}
-                      $
-                      {earn1y.toLocaleString("en-US", {
-                        maximumFractionDigits: 2,
-                      })}
+                    <div className="text-xs mt-1 text-green-600 font-medium">
+                      {option.apy} APY
                     </div>
                   </div>
                 </div>
-                {/* Action Button (if available) */}
-                {option.action && (
-                  <button
-                    className={`ml-4 px-5 py-2 rounded-full font-bold text-white ${
-                      loadingAction === option.action
-                        ? "bg-blue-300"
-                        : "bg-blue-600 hover:bg-blue-700"
-                    }`}
-                    disabled={loadingAction === option.action}
-                    onClick={() => handleInvestmentAction(option)}
-                  >
-                    {loadingAction === option.action
-                      ? "Processing..."
-                      : "Stake"}
-                  </button>
+                {/* Buy Button for selected option */}
+                {selectedIndex === index && (
+                  <div className="w-full mt-6">
+                    <button
+                      className={`w-full py-3 rounded-full font-bold text-white shadow-lg transition-all ${
+                        loadingAction === option.action || parsedAmount === 0
+                          ? "bg-gray-300 cursor-not-allowed"
+                          : "bg-blue-600 hover:bg-blue-700"
+                      }`}
+                      disabled={
+                        loadingAction === option.action || parsedAmount === 0
+                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleInvestmentAction(option);
+                      }}
+                    >
+                      {loadingAction === option.action
+                        ? "Processing..."
+                        : "Buy"}
+                    </button>
+                  </div>
                 )}
               </div>
             );
           })}
-          {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
-          {txHash && (
-            <div className="text-green-600 text-xs mt-2 break-all">
-              Staked! Tx: {txHash}
+          {error && (
+            <div className="text-red-500 text-xs mt-2">
+              Something went wrong, try again
             </div>
           )}
         </div>
