@@ -684,7 +684,7 @@ const Request = () => {
                             <p className="ml-1 text-lg">
                               on{" "}
                               {networkName === "Any"
-                                ? "any network"
+                                ? "Ethereum, Base, Arbitrum, Optimism"
                                 : networkName}
                             </p>
                           }
@@ -791,7 +791,7 @@ const Request = () => {
                           <p className="ml-1 text-lg">
                             on{" "}
                             {networkName === "Any"
-                              ? "any network"
+                              ? "Ethereum, Base, Arbitrum, Optimism"
                               : networkName}
                           </p>
                         }
@@ -1028,7 +1028,7 @@ const Request = () => {
                           <p className="ml-1 text-lg">
                             on{" "}
                             {networkName === "Any"
-                              ? "any network"
+                              ? "Ethereum, Base, Arbitrum, Optimism"
                               : networkName}
                           </p>
                         }

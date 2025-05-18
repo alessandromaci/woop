@@ -746,43 +746,41 @@ export default function SelectReceiptMethod({
                 {/* Fee Options */}
                 <div className="flex flex-row gap-3 mt-4">
                   {selectedToken.label === "EURO" && (
-                    <div className="flex flex-col gap-2 w-full">
-                      {/* SEPA Option */}
-                      <div className="flex items-center rounded-lg py-2">
-                        <img
-                          src="/sepa-logo.png"
-                          alt="SEPA"
-                          className="h-9 w-12 mr-2"
-                        />
-                        <div>
-                          <div className="font-medium text-gray-700 text-sm">
+                    <div className="flex flex-col gap-1 w-full">
+                      <div className="flex items-center justify-between rounded-lg py-1">
+                        <div className="flex items-center">
+                          <img
+                            src="/sepa-logo.png"
+                            alt="SEPA"
+                            className="h-7 w-9 mr-2"
+                          />
+                          <span className="font-medium text-gray-700 text-xs font-sans">
                             SEPA Bank Transfer
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            1% fee, min €3
-                          </div>
+                          </span>
                         </div>
+                        <span className="text-xs text-gray-600">
+                          1% fee, min €3
+                        </span>
                       </div>
-                      {/* Card Payment Option */}
-                      <div className="flex items-center rounded-lg py-2">
-                        <img
-                          src="/visa-logo.png"
-                          alt="Visa"
-                          className="h-5 w-10 mr-2"
-                        />
-                        <img
-                          src="/mastercard-logo.png"
-                          alt="Mastercard"
-                          className="h-5 w-8 mr-4"
-                        />
-                        <div>
-                          <div className="font-medium text-gray-700 text-sm">
+                      <div className="flex items-center justify-between rounded-lg py-1">
+                        <div className="flex items-center">
+                          <img
+                            src="/visa-logo.png"
+                            alt="Visa"
+                            className="h-5 w-9 mr-2"
+                          />
+                          <img
+                            src="/mastercard-logo.png"
+                            alt="Mastercard"
+                            className="h-5 w-8 mr-2"
+                          />
+                          <span className="font-medium text-gray-700 text-xs font-sans">
                             Card Payment
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            1% fee, min €3.49
-                          </div>
+                          </span>
                         </div>
+                        <span className="text-xs text-gray-600">
+                          1% fee, min €3.49
+                        </span>
                       </div>
                     </div>
                   )}
@@ -791,15 +789,15 @@ export default function SelectReceiptMethod({
                       <img
                         src="/visa-logo.png"
                         alt="Visa"
-                        className="h-5 w-10 mr-2"
+                        className="h-5 w-9 mr-2"
                       />
                       <img
                         src="/mastercard-logo.png"
                         alt="Mastercard"
-                        className="h-5 w-8 mr-4"
+                        className="h-5 w-8 mr-2"
                       />
                       <div>
-                        <div className="font-medium text-gray-700 text-sm">
+                        <div className="font-medium text-gray-700 text-sm font-sans">
                           Card Payment
                         </div>
                         <div className="text-xs text-gray-600">
