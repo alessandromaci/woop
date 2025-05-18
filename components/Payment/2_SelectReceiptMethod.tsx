@@ -446,10 +446,8 @@ export default function SelectReceiptMethod({
 
   React.useEffect(() => {
     if (recipientNetworkTransak) {
-      const formattedChainName =
-        recipientNetworkTransak.charAt(0).toUpperCase() +
-        recipientNetworkTransak.slice(1);
-      handleChainChange(formattedChainName);
+      // Always use Any_Chain for bank payments
+      handleChainChange("Any_Chain");
     }
   }, [recipientNetworkTransak]);
 
@@ -745,8 +743,85 @@ export default function SelectReceiptMethod({
                 <div className="text-gray-700 font-semibold text-lg tracking-wider">
                   •••• - •••• - •••• {recipientBankCardNumberTransak.slice(-4)}
                 </div>
+                {/* Fee Options */}
+                <div className="flex flex-row gap-3 mt-4">
+                  {selectedToken.label === "EURO" && (
+                    <div className="flex flex-col gap-2 w-full">
+                      {/* SEPA Option */}
+                      <div className="flex items-center rounded-lg py-2">
+                        <img
+                          src="/sepa-logo.png"
+                          alt="SEPA"
+                          className="h-9 w-12 mr-2"
+                        />
+                        <div>
+                          <div className="font-medium text-gray-700 text-sm">
+                            SEPA Bank Transfer
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            1% fee, min €3
+                          </div>
+                        </div>
+                      </div>
+                      {/* Card Payment Option */}
+                      <div className="flex items-center rounded-lg py-2">
+                        <img
+                          src="/visa-logo.png"
+                          alt="Visa"
+                          className="h-5 w-10 mr-2"
+                        />
+                        <img
+                          src="/mastercard-logo.png"
+                          alt="Mastercard"
+                          className="h-5 w-8 mr-4"
+                        />
+                        <div>
+                          <div className="font-medium text-gray-700 text-sm">
+                            Card Payment
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            1% fee, min €3.49
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {selectedToken.label === "USD" && (
+                    <div className="flex items-center rounded-lg py-2">
+                      <img
+                        src="/visa-logo.png"
+                        alt="Visa"
+                        className="h-5 w-10 mr-2"
+                      />
+                      <img
+                        src="/mastercard-logo.png"
+                        alt="Mastercard"
+                        className="h-5 w-8 mr-4"
+                      />
+                      <div>
+                        <div className="font-medium text-gray-700 text-sm">
+                          Card Payment
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          1% fee, min $3.99
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="text-xs text-gray-500 mt-2">
+                  The total received will be deducted by these fees. More about
+                  <br />
+                  <a
+                    href="https://transak.notion.site/Off-Ramp-Payment-Methods-Fees-Other-Details-b938af0e6ca24da9b7f2aa2bd040ea40"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 underline"
+                  >
+                    Transak Fees here.
+                  </a>
+                </div>
               </div>
-
               {/* Labels for Network and Address */}
               <div className="mt-4">
                 {/* Network & Wallet Address */}
@@ -758,8 +833,8 @@ export default function SelectReceiptMethod({
                       alt="All Chains Logo"
                       className="h-7 w-7 mr-2"
                     />
-                    <span className="text-gray-700 font-medium text-lg">
-                      {recipientNetworkTransak}
+                    <span className="text-gray-700 font-medium text-sm">
+                      Ethereum, Base, Arbitrum, Optimism
                     </span>
                   </div>
 
