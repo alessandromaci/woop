@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import { Share } from "../Share/Share";
 import ErrorsUi from "../ErrorsUi/ErrorsUi";
@@ -459,6 +459,43 @@ export default function SelectReceiptMethod({
     }
   }, [effectiveAddress]);
 
+  // Helper to calculate received amount after fees
+  const getReceivedAmountPreview = useMemo(() => {
+    if (!selectedAmount || isNaN(Number(selectedAmount))) return null;
+    const amount = Number(selectedAmount);
+    let fee = 0;
+    let minFee = 0;
+    let label = "";
+    if (selectedToken.label === "EURO") {
+      if (recipientBankMethodTransak?.toUpperCase() === "CARD") {
+        minFee = 3.49;
+        label = "Card Payment";
+      } else {
+        minFee = 3;
+        label = "SEPA Bank Transfer";
+      }
+      const transakFee = amount * 0.0099;
+      if (transakFee > minFee) {
+        fee = amount * 0.0199; // 1.99% total
+      } else {
+        fee = minFee + amount * 0.01; // min fee + 1%
+      }
+    } else if (selectedToken.label === "USD") {
+      minFee = 3.99;
+      label = "Card Payment";
+      const transakFee = amount * 0.0099;
+      if (transakFee > minFee) {
+        fee = amount * 0.0199;
+      } else {
+        fee = minFee + amount * 0.01;
+      }
+    } else {
+      return null;
+    }
+    const received = Math.max(0, amount - fee);
+    return { received, fee, label };
+  }, [selectedAmount, selectedToken.label, recipientBankMethodTransak]);
+
   return (
     <>
       <div
@@ -479,7 +516,7 @@ export default function SelectReceiptMethod({
             />
             <div className="flex items-center">
               <span className="text-lg font-medium text-gray-500 mr-2">
-                You will receive
+                You requested
               </span>
               <span className="text-lg font-bold text-gray-900">
                 {selectedAmount === "allowPayerSelectAmount"
@@ -743,82 +780,74 @@ export default function SelectReceiptMethod({
                 <div className="text-gray-700 font-semibold text-lg tracking-wider">
                   •••• - •••• - •••• {recipientBankCardNumberTransak.slice(-4)}
                 </div>
-                {/* Fee Options */}
-                <div className="flex flex-row gap-3 mt-4">
-                  {selectedToken.label === "EURO" && (
-                    <div className="flex flex-col gap-1 w-full">
-                      <div className="flex items-center justify-between rounded-lg py-1">
-                        <div className="flex items-center">
-                          <img
-                            src="/sepa-logo.png"
-                            alt="SEPA"
-                            className="h-7 w-9 mr-2"
-                          />
-                          <span className="font-medium text-gray-700 text-xs font-sans">
-                            SEPA Bank Transfer
-                          </span>
-                        </div>
-                        <span className="text-xs text-gray-600">
-                          1% fee, min €3
+                {/* Fee and Amount Preview - Two Column Layout */}
+                {getReceivedAmountPreview && (
+                  <div className="w-full mt-4 mb-2">
+                    <div className="flex flex-row items-center justify-between w-full">
+                      {/* Left: Amount */}
+                      <div className="flex flex-col">
+                        <span className="text-xs text-gray-500 mb-1">
+                          You will receive (estimate)
+                        </span>
+                        <span className="text-xl font-bold text-blue-700">
+                          {getReceivedAmountPreview.received.toFixed(2)}{" "}
+                          {selectedToken.label}
                         </span>
                       </div>
-                      <div className="flex items-center justify-between rounded-lg py-1">
-                        <div className="flex items-center">
-                          <img
-                            src="/visa-logo.png"
-                            alt="Visa"
-                            className="h-5 w-9 mr-2"
-                          />
-                          <img
-                            src="/mastercard-logo.png"
-                            alt="Mastercard"
-                            className="h-5 w-8 mr-2"
-                          />
-                          <span className="font-medium text-gray-700 text-xs font-sans">
-                            Card Payment
-                          </span>
+                      {/* Right: Logos and Fee */}
+                      <div className="flex flex-col items-end">
+                        <div className="flex items-center mb-1">
+                          {selectedToken.label === "USD" ||
+                          (selectedToken.label === "EURO" &&
+                            recipientBankMethodTransak?.toUpperCase() ===
+                              "CARD") ? (
+                            <>
+                              <img
+                                src="/visa-logo.png"
+                                alt="Visa"
+                                className="h-5 w-9 mr-1"
+                              />
+                              <img
+                                src="/mastercard-logo.png"
+                                alt="Mastercard"
+                                className="h-5 w-8 mr-1"
+                              />
+                            </>
+                          ) : (
+                            <img
+                              src="/sepa-logo.png"
+                              alt="SEPA"
+                              className="h-7 w-9 mr-1"
+                            />
+                          )}
                         </div>
                         <span className="text-xs text-gray-600">
-                          1% fee, min €3.49
+                          {selectedToken.label === "USD" &&
+                            "1.99% fee, min $3.99"}
+                          {selectedToken.label === "EURO" &&
+                            recipientBankMethodTransak?.toUpperCase() ===
+                              "CARD" &&
+                            "1.99% fee, min €3.49"}
+                          {selectedToken.label === "EURO" &&
+                            recipientBankMethodTransak?.toUpperCase() !==
+                              "CARD" &&
+                            "1.99% fee, min €3"}
                         </span>
                       </div>
                     </div>
-                  )}
-                  {selectedToken.label === "USD" && (
-                    <div className="flex items-center rounded-lg py-2">
-                      <img
-                        src="/visa-logo.png"
-                        alt="Visa"
-                        className="h-5 w-9 mr-2"
-                      />
-                      <img
-                        src="/mastercard-logo.png"
-                        alt="Mastercard"
-                        className="h-5 w-8 mr-2"
-                      />
-                      <div>
-                        <div className="font-medium text-gray-700 text-sm font-sans">
-                          Card Payment
-                        </div>
-                        <div className="text-xs text-gray-600">
-                          1% fee, min $3.99
-                        </div>
-                      </div>
+                    <div className="text-xs text-gray-500 mt-4">
+                      More about{" "}
+                      <a
+                        href="https://transak.notion.site/Off-Ramp-Payment-Methods-Fees-Other-Details-b938af0e6ca24da9b7f2aa2bd040ea40"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 underline"
+                      >
+                        Transak Fees here.
+                      </a>
                     </div>
-                  )}
-                </div>
-                <div className="text-xs text-gray-500 mt-2">
-                  The total received will be deducted by these fees. More about
-                  <br />
-                  <a
-                    href="https://transak.notion.site/Off-Ramp-Payment-Methods-Fees-Other-Details-b938af0e6ca24da9b7f2aa2bd040ea40"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 underline"
-                  >
-                    Transak Fees here.
-                  </a>
-                </div>
+                  </div>
+                )}
               </div>
               {/* Labels for Network and Address */}
               <div className="mt-4">
