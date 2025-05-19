@@ -38,8 +38,7 @@ const InstantOffRampEventsSDK: React.FC<InstantOffRampProps> = ({
         const bankMethod = eventData.status.withdrawalMethod;
         const bankCardNumber = eventData.status.withdrawalInstrument;
         onNetworkReceived(network);
-        onBankMethodReceived;
-        bankMethod;
+        onBankMethodReceived(bankMethod);
         onBankCardNumberReceived(bankCardNumber);
         onWalletAddressReceived(walletAddress);
       }

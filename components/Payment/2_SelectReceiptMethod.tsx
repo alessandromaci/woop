@@ -588,14 +588,16 @@ export default function SelectReceiptMethod({
               } ${
                 (selectedToken.label === "USD" ||
                   selectedToken.label === "EURO") &&
-                Number(selectedAmount) >= 10
+                Number(selectedAmount) >= 10 &&
+                selectedAmount !== "allowPayerSelectAmount"
                   ? "cursor-pointer hover:bg-gray-300"
                   : "cursor-not-allowed opacity-50"
               } ${
                 isBankPaymentMethod &&
                 (selectedToken.label === "USD" ||
                   selectedToken.label === "EURO") &&
-                Number(selectedAmount) >= 10
+                Number(selectedAmount) >= 10 &&
+                selectedAmount !== "allowPayerSelectAmount"
                   ? "bg-blue-100 text-black"
                   : "bg-transparent"
               }`}
@@ -603,7 +605,8 @@ export default function SelectReceiptMethod({
                 if (
                   (selectedToken.label === "USD" ||
                     selectedToken.label === "EURO") &&
-                  Number(selectedAmount) >= 10
+                  Number(selectedAmount) >= 10 &&
+                  selectedAmount !== "allowPayerSelectAmount"
                 ) {
                   setIsBankPaymentMethod(true);
                   setIsCryptoPaymentMethod(false);
@@ -881,10 +884,8 @@ export default function SelectReceiptMethod({
                   <div
                     className={`font-sans text-xs leading-snug text-gray-600 mt-1`}
                   >
-                    {`*This wallet address is linked to your bank account through
-                    Transak. Any crypto sent to this address will be
-                    automatically converted and deposited into your bank
-                    account.`}
+                    {`*This wallet address is linked to your payment account via Transak. Any crypto sent to this address will be
+                    converted and deposited into your selected payment method.`}
                   </div>
                 </div>
               </div>
