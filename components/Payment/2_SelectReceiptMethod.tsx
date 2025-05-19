@@ -568,7 +568,7 @@ export default function SelectReceiptMethod({
               <div className="flex items-center">
                 {/* Display logo next to chain name */}
                 <Image
-                  src={ethLogo}
+                  src={allChainsLogo}
                   alt="Ethereum Logo"
                   className="h-7 w-7 mr-2"
                 />
