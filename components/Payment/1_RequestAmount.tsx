@@ -182,9 +182,20 @@ export default function RequestAmount({
                         >
                           {token.label}
                         </div>
-                        <div className="text-sm text-gray-500">
-                          {chain?.name || "Ethereum"}
-                        </div>
+                        {(token.label === "USD" || token.label === "EURO") && (
+                          <div className="flex items-center mt-1">
+                            <Image
+                              src="/bank_card.png"
+                              alt="Direct Bank Transfer available"
+                              width={16}
+                              height={16}
+                              className="mr-1"
+                            />
+                            <span className="text-xs text-gray-500">
+                              Direct Bank Transfer Available
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
