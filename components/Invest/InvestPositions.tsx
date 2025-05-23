@@ -42,6 +42,10 @@ export default function InvestPositions() {
   const { address } = useAccount();
   const [positions, setPositions] = useState<InvestmentPosition[]>([]);
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     async function fetchPositions() {
@@ -71,9 +75,17 @@ export default function InvestPositions() {
     <div>
       <div className="text-blue-600 font-semibold mb-2">Open investments</div>
       <div className="flex flex-col gap-3">
-        {loading ? (
+        {!mounted ? (
+          <div className="h-10" />
+        ) : !address ? (
+          <div className="text-xs text-gray-400">
+            Connect your wallet to view open investments
+          </div>
+        ) : loading ? (
           <div className="text-xs text-gray-400">Loading...</div>
-        ) : positions.length === 0 ? null : (
+        ) : positions.length === 0 ? (
+          <div className="text-xs text-gray-400">No investments found</div>
+        ) : (
           Object.values(
             positions.reduce((agg, pos) => {
               const key = `${pos.protocol}_${pos.token}`;

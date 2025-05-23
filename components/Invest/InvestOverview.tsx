@@ -7,10 +7,10 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { tokensDetails } from "../../utils/constants";
 import { useAccount } from "wagmi";
 import { supabase } from "../../utils/supabaseClient";
 import { getTotalOpenInvestmentUSD } from "./InvestPositions";
+import Wallet from "../common/Wallet";
 
 interface InvestOverviewProps {
   onInvestClick: () => void;
@@ -66,6 +66,10 @@ export default function InvestOverview({
   refreshKey,
 }: InvestOverviewProps) {
   const { address } = useAccount();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [totalInvested, setTotalInvested] = useState(0);
   const [openInvestments, setOpenInvestments] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -133,11 +137,33 @@ export default function InvestOverview({
   };
 
   return (
-    <div className="rounded-2xl bg-white p-4 flex flex-col items-left">
-      <div className="text-blue-600 text-5xl font-bold mb-2">
+    <div className="rounded-2xl bg-white p-4 flex flex-col items-left relative">
+      {!mounted ? (
+        <div className="h-40" />
+      ) : !address ? (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white bg-opacity-80 rounded-2xl">
+          <div className="text-gray-700 text-lg font-semibold mb-2">
+            Connect your wallet to start
+          </div>
+          <Wallet />
+        </div>
+      ) : null}
+      <div
+        className={`text-blue-600 text-5xl font-bold mb-2 transition-all ${
+          mounted && !address
+            ? "filter blur-sm pointer-events-none select-none"
+            : ""
+        }`}
+      >
         ${formattedInvested}
       </div>
-      <div className="flex items-center gap-5">
+      <div
+        className={`flex items-center gap-5 ${
+          mounted && !address
+            ? "filter blur-sm pointer-events-none select-none"
+            : ""
+        }`}
+      >
         <div>
           <div className="text-gray-500 text-xs font-semibold">
             TOTAL RETURN
@@ -152,12 +178,12 @@ export default function InvestOverview({
         </div>
       </div>
       {/* Investment Performance Graph */}
-      <div className="-mx-4 w-[calc(100%+32px)]">
-        <div className="w-full h-56 mb-2">
+      <div className="-mx-2 w-[calc(100%+16px)]">
+        <div className="w-full h-40 mb-2">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={chartData[selectedRange]}
-              margin={{ left: 0, right: 0, top: 10, bottom: 0 }}
+              margin={{ left: 0, right: 10, top: 10, bottom: 0 }}
             >
               <defs>
                 <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
@@ -173,7 +199,7 @@ export default function InvestOverview({
                 tickLine={false}
                 tick={{ fill: "#6B7280", fontSize: 12 }}
                 tickFormatter={formatYAxis}
-                width={30}
+                width={36}
               />
               <Tooltip
                 contentStyle={{
