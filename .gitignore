@@ -15,12 +15,6 @@
 # production
 /build
 
-# components
-/components
-/hooks
-/abi
-/utils
-
 # misc
 .DS_Store
 *.pem
