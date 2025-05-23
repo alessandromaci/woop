@@ -1,42 +1,33 @@
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
-import { tokensDetails } from "../../utils/constants";
-import { useAccount, useWalletClient } from "wagmi";
+import {
+  tokensDetails,
+  morphoVaults,
+  selectToken,
+  selectTokenDecimals,
+} from "../../utils/constants";
+import {
+  useAccount,
+  useWalletClient,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useSimulateContract,
+} from "wagmi";
 import { LidoSDK } from "@lidofinance/lido-ethereum-sdk";
 import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from "next/router";
-
-const ETH_LOGO = "/ethereum.svg";
-const MORPHO_LOGO = "/morpho.png";
-const LIDO_LOGO = "/lido.png";
+import ERC20_ABI from "../../abi/ERC20.abi.json";
+import LIDO_LOGO from "../../public/lido.png";
+import {
+  parseApy,
+  calculateEarnings,
+  getTokenPriceUSD,
+} from "../../utils/helper";
 
 interface InvestOptionsProps {
   theme: string;
   buttonColor: string;
   onBack: () => void;
-}
-
-// Helper to parse APY string like "4-7%" or "2-4%" to a number (use min for conservative estimate)
-function parseApy(apy: string) {
-  if (!apy) return 0;
-  const match = apy.match(/(\d+(?:\.\d+)?)/);
-  return match ? parseFloat(match[1]) : 0;
-}
-
-// Helper to calculate earnings
-function calculateEarnings(amount: number, apy: string, months: number) {
-  const apyNum = parseApy(apy);
-  if (!amount || !apyNum) return 0;
-  // Compound interest: amount * ((1 + apy/100)^(months/12) - 1)
-  const factor = Math.pow(1 + apyNum / 100, months / 12) - 1;
-  return amount * factor;
-}
-
-// Helper to get token price in USD
-function getTokenPriceUSD(tokenLabel: string): number {
-  if (tokenLabel === "ETH") return 2200;
-  if (tokenLabel === "BTC") return 100000;
-  return 1; // fallback for other tokens
 }
 
 // Example: dynamic investment options per token
@@ -51,64 +42,15 @@ const tokenInvestmentOptions: Record<string, any[]> = {
       minAmount: "0.01",
       action: "lido-stake",
     },
-    {
-      platformLogo: MORPHO_LOGO,
-      platformName: "Morpho Lending",
-      name: "Lending",
-      description: "Lend ETH on Morpho for yield",
-      apy: "7-12%",
-      minAmount: "0.5",
-    },
-  ],
-  USDC: [
-    {
-      platformLogo: MORPHO_LOGO,
-      platformName: "Morpho Lending",
-      name: "Lending",
-      description: "Lend USDC to earn interest",
-      apy: "2-4%",
-      risk: "Low",
-      minAmount: "100",
-    },
-    {
-      platformLogo: ETH_LOGO,
-      platformName: "Stable Pool",
-      name: "Stable Pool",
-      description: "Provide USDC liquidity for stable returns",
-      apy: "4-7%",
-      risk: "Medium",
-      minAmount: "500",
-    },
   ],
   // fallback for other tokens
-  default: [
-    {
-      platformLogo: ETH_LOGO,
-      platformName: "Staking",
-      name: "Staking",
-      description: "Earn passive income by staking your assets",
-      apy: "5-12%",
-      risk: "Low",
-      minAmount: "100",
-    },
-    {
-      platformLogo: MORPHO_LOGO,
-      platformName: "Morpho Lending",
-      name: "Lending",
-      description: "Lend assets for yield",
-      apy: "8-15%",
-      risk: "Medium",
-      minAmount: "500",
-    },
-    {
-      name: "Yield Farming",
-      description: "Maximize returns through yield optimization",
-      apy: "15-25%",
-      risk: "High",
-      minAmount: "1000",
-    },
-  ],
+  default: [],
 };
+
+// Helper to get token details from constants
+function getTokenDetails(label: string) {
+  return tokensDetails.find((t) => t.label === label);
+}
 
 export default function InvestOptions({
   theme,
@@ -126,10 +68,13 @@ export default function InvestOptions({
   const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient();
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
-  const [txHash, setTxHash] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const router = useRouter();
+  const [needsApproval, setNeedsApproval] = useState(false);
+  const [buttonStatus, setButtonStatus] = useState<
+    "idle" | "processing" | "done"
+  >("idle");
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -139,16 +84,121 @@ export default function InvestOptions({
   };
 
   // Get investment options for selected token
-  const investmentOptions =
-    tokenInvestmentOptions[selectedToken.label] ||
-    tokenInvestmentOptions.default;
+  const lidoOption =
+    selectedToken.label === "ETH" ? tokenInvestmentOptions.ETH[0] : null;
+
+  const selectedTokenDetails = getTokenDetails(selectedToken.label);
+  const tokenDecimals = selectTokenDecimals(selectedToken.label) || 18;
+  const tokenAddress =
+    selectToken(selectedToken.label, chain?.name || "Ethereum") || "";
 
   const parsedAmount = parseFloat(amount) || 0;
+  const amountInDecimals = parsedAmount * Math.pow(10, tokenDecimals);
   const tokenPriceUSD = getTokenPriceUSD(selectedToken.label);
   const usdValue = parsedAmount * tokenPriceUSD;
 
-  // Modular action handler
+  const {
+    data: writeHash,
+    writeContract,
+    error: writeError,
+  } = useWriteContract();
+  const { isLoading: isTxLoading, isSuccess: isTxSuccess } =
+    useWaitForTransactionReceipt({ hash: writeHash });
+
+  // Effect to trigger deposit after approval
+  useEffect(() => {
+    if (isTxSuccess && needsApproval) {
+      setNeedsApproval(false);
+      handleDeposit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isTxSuccess]);
+
+  useEffect(() => {
+    if (writeError) {
+      console.error("Write contract error:", writeError);
+    }
+    if (error) {
+      console.log(error);
+    }
+  }, [writeError, error]);
+
+  // Deposit handler
+  async function handleDeposit() {
+    try {
+      if (!address) {
+        setError("Connect your wallet to deposit.");
+        setLoadingAction(null);
+        return;
+      }
+      // 1. Check allowance (call contract directly)
+      const allowance = await (window as any).ethereum.request({
+        method: "eth_call",
+        params: [
+          {
+            to: tokenAddress,
+            data: `0xdd62ed3e${address!
+              .slice(2)
+              .padStart(64, "0")}${selectedTokenDetails?.address
+              .slice(2)
+              .padStart(64, "0")}`,
+          },
+          "latest",
+        ],
+      });
+      const allowanceBN = BigInt(allowance);
+      const amountBN = BigInt(Math.floor(amountInDecimals));
+      if (allowanceBN < amountBN) {
+        setNeedsApproval(true);
+        try {
+          const { data: approveSim } = useSimulateContract({
+            address: tokenAddress as `0x${string}`,
+            abi: ERC20_ABI,
+            functionName: "approve",
+            args: [selectedTokenDetails?.address, amountBN],
+          });
+          if (!approveSim?.request)
+            throw new Error("Approval simulation failed");
+          writeContract(approveSim.request);
+        } catch (e) {
+          setError("Approval failed");
+          setLoadingAction(null);
+          return;
+        }
+      } else {
+        setNeedsApproval(false);
+        try {
+          writeContract(selectedTokenDetails?.depositTx || "");
+        } catch (e) {
+          setError("Deposit failed");
+          setLoadingAction(null);
+        }
+      }
+    } catch (e) {
+      setError("Deposit failed");
+      setLoadingAction(null);
+    }
+  }
+
+  // Helper to get current network id
+  const currentNetworkId = chain?.id;
+
+  // Filter Morpho vaults for selected token and current network
+  const availableMorphoVaults = morphoVaults.filter(
+    (vault) =>
+      vault.token === selectedToken.label &&
+      (!vault.network || vault.network === currentNetworkId)
+  );
+
+  // Build investment options dynamically: Lido for ETH, Morpho vaults for all
+  const investmentOptionsDynamic = [
+    ...(lidoOption ? [lidoOption] : []),
+    ...availableMorphoVaults,
+  ];
+
+  // Modular action handler (dynamic, protocol-agnostic)
   async function handleInvestmentAction(option: any) {
+    setButtonStatus("processing");
     setError(null);
     setLoadingAction(option.action);
     try {
@@ -199,15 +249,97 @@ export default function InvestOptions({
         ]);
         // Redirect to investment overview
         router.push("/invest/overview");
+      } else if (option.platformName === "Morpho Vault") {
+        if (!chain) {
+          setError("Connect your wallet to deposit.");
+          setLoadingAction(null);
+          return;
+        }
+        if (!address) {
+          setError("Connect your wallet to deposit.");
+          setLoadingAction(null);
+          return;
+        }
+        // 1. Check allowance (call contract directly)
+        const allowance = await (window as any).ethereum.request({
+          method: "eth_call",
+          params: [
+            {
+              to: tokenAddress,
+              data: `0xdd62ed3e${address
+                .slice(2)
+                .padStart(64, "0")}${option.address
+                .slice(2)
+                .padStart(64, "0")}`,
+            },
+            "latest",
+          ],
+        });
+        const allowanceBN = BigInt(allowance);
+        const amountBN = BigInt(Math.floor(amountInDecimals));
+        if (allowanceBN < amountBN) {
+          setNeedsApproval(true);
+          try {
+            const { data: approveSim } = useSimulateContract({
+              address: tokenAddress as `0x${string}`,
+              abi: ERC20_ABI,
+              functionName: "approve",
+              args: [option.address, amountBN],
+            });
+            if (!approveSim?.request)
+              throw new Error("Approval simulation failed");
+            writeContract(approveSim.request);
+          } catch (e) {
+            setError("Approval failed");
+            setLoadingAction(null);
+            return;
+          }
+        } else {
+          setNeedsApproval(false);
+          try {
+            writeContract(option.depositTx || "");
+          } catch (e) {
+            setError("Deposit failed");
+            setLoadingAction(null);
+          }
+        }
       } else {
         setError("This investment action is not yet implemented.");
       }
     } catch (e: any) {
       setError(e.message || "Transaction failed");
-    } finally {
       setLoadingAction(null);
+      setButtonStatus("idle");
     }
   }
+
+  // Effect to save to Supabase and redirect after deposit success
+  useEffect(() => {
+    const afterDeposit = async () => {
+      if (isTxSuccess && writeHash && chain && address && !needsApproval) {
+        await supabase.from("investments").insert([
+          {
+            address: address.toLowerCase(),
+            amount: Number(amount),
+            token: selectedToken.label,
+            protocol:
+              investmentOptionsDynamic[selectedIndex ?? 0]?.platformName ||
+              "MorphoSteakhouse",
+            tx_hash: writeHash,
+            chain_id: chain.id,
+            created_at: new Date().toISOString(),
+            status: "open",
+          },
+        ]);
+        setButtonStatus("done");
+        setTimeout(() => {
+          router.push("/invest");
+        }, 2000);
+      }
+    };
+    afterDeposit();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isTxSuccess]);
 
   return (
     <div
@@ -222,7 +354,7 @@ export default function InvestOptions({
             theme === "dark" ? "text-gray-200" : "text-slate-600"
           } mb-2`}
         >
-          How much would you like to invest?
+          Add investment amount
         </p>
 
         <div
@@ -280,7 +412,7 @@ export default function InvestOptions({
 
         {/* Investment Options */}
         <div className="space-y-4">
-          {investmentOptions.map((option, index) => {
+          {investmentOptionsDynamic.map((option, index) => {
             const earn1mToken = calculateEarnings(parsedAmount, option.apy, 1);
             const earn1m = earn1mToken * tokenPriceUSD;
             const earn1yToken = calculateEarnings(parsedAmount, option.apy, 12);
@@ -314,7 +446,10 @@ export default function InvestOptions({
                       {option.platformName}
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
-                      {option.network || "Ethereum"}
+                      {option.name ||
+                        option.networkName ||
+                        option.network ||
+                        "Ethereum"}
                     </div>
                   </div>
                   {/* Right: Earnings and APR */}
@@ -335,20 +470,29 @@ export default function InvestOptions({
                   <div className="w-full mt-6">
                     <button
                       className={`w-full py-3 rounded-full font-bold text-white shadow-lg transition-all ${
-                        loadingAction === option.action || parsedAmount === 0
+                        loadingAction === option.action ||
+                        parsedAmount === 0 ||
+                        buttonStatus === "processing"
                           ? "bg-gray-300 cursor-not-allowed"
+                          : buttonStatus === "done"
+                          ? "bg-green-500"
                           : "bg-blue-600 hover:bg-blue-700"
                       }`}
                       disabled={
-                        loadingAction === option.action || parsedAmount === 0
+                        loadingAction === option.action ||
+                        parsedAmount === 0 ||
+                        buttonStatus === "processing" ||
+                        buttonStatus === "done"
                       }
                       onClick={(e) => {
                         e.stopPropagation();
                         handleInvestmentAction(option);
                       }}
                     >
-                      {loadingAction === option.action
+                      {buttonStatus === "processing"
                         ? "Processing..."
+                        : buttonStatus === "done"
+                        ? "Done 🥳"
                         : "Buy"}
                     </button>
                   </div>
@@ -356,9 +500,21 @@ export default function InvestOptions({
               </div>
             );
           })}
-          {error && (
+          {(error || writeError) && (
             <div className="text-red-500 text-xs mt-2">
-              Something went wrong, try again
+              Error:{" "}
+              {typeof error === "string"
+                ? error
+                : (error as any)?.shortMessage || (error as any)?.message || ""}
+              {writeError && (
+                <div>
+                  Write:{" "}
+                  {typeof writeError === "string"
+                    ? writeError
+                    : (writeError as any).shortMessage ||
+                      (writeError as any).message}
+                </div>
+              )}
             </div>
           )}
         </div>
