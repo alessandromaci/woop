@@ -11,6 +11,9 @@ import { useAccount } from "wagmi";
 import { supabase } from "../../utils/supabaseClient";
 import { getTotalOpenInvestmentUSD } from "./InvestPositions";
 import Wallet from "../common/Wallet";
+import { getTokenPriceUSD as getTokenPriceUSDAsync } from "../../utils/helper";
+import { tokensDetails, investmentOptions } from "../../utils/constants";
+import Image from "next/image";
 
 interface InvestOverviewProps {
   onInvestClick: () => void;
@@ -79,6 +82,9 @@ export default function InvestOverview({
   const [formattedReturn, setFormattedReturn] = useState("");
   const [selectedRange, setSelectedRange] = useState<TimeRange>("1M");
 
+  const [tokenPrices, setTokenPrices] = useState<Record<string, number>>({});
+  const [usdLoading, setUsdLoading] = useState(false);
+
   // Fetch open investments for the connected address
   useEffect(() => {
     async function fetchInvestments() {
@@ -128,12 +134,49 @@ export default function InvestOverview({
     );
   }, [totalInvested, totalReturn]);
 
+  useEffect(() => {
+    let mounted = true;
+    setUsdLoading(true);
+    Promise.all(
+      openInvestments.map(async (inv) => {
+        const price = await getTokenPriceUSDAsync(inv.token);
+        return { token: inv.token, price };
+      })
+    )
+      .then((prices) => {
+        if (mounted) {
+          const priceMap: Record<string, number> = {};
+          prices.forEach((p) => (priceMap[p.token] = p.price));
+          setTokenPrices(priceMap);
+        }
+      })
+      .finally(() => setUsdLoading(false));
+    return () => {
+      mounted = false;
+    };
+  }, [openInvestments]);
+
   // Format Y axis as round $Xk (no decimals)
   const formatYAxis = (value: number) => {
     if (value >= 1000) {
       return `$${Math.round(value / 1000)}k`;
     }
     return `$${value}`;
+  };
+
+  const getPlatformDetails = (protocol: string, token: string) => {
+    const opt = investmentOptions.find(
+      (o) =>
+        o.platformName?.toLowerCase().includes(protocol.toLowerCase()) &&
+        o.token === token
+    );
+    return (
+      opt || {
+        platformLogo: "/ethereum.svg",
+        platformName: protocol,
+        name: token,
+      }
+    );
   };
 
   return (

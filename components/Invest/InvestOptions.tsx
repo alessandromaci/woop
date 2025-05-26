@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import {
   tokensDetails,
-  morphoVaults,
+  investmentOptions,
   selectToken,
   selectTokenDecimals,
 } from "../../utils/constants";
@@ -12,6 +12,7 @@ import {
   useWriteContract,
   useWaitForTransactionReceipt,
   useSimulateContract,
+  useBalance,
 } from "wagmi";
 import { LidoSDK } from "@lidofinance/lido-ethereum-sdk";
 import { supabase } from "../../utils/supabaseClient";
@@ -21,7 +22,7 @@ import LIDO_LOGO from "../../public/lido.png";
 import {
   parseApy,
   calculateEarnings,
-  getTokenPriceUSD,
+  getTokenPriceUSD as getTokenPriceUSDAsync,
 } from "../../utils/helper";
 
 interface InvestOptionsProps {
@@ -75,6 +76,8 @@ export default function InvestOptions({
   const [buttonStatus, setButtonStatus] = useState<
     "idle" | "processing" | "done"
   >("idle");
+  const [tokenPriceUSD, setTokenPriceUSD] = useState<number>(1);
+  const [usdLoading, setUsdLoading] = useState(false);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -85,17 +88,18 @@ export default function InvestOptions({
 
   // Get investment options for selected token
   const lidoOption =
-    selectedToken.label === "ETH" ? tokenInvestmentOptions.ETH[0] : null;
+    selectedToken.label === "ETH" && (chain?.id === 1 || chain?.id === 8453)
+      ? tokenInvestmentOptions.ETH[0]
+      : null;
 
   const selectedTokenDetails = getTokenDetails(selectedToken.label);
-  const tokenDecimals = selectTokenDecimals(selectedToken.label) || 18;
+  const tokenDecimals = selectTokenDecimals(selectedToken.label) ?? 18;
   const tokenAddress =
     selectToken(selectedToken.label, chain?.name || "Ethereum") || "";
 
   const parsedAmount = parseFloat(amount) || 0;
-  const amountInDecimals = parsedAmount * Math.pow(10, tokenDecimals);
-  const tokenPriceUSD = getTokenPriceUSD(selectedToken.label);
-  const usdValue = parsedAmount * tokenPriceUSD;
+  const amountInDecimals =
+    Number(parsedAmount) * Math.pow(10, Number(tokenDecimals));
 
   const {
     data: writeHash,
@@ -104,6 +108,18 @@ export default function InvestOptions({
   } = useWriteContract();
   const { isLoading: isTxLoading, isSuccess: isTxSuccess } =
     useWaitForTransactionReceipt({ hash: writeHash });
+
+  const { data: balanceData } = useBalance({
+    address,
+    token:
+      selectedToken.label === "ETH"
+        ? undefined
+        : (tokenAddress as `0x${string}`),
+  });
+  const userBalance = balanceData?.value
+    ? Number(balanceData.value) / Math.pow(10, Number(tokenDecimals))
+    : 0;
+  const notEnoughBalance = parsedAmount > userBalance;
 
   // Effect to trigger deposit after approval
   useEffect(() => {
@@ -122,6 +138,20 @@ export default function InvestOptions({
       console.log(error);
     }
   }, [writeError, error]);
+
+  useEffect(() => {
+    let mounted = true;
+    setUsdLoading(true);
+    getTokenPriceUSDAsync(selectedToken.label)
+      .then((price) => {
+        if (mounted) setTokenPriceUSD(price);
+      })
+      .catch(() => setTokenPriceUSD(1))
+      .finally(() => setUsdLoading(false));
+    return () => {
+      mounted = false;
+    };
+  }, [selectedToken.label]);
 
   // Deposit handler
   async function handleDeposit() {
@@ -183,18 +213,18 @@ export default function InvestOptions({
   // Helper to get current network id
   const currentNetworkId = chain?.id;
 
-  // Filter Morpho vaults for selected token and current network
-  const availableMorphoVaults = morphoVaults.filter(
-    (vault) =>
-      vault.token === selectedToken.label &&
-      (!vault.network || vault.network === currentNetworkId)
+  // Filter investmentOptions for selected token and current network
+  const availableOptions = investmentOptions.filter(
+    (opt) =>
+      opt.token === selectedToken.label &&
+      (!opt.network || opt.network === currentNetworkId) &&
+      (opt.type !== "lido" ||
+        (selectedToken.label === "ETH" &&
+          (chain?.id === 1 || chain?.id === 8453)))
   );
 
-  // Build investment options dynamically: Lido for ETH, Morpho vaults for all
-  const investmentOptionsDynamic = [
-    ...(lidoOption ? [lidoOption] : []),
-    ...availableMorphoVaults,
-  ];
+  // Build investment options dynamically
+  const investmentOptionsDynamic = availableOptions;
 
   // Modular action handler (dynamic, protocol-agnostic)
   async function handleInvestmentAction(option: any) {
@@ -289,9 +319,14 @@ export default function InvestOptions({
             if (!approveSim?.request)
               throw new Error("Approval simulation failed");
             writeContract(approveSim.request);
-          } catch (e) {
-            setError("Approval failed");
+          } catch (e: any) {
+            setError(
+              e?.message ||
+                e?.shortMessage ||
+                "Approval failed. Please check your wallet and try again."
+            );
             setLoadingAction(null);
+            setButtonStatus("idle");
             return;
           }
         } else {
@@ -354,7 +389,7 @@ export default function InvestOptions({
             theme === "dark" ? "text-gray-200" : "text-slate-600"
           } mb-2`}
         >
-          Add investment amount
+          Invest Amount
         </p>
 
         <div
@@ -375,29 +410,46 @@ export default function InvestOptions({
                 onChange={handleAmountChange}
               />
             </div>
+            {/* Token Selector Button - match RequestAmount style */}
             <button
-              onClick={() => setSelectorVisibility(true)}
-              className={`flex items-center gap-3 px-4 py-2 rounded-lg border transition-all min-w-[120px] max-w-[180px] ${
+              type="button"
+              className={`flex items-center justify-between border px-2 rounded-full h-12 ml-2 transition-colors ${
                 theme === "dark"
-                  ? "bg-gray-700 border-gray-600"
-                  : "bg-gray-100 border-gray-200"
+                  ? "border-gray-600 hover:bg-gray-700"
+                  : "border-black hover:bg-gray-300"
               }`}
+              style={{ width: "auto", minWidth: "120px" }}
+              onClick={() => setSelectorVisibility(true)}
             >
+              {/* Token Icon */}
               <Image
-                src={selectedToken.logo}
                 alt={selectedToken.label}
+                src={selectedToken.logo}
                 width={24}
                 height={24}
-                className="rounded-full"
+                className="flex-shrink-0"
               />
-              <span
-                className={`font-semibold text-base truncate ${
-                  theme === "dark" ? "text-gray-200" : "text-slate-700"
+              {/* Token Label */}
+              <p
+                className={`ml-2 font-medium text-base ${
+                  theme === "dark" ? "text-gray-300" : "text-slate-600"
                 }`}
-                style={{ maxWidth: 90 }}
               >
                 {selectedToken.label}
-              </span>
+              </p>
+              {/* Down Arrow */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="ml-2 w-5 h-5 text-gray-500"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
             </button>
           </div>
           <div
@@ -405,8 +457,14 @@ export default function InvestOptions({
               theme === "dark" ? "text-gray-400" : "text-gray-500"
             }`}
           >
-            ≈ ${usdValue.toLocaleString("en-US", { maximumFractionDigits: 2 })}{" "}
-            USD
+            ≈ $
+            {usdLoading ? (
+              <span className="animate-pulse text-gray-400">...</span>
+            ) : (
+              (parsedAmount * tokenPriceUSD).toLocaleString("en-US", {
+                maximumFractionDigits: 2,
+              })
+            )}
           </div>
         </div>
 
@@ -429,7 +487,7 @@ export default function InvestOptions({
                 }`}
                 onClick={() => setSelectedIndex(index)}
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 items-center">
                   {/* Logo */}
                   <div className="flex-shrink-0 flex items-center justify-center w-16 h-16 bg-gray-100 rounded-2xl">
                     <Image
@@ -440,29 +498,77 @@ export default function InvestOptions({
                       className="rounded-2xl"
                     />
                   </div>
-                  {/* Center: Name and Network */}
-                  <div className="flex flex-col flex-1 justify-center">
+                  {/* Center: Name and Network - stretch to align with logo */}
+                  <div
+                    className="flex flex-col justify-center"
+                    style={{ flex: 1, marginLeft: 0 }}
+                  >
                     <div className="font-bold text-lg text-slate-800">
                       {option.platformName}
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className="text-xs text-gray-500">
                       {option.name ||
                         option.networkName ||
                         option.network ||
                         "Ethereum"}
                     </div>
                   </div>
-                  {/* Right: Earnings and APR */}
-                  <div className="flex flex-col items-end min-w-[90px]">
-                    <div className="font-bold text-2xl text-slate-900">
-                      $
-                      {earn1m.toLocaleString("en-US", {
-                        maximumFractionDigits: 2,
-                      })}
+                  {/* Right: APY top right */}
+                  <div className="flex flex-col items-end min-w-[110px]">
+                    <div className="flex items-center justify-end w-full">
+                      <span className="text-green-600 font-bold text-base bg-green-50 px-3 py-1 rounded-full border border-green-200">
+                        {option.apy} APY
+                      </span>
                     </div>
-                    <div className="text-xs mt-1 text-green-600 font-medium">
-                      {option.apy} APY
-                    </div>
+                  </div>
+                </div>
+                {/* Projected Earnings Box (Morpho style) */}
+                <div className="flex flex-row justify-end mt-2">
+                  <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 flex flex-col w-full">
+                    {(() => {
+                      const apyParts = option.apy
+                        .split("-")
+                        .map((s: string) => parseFloat(s));
+                      const apyMax = apyParts[1] || apyParts[0] || 0;
+                      const earn1m =
+                        calculateEarnings(parsedAmount, apyMax + "%", 1) *
+                        tokenPriceUSD;
+                      const earn1y =
+                        calculateEarnings(parsedAmount, apyMax + "%", 12) *
+                        tokenPriceUSD;
+                      return (
+                        <>
+                          <div className="flex justify-between items-center text-xs text-gray-500 mb-1 w-full">
+                            <span>
+                              Projected Earnings / Month
+                              <span className="block md:inline"> (USD)</span>
+                            </span>
+                            <span className="font-bold text-green-700">
+                              + $
+                              {usdLoading
+                                ? "..."
+                                : earn1m.toLocaleString("en-US", {
+                                    maximumFractionDigits: 2,
+                                  })}{" "}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center text-xs text-gray-500 w-full">
+                            <span>
+                              Projected Earnings / Year
+                              <span className="block md:inline"> (USD)</span>
+                            </span>
+                            <span className="font-bold text-green-700">
+                              + $
+                              {usdLoading
+                                ? "..."
+                                : earn1y.toLocaleString("en-US", {
+                                    maximumFractionDigits: 2,
+                                  })}{" "}
+                            </span>
+                          </div>
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
                 {/* Buy Button for selected option */}
@@ -472,7 +578,8 @@ export default function InvestOptions({
                       className={`w-full py-3 rounded-full font-bold text-white shadow-lg transition-all ${
                         loadingAction === option.action ||
                         parsedAmount === 0 ||
-                        buttonStatus === "processing"
+                        buttonStatus === "processing" ||
+                        notEnoughBalance
                           ? "bg-gray-300 cursor-not-allowed"
                           : buttonStatus === "done"
                           ? "bg-green-500"
@@ -482,7 +589,8 @@ export default function InvestOptions({
                         loadingAction === option.action ||
                         parsedAmount === 0 ||
                         buttonStatus === "processing" ||
-                        buttonStatus === "done"
+                        buttonStatus === "done" ||
+                        notEnoughBalance
                       }
                       onClick={(e) => {
                         e.stopPropagation();
@@ -493,6 +601,8 @@ export default function InvestOptions({
                         ? "Processing..."
                         : buttonStatus === "done"
                         ? "Done 🥳"
+                        : notEnoughBalance
+                        ? "Insufficient Balance"
                         : "Buy"}
                     </button>
                   </div>
@@ -528,7 +638,7 @@ export default function InvestOptions({
             onClick={() => setSelectorVisibility(false)}
           />
           <div
-            className={`relative w-full max-w-md mt-6 rounded-2xl shadow-xl ${
+            className={`relative w-full max-w-md rounded-2xl shadow-xl ${
               theme === "dark" ? "bg-[#23262F]" : "bg-white"
             }`}
             style={{ zIndex: 60 }}

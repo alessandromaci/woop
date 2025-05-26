@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useAccount } from "wagmi";
 import { supabase } from "../../utils/supabaseClient";
+import { getTokenPriceUSD as getTokenPriceUSDAsync } from "../../utils/helper";
+import { investmentOptions } from "../../utils/constants";
 
 // Type for investment position
 interface InvestmentPosition {
@@ -43,6 +45,9 @@ export default function InvestPositions() {
   const [positions, setPositions] = useState<InvestmentPosition[]>([]);
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [tokenPrices, setTokenPrices] = useState<Record<string, number>>({});
+  const [usdLoading, setUsdLoading] = useState(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -70,6 +75,50 @@ export default function InvestPositions() {
     }
     fetchPositions();
   }, [address]);
+
+  useEffect(() => {
+    let mounted = true;
+    setUsdLoading(true);
+    Promise.all(
+      positions.map(async (pos) => {
+        const price = await getTokenPriceUSDAsync(pos.token);
+        return { token: pos.token, price };
+      })
+    )
+      .then((prices) => {
+        if (mounted) {
+          const priceMap: Record<string, number> = {};
+          prices.forEach((p) => (priceMap[p.token] = p.price));
+          setTokenPrices(priceMap);
+        }
+      })
+      .finally(() => setUsdLoading(false));
+    return () => {
+      mounted = false;
+    };
+  }, [positions]);
+
+  const normalize = (str: string) =>
+    str?.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+  const getPlatformDetails = (protocol: string, token: string) => {
+    const normProtocol = normalize(protocol);
+    // Try to match by platformName, name, or action
+    const opt = investmentOptions.find(
+      (o) =>
+        (normalize(o.platformName)?.includes(normProtocol) ||
+          normalize(o.name)?.includes(normProtocol) ||
+          normalize(o.action)?.includes(normProtocol)) &&
+        o.token === token
+    );
+    return (
+      opt || {
+        platformLogo: "/ethereum.svg",
+        platformName: protocol,
+        name: token,
+      }
+    );
+  };
 
   return (
     <div>
@@ -104,18 +153,19 @@ export default function InvestPositions() {
                 className="flex items-center bg-gray-50 rounded-xl p-4 shadow"
               >
                 <Image
-                  src={getPlatformLogo(pos.protocol)}
-                  alt={pos.protocol}
+                  src={getPlatformDetails(pos.protocol, pos.token).platformLogo}
+                  alt={getPlatformDetails(pos.protocol, pos.token).platformName}
                   width={40}
                   height={40}
                   className="rounded-full"
                 />
                 <div className="ml-4 flex-1">
                   <div className="font-bold text-gray-800">
-                    {`${pos.protocol} ${pos.token}`}
+                    {getPlatformDetails(pos.protocol, pos.token).platformName}
                   </div>
                   <div className="text-sm text-gray-500">
-                    Platform: {pos.protocol}
+                    {" "}
+                    {getPlatformDetails(pos.protocol, pos.token).name}
                   </div>
                 </div>
                 <div className="text-right">
