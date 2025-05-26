@@ -78,6 +78,10 @@ export default function InvestOptions({
   >("idle");
   const [tokenPriceUSD, setTokenPriceUSD] = useState<number>(1);
   const [usdLoading, setUsdLoading] = useState(false);
+  const [simulateArgs, setSimulateArgs] = useState<{
+    address: string;
+    args: any[];
+  } | null>(null);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -120,6 +124,26 @@ export default function InvestOptions({
     ? Number(balanceData.value) / Math.pow(10, Number(tokenDecimals))
     : 0;
   const notEnoughBalance = parsedAmount > userBalance;
+
+  // Call useSimulateContract at the top level
+  const { data: approveSim, error: simulateError } = useSimulateContract(
+    simulateArgs
+      ? {
+          address: simulateArgs.address as `0x${string}`,
+          abi: ERC20_ABI,
+          functionName: "approve",
+          args: simulateArgs.args,
+        }
+      : undefined
+  );
+
+  // Effect to trigger contract write when simulation data is ready
+  useEffect(() => {
+    if (approveSim?.request && needsApproval) {
+      writeContract(approveSim.request);
+      setSimulateArgs(null); // reset
+    }
+  }, [approveSim, needsApproval]);
 
   // Effect to trigger deposit after approval
   useEffect(() => {
@@ -180,21 +204,10 @@ export default function InvestOptions({
       const amountBN = BigInt(Math.floor(amountInDecimals));
       if (allowanceBN < amountBN) {
         setNeedsApproval(true);
-        try {
-          const { data: approveSim } = useSimulateContract({
-            address: tokenAddress as `0x${string}`,
-            abi: ERC20_ABI,
-            functionName: "approve",
-            args: [selectedTokenDetails?.address, amountBN],
-          });
-          if (!approveSim?.request)
-            throw new Error("Approval simulation failed");
-          writeContract(approveSim.request);
-        } catch (e) {
-          setError("Approval failed");
-          setLoadingAction(null);
-          return;
-        }
+        setSimulateArgs({
+          address: tokenAddress,
+          args: [selectedTokenDetails?.address, amountBN],
+        });
       } else {
         setNeedsApproval(false);
         try {
@@ -309,26 +322,10 @@ export default function InvestOptions({
         const amountBN = BigInt(Math.floor(amountInDecimals));
         if (allowanceBN < amountBN) {
           setNeedsApproval(true);
-          try {
-            const { data: approveSim } = useSimulateContract({
-              address: tokenAddress as `0x${string}`,
-              abi: ERC20_ABI,
-              functionName: "approve",
-              args: [option.address, amountBN],
-            });
-            if (!approveSim?.request)
-              throw new Error("Approval simulation failed");
-            writeContract(approveSim.request);
-          } catch (e: any) {
-            setError(
-              e?.message ||
-                e?.shortMessage ||
-                "Approval failed. Please check your wallet and try again."
-            );
-            setLoadingAction(null);
-            setButtonStatus("idle");
-            return;
-          }
+          setSimulateArgs({
+            address: tokenAddress,
+            args: [option.address, amountBN],
+          });
         } else {
           setNeedsApproval(false);
           try {
