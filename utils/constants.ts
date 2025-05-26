@@ -5,6 +5,9 @@ import usdcLogo from "../public/usdc.png";
 import usdtLogo from "../public/usdt.png";
 import usdLogo from "../public/usd.png";
 import euroLogo from "../public/euro.png";
+import morphoLogo from "../public/morpho.png";
+import Morpho_ABI from "../abi/Morpho.abi.json";
+import LIDO_LOGO from "../public/lido.png";
 
 type Token = {
   label: string;
@@ -230,3 +233,112 @@ export const getNetworkName = (chainId: string | number): string => {
   const chainIdStr = chainId.toString();
   return CHAIN_ID_TO_NETWORK[chainIdStr] || chainIdStr;
 };
+
+export const investmentOptions = [
+  {
+    name: "Lido Staking",
+    address: null, // Lido doesn't use a vault address
+    token: "ETH",
+    network: 1,
+    networkName: "Ethereum Mainnet",
+    apy: "3.5%",
+    minAmount: 0.01,
+    abi: null, // Lido handled via SDK
+    platformLogo: LIDO_LOGO,
+    platformName: "Lido",
+    description: "Stake ETH and receive stETH with Lido.",
+    action: "lido-stake",
+    type: "lido",
+  },
+  // Morpho vaults
+  {
+    name: "Steakhouse USDC",
+    address: "0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB",
+    token: "USDC",
+    network: 1,
+    networkName: "Ethereum Mainnet",
+    apy: "2-4%",
+    minAmount: 100,
+    abi: Morpho_ABI,
+    platformLogo: morphoLogo,
+    platformName: "Morpho Vault",
+    description: "Deposit USDC to earn interest",
+    action: "morpho-steakhouse-usdc",
+    type: "morpho-vault",
+  },
+  {
+    name: "Spark USDC Vault",
+    address: "0x7BfA7C4f149E7415b73bdeDfe609237e29CBF34A",
+    token: "USDC",
+    network: 8453,
+    networkName: "Base",
+    apy: "5-6%",
+    minAmount: 100,
+    abi: Morpho_ABI,
+    platformLogo: morphoLogo,
+    platformName: "Morpho Vault",
+    description: "Deposit USDC to earn interest",
+    action: "morpho-spark-usdc-vault-base",
+    type: "morpho-vault",
+  },
+  {
+    name: "Steakhouse USDT",
+    address: "0xbEef047a543E45807105E51A8BBEFCc5950fcfBa",
+    token: "USDT",
+    network: 1,
+    networkName: "Ethereum Mainnet",
+    apy: "4-5%",
+    minAmount: 100,
+    abi: Morpho_ABI,
+    platformLogo: morphoLogo,
+    platformName: "Morpho Vault",
+    description: "Deposit USDT to earn interest",
+    action: "morpho-steakhouse-usdt",
+    type: "morpho-vault",
+  },
+  {
+    name: "Re7 WBTC",
+    address: "0xE0C98605f279e4D7946d25B75869c69802823763",
+    token: "WBTC",
+    network: 1,
+    networkName: "Ethereum Mainnet",
+    apy: "0-1%",
+    minAmount: 100,
+    abi: Morpho_ABI,
+    platformLogo: morphoLogo,
+    platformName: "Morpho Vault",
+    description: "Deposit WBTC to earn interest",
+    action: "morpho-re7-wbtc",
+    type: "morpho-vault",
+  },
+  {
+    name: "Gauntlet cbBTC Core",
+    address: "0xF587f2e8AfF7D76618d3B6B4626621860FbD54e3",
+    token: "cbBTC",
+    network: 1,
+    networkName: "Ethereum Mainnet",
+    apy: "0-1%",
+    minAmount: 100,
+    abi: Morpho_ABI,
+    platformLogo: morphoLogo,
+    platformName: "Morpho Vault",
+    description: "Deposit cbBTC to earn interest",
+    action: "morpho-gauntlet-cbbtc-core",
+    type: "morpho-vault",
+  },
+  {
+    name: "Seamless cbBTC Vault",
+    address: "0x5a47C803488FE2BB0A0EAaf346b420e4dF22F3C7",
+    token: "cbBTC",
+    network: 8453,
+    networkName: "Base",
+    apy: "1-2%",
+    minAmount: 100,
+    abi: Morpho_ABI,
+    platformLogo: morphoLogo,
+    platformName: "Morpho Vault",
+    description: "Deposit cbBTC to earn interest",
+    action: "morpho-seamless-cbbtc-vault-base",
+    type: "morpho-vault",
+  },
+];
