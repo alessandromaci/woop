@@ -171,7 +171,7 @@ const Request = () => {
   };
 
   const checkAndUpdateNetwork = (result: any) => {
-    if (result?.networkName === "Any") {
+    if (result?.networkName === "Any_Chain") {
       // If "Any" is selected, don't check for network mismatch
       setWrongNetwork(false);
       setWoopBadNetwork("");
@@ -683,7 +683,7 @@ const Request = () => {
                           {
                             <p className="ml-1 text-lg">
                               on{" "}
-                              {networkName === "Any"
+                              {networkName === "Any_Chain"
                                 ? "Ethereum, Base, Arbitrum, Optimism"
                                 : networkName}
                             </p>
@@ -790,7 +790,7 @@ const Request = () => {
                         {
                           <p className="ml-1 text-lg">
                             on{" "}
-                            {networkName === "Any"
+                            {networkName === "Any_Chain"
                               ? "Ethereum, Base, Arbitrum, Optimism"
                               : networkName}
                           </p>
@@ -1027,7 +1027,7 @@ const Request = () => {
                         {
                           <p className="ml-1 text-lg">
                             on{" "}
-                            {networkName === "Any"
+                            {networkName === "Any_Chain"
                               ? "Ethereum, Base, Arbitrum, Optimism"
                               : networkName}
                           </p>
