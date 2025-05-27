@@ -71,6 +71,8 @@ const Request = () => {
   const [wrongNetwork, setWrongNetwork] = React.useState<boolean>(false);
   const [isNativeTx, setIsNativeTx] = React.useState<boolean>(false);
   const [isFiatTx, setIsFiatTx] = React.useState<boolean>(false);
+  const [isBankPaymentMethod, setIsBankPaymentMethod] =
+    React.useState<boolean>(false);
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
   const [selectorVisibility, setSelectorVisibility] =
     React.useState<boolean>(false);
@@ -107,6 +109,7 @@ const Request = () => {
       setNetworkName(json.networkName);
       setDescription(json.selectedDescription);
       setTokenAddress(json.tokenAddress);
+      setIsBankPaymentMethod(json.offRamp);
 
       console.log(json);
 
@@ -880,12 +883,18 @@ const Request = () => {
                                   <div className="max-h-[450px] overflow-y-auto">
                                     {tokensDetails
                                       .filter((token) => {
+                                        // First check if it's a bank payment method
+                                        if (isBankPaymentMethod) {
+                                          return token.label === "USDC";
+                                        }
                                         if (
                                           ["USD", "EURO"].includes(token.label)
-                                        )
+                                        ) {
                                           return false;
-                                        if (chainId === "Base")
+                                        }
+                                        if (chainId === "Base") {
                                           return token.label !== "WBTC";
+                                        }
                                         return token.label !== "cbBTC";
                                       })
                                       .map((token, i) => (

@@ -298,6 +298,7 @@ export default function SelectReceiptMethod({
         networkName: recipientChainData.name,
         tokenName: selectedToken.label,
         tokenAddress: selectToken(selectedToken.label, recipientChainData.name),
+        offRamp: isBankPaymentMethod,
       };
 
       const path = await uploadIpfs(data).finally(() => {
