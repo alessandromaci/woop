@@ -18,12 +18,14 @@ import { LidoSDK } from "@lidofinance/lido-ethereum-sdk";
 import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from "next/router";
 import ERC20_ABI from "../../abi/ERC20.abi.json";
+import MORPHO_ABI from "../../abi/Morpho.abi.json";
 import LIDO_LOGO from "../../public/lido.png";
 import {
   parseApy,
   calculateEarnings,
   getTokenPriceUSD as getTokenPriceUSDAsync,
 } from "../../utils/helper";
+import { parseEther, parseUnits } from "ethers";
 
 interface InvestOptionsProps {
   theme: string;
@@ -53,6 +55,13 @@ function getTokenDetails(label: string) {
   return tokensDetails.find((t) => t.label === label);
 }
 
+// Add these type definitions at the top of the file
+type Option = {
+  action: string;
+  address: string;
+  depositTx?: string;
+};
+
 export default function InvestOptions({
   theme,
   buttonColor,
@@ -63,8 +72,11 @@ export default function InvestOptions({
     () => tokensDetails.filter((t) => t.label !== "USD" && t.label !== "EURO"),
     []
   );
-  const [amount, setAmount] = useState<string>("");
+  const [amount, setAmount] = useState<string>("0.01");
+  const [amountForTransaction, setAmountForTransaction] = useState<string>("");
   const [selectedToken, setSelectedToken] = useState(cryptoTokens[0]);
+  const [tokenAddress, setTokenAddress] = useState<string>("");
+  const [selectedTokenDetails, setSelectedTokenDetails] = useState<any>();
   const [selectorVisibility, setSelectorVisibility] = useState<boolean>(false);
   const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient();
@@ -72,16 +84,16 @@ export default function InvestOptions({
   const [error, setError] = useState<string | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const router = useRouter();
-  const [needsApproval, setNeedsApproval] = useState(false);
   const [buttonStatus, setButtonStatus] = useState<
     "idle" | "processing" | "done"
   >("idle");
   const [tokenPriceUSD, setTokenPriceUSD] = useState<number>(1);
   const [usdLoading, setUsdLoading] = useState(false);
-  const [simulateArgs, setSimulateArgs] = useState<{
-    address: string;
-    args: any[];
-  } | null>(null);
+  const [pendingStep, setPendingStep] = useState<null | "approve" | "deposit">(
+    null
+  );
+  const [selectedInvestmentOption, setSelectedInvestmentOption] =
+    useState<any>(null);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -96,22 +108,58 @@ export default function InvestOptions({
       ? tokenInvestmentOptions.ETH[0]
       : null;
 
-  const selectedTokenDetails = getTokenDetails(selectedToken.label);
-  const tokenDecimals = selectTokenDecimals(selectedToken.label) ?? 18;
-  const tokenAddress =
-    selectToken(selectedToken.label, chain?.name || "Ethereum") || "";
-
-  const parsedAmount = parseFloat(amount) || 0;
-  const amountInDecimals =
-    Number(parsedAmount) * Math.pow(10, Number(tokenDecimals));
+  // approve erc20 transaction
+  const { data: dataApproveTransaction } = useSimulateContract({
+    address: tokenAddress as `0x${string}`,
+    abi: ERC20_ABI,
+    functionName: "approve",
+    args: [
+      selectedTokenDetails?.address,
+      parseUnits(amount, selectedTokenDetails?.decimals || 18),
+    ],
+  });
 
   const {
-    data: writeHash,
-    writeContract,
-    error: writeError,
+    data: hashApprove,
+    writeContract: writeApprove,
+    isPending: isApprovePending,
+    error: writeApproveError,
   } = useWriteContract();
-  const { isLoading: isTxLoading, isSuccess: isTxSuccess } =
-    useWaitForTransactionReceipt({ hash: writeHash });
+
+  const { isLoading: isLoadingApprove, isSuccess: isSuccessApprove } =
+    useWaitForTransactionReceipt({ hash: hashApprove });
+
+  // deposit morpho transaction
+  const isValidAmount =
+    !!amount &&
+    !isNaN(Number(amount)) &&
+    Number(amount) > 0 &&
+    selectedInvestmentOption &&
+    address;
+  const { data: dataDepositTransaction, error: errorDepositTransaction } =
+    useSimulateContract(
+      isValidAmount
+        ? {
+            address: selectedInvestmentOption.address as `0x${string}`,
+            abi: MORPHO_ABI,
+            functionName: "deposit",
+            args: [
+              parseUnits(amount, selectedTokenDetails?.decimals || 18),
+              address,
+            ],
+          }
+        : undefined
+    );
+
+  const {
+    data: hashDeposit,
+    writeContract: writeDeposit,
+    isPending: isDepositPending,
+    error: writeDepositError,
+  } = useWriteContract();
+
+  const { isLoading: isLoadingDeposit, isSuccess: isSuccessDeposit } =
+    useWaitForTransactionReceipt({ hash: hashDeposit });
 
   const { data: balanceData } = useBalance({
     address,
@@ -120,50 +168,22 @@ export default function InvestOptions({
         ? undefined
         : (tokenAddress as `0x${string}`),
   });
+
+  const parsedAmount = parseFloat(amount) || 0;
   const userBalance = balanceData?.value
-    ? Number(balanceData.value) / Math.pow(10, Number(tokenDecimals))
+    ? Number(balanceData.value) /
+      Math.pow(10, Number(selectedTokenDetails?.decimals || 18))
     : 0;
   const notEnoughBalance = parsedAmount > userBalance;
 
-  // Call useSimulateContract at the top level
-  const { data: approveSim, error: simulateError } = useSimulateContract(
-    simulateArgs
-      ? {
-          address: simulateArgs.address as `0x${string}`,
-          abi: ERC20_ABI,
-          functionName: "approve",
-          args: simulateArgs.args,
-        }
-      : undefined
-  );
-
-  // Effect to trigger contract write when simulation data is ready
+  // this is to modify the token values as expected by the wagmi approve tx. to check though for the mount
   useEffect(() => {
-    if (approveSim?.request && needsApproval) {
-      writeContract(approveSim.request);
-      setSimulateArgs(null); // reset
-    }
-  }, [approveSim, needsApproval]);
+    const tokenAddress =
+      selectToken(selectedToken.label, chain?.name || "Ethereum") || "";
+    setTokenAddress(tokenAddress);
+    const selectedTokenDetails = getTokenDetails(selectedToken.label);
+    setSelectedTokenDetails(selectedTokenDetails);
 
-  // Effect to trigger deposit after approval
-  useEffect(() => {
-    if (isTxSuccess && needsApproval) {
-      setNeedsApproval(false);
-      handleDeposit();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isTxSuccess]);
-
-  useEffect(() => {
-    if (writeError) {
-      console.error("Write contract error:", writeError);
-    }
-    if (error) {
-      console.log(error);
-    }
-  }, [writeError, error]);
-
-  useEffect(() => {
     let mounted = true;
     setUsdLoading(true);
     getTokenPriceUSDAsync(selectedToken.label)
@@ -177,51 +197,18 @@ export default function InvestOptions({
     };
   }, [selectedToken.label]);
 
-  // Deposit handler
-  async function handleDeposit() {
-    try {
-      if (!address) {
-        setError("Connect your wallet to deposit.");
-        setLoadingAction(null);
-        return;
-      }
-      // 1. Check allowance (call contract directly)
-      const allowance = await (window as any).ethereum.request({
-        method: "eth_call",
-        params: [
-          {
-            to: tokenAddress,
-            data: `0xdd62ed3e${address!
-              .slice(2)
-              .padStart(64, "0")}${selectedTokenDetails?.address
-              .slice(2)
-              .padStart(64, "0")}`,
-          },
-          "latest",
-        ],
-      });
-      const allowanceBN = BigInt(allowance);
-      const amountBN = BigInt(Math.floor(amountInDecimals));
-      if (allowanceBN < amountBN) {
-        setNeedsApproval(true);
-        setSimulateArgs({
-          address: tokenAddress,
-          args: [selectedTokenDetails?.address, amountBN],
-        });
-      } else {
-        setNeedsApproval(false);
-        try {
-          writeContract(selectedTokenDetails?.depositTx || "");
-        } catch (e) {
-          setError("Deposit failed");
-          setLoadingAction(null);
-        }
-      }
-    } catch (e) {
-      setError("Deposit failed");
-      setLoadingAction(null);
-    }
-  }
+  // this is to transform the amount in what wagmi write contract needs
+  useEffect(() => {
+    const selectedTokenDetails = getTokenDetails(selectedToken.label);
+    const tokenDecimals = selectTokenDecimals(selectedToken.label) ?? 18;
+    const tokenAddress =
+      selectToken(selectedToken.label, chain?.name || "Ethereum") || "";
+
+    const parsedAmount = parseFloat(amount) || 0;
+    const amountInDecimals =
+      Number(parsedAmount) * Math.pow(10, Number(tokenDecimals));
+    setAmountForTransaction(amountInDecimals.toString());
+  }, [amount]);
 
   // Helper to get current network id
   const currentNetworkId = chain?.id;
@@ -239,13 +226,14 @@ export default function InvestOptions({
   // Build investment options dynamically
   const investmentOptionsDynamic = availableOptions;
 
-  // Modular action handler (dynamic, protocol-agnostic)
-  async function handleInvestmentAction(option: any) {
-    setButtonStatus("processing");
+  // Modular action handler (dynamic, protocol-agnostic). This is the main function to handle lido, approve, deposit.
+  async function handleInvestmentAction(selectedOption: any) {
     setError(null);
-    setLoadingAction(option.action);
+    setLoadingAction(selectedOption.action);
+    setButtonStatus("processing");
+    setPendingStep(null);
     try {
-      if (option.action === "lido-stake") {
+      if (selectedOption.action === "lido-stake") {
         // Only allow on mainnet or sepolia
         if (!chain || (chain.id !== 1 && chain.id !== 11155111)) {
           setError("Lido staking is only available on Mainnet and Sepolia.");
@@ -290,20 +278,15 @@ export default function InvestOptions({
             status: "open",
           },
         ]);
-        // Redirect to investment overview
-        router.push("/invest/overview");
-      } else if (option.platformName === "Morpho Vault") {
-        if (!chain) {
+        router.push("/invest");
+      } else if (selectedOption.platformName === "Morpho Vault") {
+        if (!chain || !address) {
           setError("Connect your wallet to deposit.");
+          setButtonStatus("idle");
           setLoadingAction(null);
           return;
         }
-        if (!address) {
-          setError("Connect your wallet to deposit.");
-          setLoadingAction(null);
-          return;
-        }
-        // 1. Check allowance (call contract directly)
+        // Check allowance
         const allowance = await (window as any).ethereum.request({
           method: "eth_call",
           params: [
@@ -311,7 +294,7 @@ export default function InvestOptions({
               to: tokenAddress,
               data: `0xdd62ed3e${address
                 .slice(2)
-                .padStart(64, "0")}${option.address
+                .padStart(64, "0")}${selectedOption.address
                 .slice(2)
                 .padStart(64, "0")}`,
             },
@@ -319,45 +302,72 @@ export default function InvestOptions({
           ],
         });
         const allowanceBN = BigInt(allowance);
-        const amountBN = BigInt(Math.floor(amountInDecimals));
+        const amountBN = BigInt(Math.floor(Number(amountForTransaction)));
         if (allowanceBN < amountBN) {
-          setNeedsApproval(true);
-          setSimulateArgs({
-            address: tokenAddress,
-            args: [option.address, amountBN],
-          });
-        } else {
-          setNeedsApproval(false);
-          try {
-            writeContract(option.depositTx || "");
-          } catch (e) {
-            setError("Deposit failed");
+          setPendingStep("approve");
+          if (!dataApproveTransaction?.request) {
+            setError("Failed to prepare approval transaction");
+            setButtonStatus("idle");
             setLoadingAction(null);
+            return;
           }
+          writeApprove(dataApproveTransaction.request);
+        } else {
+          setPendingStep("deposit");
+          if (!dataDepositTransaction?.request) {
+            console.log("dataDepositTransaction", dataDepositTransaction);
+            console.log("tokenAddress", tokenAddress);
+            console.log("selectedOption", selectedOption);
+            console.log("amountForTransaction", amountForTransaction);
+            console.log("address", address);
+            console.log(errorDepositTransaction);
+            setError("Failed to prepare deposit transaction");
+            setButtonStatus("idle");
+            setLoadingAction(null);
+            return;
+          }
+          writeDeposit(dataDepositTransaction.request);
         }
       } else {
         setError("This investment action is not yet implemented.");
       }
     } catch (e: any) {
       setError(e.message || "Transaction failed");
-      setLoadingAction(null);
       setButtonStatus("idle");
+      setLoadingAction(null);
     }
   }
 
-  // Effect to save to Supabase and redirect after deposit success
+  // After approval is confirmed, trigger deposit
   useEffect(() => {
-    const afterDeposit = async () => {
-      if (isTxSuccess && writeHash && chain && address && !needsApproval) {
+    if (
+      pendingStep === "approve" &&
+      isSuccessApprove &&
+      dataDepositTransaction?.request
+    ) {
+      setPendingStep("deposit");
+      writeDeposit(dataDepositTransaction.request);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessApprove]);
+
+  // After deposit is confirmed, save to Supabase and update status
+  useEffect(() => {
+    if (
+      pendingStep === "deposit" &&
+      isSuccessDeposit &&
+      hashDeposit &&
+      chain &&
+      address
+    ) {
+      (async () => {
         await supabase.from("investments").insert([
           {
             address: address.toLowerCase(),
             amount: Number(amount),
             token: selectedToken.label,
-            protocol:
-              investmentOptionsDynamic[selectedIndex ?? 0]?.platformName ||
-              "MorphoSteakhouse",
-            tx_hash: writeHash,
+            protocol: "Morpho Vault",
+            tx_hash: hashDeposit,
             chain_id: chain.id,
             created_at: new Date().toISOString(),
             status: "open",
@@ -367,11 +377,21 @@ export default function InvestOptions({
         setTimeout(() => {
           router.push("/invest");
         }, 2000);
-      }
-    };
-    afterDeposit();
+        setPendingStep(null);
+      })();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isTxSuccess]);
+  }, [isSuccessDeposit, hashDeposit, chain, address, pendingStep]);
+
+  // Update button text based on status
+  let buttonText = "Buy";
+  if (buttonStatus === "done") buttonText = "Done 🥳";
+  else if (pendingStep === "approve" && (isLoadingApprove || isApprovePending))
+    buttonText = "Approving...";
+  else if (pendingStep === "deposit" && (isLoadingDeposit || isDepositPending))
+    buttonText = "Depositing...";
+  else if (buttonStatus === "processing") buttonText = "Processing...";
+  else if (notEnoughBalance) buttonText = "Insufficient Balance";
 
   return (
     <div
@@ -403,7 +423,7 @@ export default function InvestOptions({
                 type="number"
                 step="0.000000"
                 placeholder="0.00"
-                value={amount}
+                value={amount === "0.01" ? "" : amount}
                 onChange={handleAmountChange}
               />
             </div>
@@ -482,7 +502,10 @@ export default function InvestOptions({
                 } ${
                   selectedIndex === index ? "ring-2 ring-blue-500 mb-4" : "mb-4"
                 }`}
-                onClick={() => setSelectedIndex(index)}
+                onClick={() => {
+                  setSelectedIndex(index);
+                  setSelectedInvestmentOption(option);
+                }}
               >
                 <div className="flex items-center gap-4 items-center">
                   {/* Logo */}
@@ -519,107 +542,121 @@ export default function InvestOptions({
                     </div>
                   </div>
                 </div>
-                {/* Projected Earnings Box (Morpho style) */}
-                <div className="flex flex-row justify-end mt-2">
-                  <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 flex flex-col w-full">
-                    {(() => {
-                      const apyParts = option.apy
-                        .split("-")
-                        .map((s: string) => parseFloat(s));
-                      const apyMax = apyParts[1] || apyParts[0] || 0;
-                      const earn1m =
-                        calculateEarnings(parsedAmount, apyMax + "%", 1) *
-                        tokenPriceUSD;
-                      const earn1y =
-                        calculateEarnings(parsedAmount, apyMax + "%", 12) *
-                        tokenPriceUSD;
-                      return (
-                        <>
-                          <div className="flex justify-between items-center text-xs text-gray-500 mb-1 w-full">
-                            <span>
-                              Projected Earnings / Month
-                              <span className="block md:inline"> (USD)</span>
-                            </span>
-                            <span className="font-bold text-green-700">
-                              + $
-                              {usdLoading
-                                ? "..."
-                                : earn1m.toLocaleString("en-US", {
-                                    maximumFractionDigits: 2,
-                                  })}{" "}
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center text-xs text-gray-500 w-full">
-                            <span>
-                              Projected Earnings / Year
-                              <span className="block md:inline"> (USD)</span>
-                            </span>
-                            <span className="font-bold text-green-700">
-                              + $
-                              {usdLoading
-                                ? "..."
-                                : earn1y.toLocaleString("en-US", {
-                                    maximumFractionDigits: 2,
-                                  })}{" "}
-                            </span>
-                          </div>
-                        </>
-                      );
-                    })()}
-                  </div>
-                </div>
+
                 {/* Buy Button for selected option */}
                 {selectedIndex === index && (
-                  <div className="w-full mt-6">
-                    <button
-                      className={`w-full py-3 rounded-full font-bold text-white shadow-lg transition-all ${
-                        loadingAction === option.action ||
-                        parsedAmount === 0 ||
-                        buttonStatus === "processing" ||
-                        notEnoughBalance
-                          ? "bg-gray-300 cursor-not-allowed"
-                          : buttonStatus === "done"
-                          ? "bg-green-500"
-                          : "bg-blue-600 hover:bg-blue-700"
-                      }`}
-                      disabled={
-                        loadingAction === option.action ||
-                        parsedAmount === 0 ||
-                        buttonStatus === "processing" ||
-                        buttonStatus === "done" ||
-                        notEnoughBalance
-                      }
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleInvestmentAction(option);
-                      }}
-                    >
-                      {buttonStatus === "processing"
-                        ? "Processing..."
-                        : buttonStatus === "done"
-                        ? "Done 🥳"
-                        : notEnoughBalance
-                        ? "Insufficient Balance"
-                        : "Buy"}
-                    </button>
-                  </div>
+                  <>
+                    {/* Projected Earnings Box (Morpho style) */}
+                    <div className="flex flex-row justify-end mt-2">
+                      <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 flex flex-col w-full">
+                        {(() => {
+                          const apyParts = option.apy
+                            .split("-")
+                            .map((s: string) => parseFloat(s));
+                          const apyMax = apyParts[1] || apyParts[0] || 0;
+                          const earn1m =
+                            calculateEarnings(parsedAmount, apyMax + "%", 1) *
+                            tokenPriceUSD;
+                          const earn1y =
+                            calculateEarnings(parsedAmount, apyMax + "%", 12) *
+                            tokenPriceUSD;
+                          return (
+                            <>
+                              <div className="flex justify-between items-center text-xs text-gray-500 mb-1 w-full">
+                                <span>
+                                  Projected Earnings / Month
+                                  <span className="block md:inline">
+                                    {" "}
+                                    (USD)
+                                  </span>
+                                </span>
+                                <span className="font-bold text-green-700">
+                                  + $
+                                  {usdLoading
+                                    ? "..."
+                                    : earn1m.toLocaleString("en-US", {
+                                        maximumFractionDigits: 2,
+                                      })}{" "}
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center text-xs text-gray-500 w-full">
+                                <span>
+                                  Projected Earnings / Year
+                                  <span className="block md:inline">
+                                    {" "}
+                                    (USD)
+                                  </span>
+                                </span>
+                                <span className="font-bold text-green-700">
+                                  + $
+                                  {usdLoading
+                                    ? "..."
+                                    : earn1y.toLocaleString("en-US", {
+                                        maximumFractionDigits: 2,
+                                      })}{" "}
+                                </span>
+                              </div>
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </div>
+                    <div className="w-full mt-6">
+                      <button
+                        className={`w-full py-3 rounded-full font-bold text-white shadow-lg transition-all ${
+                          loadingAction === option.action ||
+                          parsedAmount === 0 ||
+                          buttonStatus === "processing" ||
+                          notEnoughBalance ||
+                          !isValidAmount
+                            ? "bg-gray-300 cursor-not-allowed"
+                            : buttonStatus === "done"
+                            ? "bg-green-500"
+                            : "bg-blue-600 hover:bg-blue-700"
+                        }`}
+                        disabled={
+                          loadingAction === option.action ||
+                          parsedAmount === 0 ||
+                          buttonStatus === "processing" ||
+                          buttonStatus === "done" ||
+                          notEnoughBalance ||
+                          !isValidAmount
+                        }
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleInvestmentAction(option);
+                        }}
+                      >
+                        {buttonText}
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
             );
           })}
-          {(error || writeError) && (
+          {(error || writeApproveError || writeDepositError) && (
             <div className="text-red-500 text-xs mt-2">
               Error:{" "}
               {typeof error === "string"
                 ? error
                 : (error as any)?.shortMessage || (error as any)?.message || ""}
-              {writeError && (
+              {writeApproveError && (
                 <div>
                   Write:{" "}
-                  {typeof writeError === "string"
-                    ? writeError
-                    : (writeError as any).shortMessage ||
-                      (writeError as any).message}
+                  {typeof writeApproveError === "string"
+                    ? writeApproveError
+                    : (writeApproveError as any).shortMessage ||
+                      (writeApproveError as any).message}
+                </div>
+              )}
+              {writeDepositError && (
+                <div>
+                  Write:{" "}
+                  {typeof writeDepositError === "string"
+                    ? writeDepositError
+                    : (writeDepositError as any).shortMessage ||
+                      (writeDepositError as any).message}
                 </div>
               )}
             </div>
