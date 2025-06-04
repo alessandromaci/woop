@@ -94,6 +94,7 @@ export default function InvestOptions({
   );
   const [selectedInvestmentOption, setSelectedInvestmentOption] =
     useState<any>(null);
+  const [depositTrigger, setDepositTrigger] = useState(0);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -108,16 +109,28 @@ export default function InvestOptions({
       ? tokenInvestmentOptions.ETH[0]
       : null;
 
+  const isValidAmount = Boolean(
+    !!amount &&
+      !isNaN(Number(amount)) &&
+      Number(amount) > 0 &&
+      selectedInvestmentOption &&
+      address
+  );
+
   // approve erc20 transaction
-  const { data: dataApproveTransaction } = useSimulateContract({
-    address: tokenAddress as `0x${string}`,
-    abi: ERC20_ABI,
-    functionName: "approve",
-    args: [
-      selectedTokenDetails?.address,
-      parseUnits(amount, selectedTokenDetails?.decimals || 18),
-    ],
-  });
+  const { data: dataApproveTransaction } = useSimulateContract(
+    isValidAmount
+      ? {
+          address: tokenAddress as `0x${string}`,
+          abi: ERC20_ABI,
+          functionName: "approve",
+          args: [
+            selectedInvestmentOption.address as `0x${string}`,
+            parseUnits(amount, selectedTokenDetails?.decimals || 18),
+          ],
+        }
+      : undefined
+  );
 
   const {
     data: hashApprove,
@@ -129,16 +142,13 @@ export default function InvestOptions({
   const { isLoading: isLoadingApprove, isSuccess: isSuccessApprove } =
     useWaitForTransactionReceipt({ hash: hashApprove });
 
-  // deposit morpho transaction
-  const isValidAmount =
-    !!amount &&
-    !isNaN(Number(amount)) &&
-    Number(amount) > 0 &&
-    selectedInvestmentOption &&
-    address;
+  // Simulate deposit if valid and (pendingStep is deposit and depositTrigger > 0)
+  const shouldSimulateDeposit =
+    isValidAmount && pendingStep === "deposit" && depositTrigger > 0;
+
   const { data: dataDepositTransaction, error: errorDepositTransaction } =
     useSimulateContract(
-      isValidAmount
+      shouldSimulateDeposit
         ? {
             address: selectedInvestmentOption.address as `0x${string}`,
             abi: MORPHO_ABI,
@@ -314,13 +324,10 @@ export default function InvestOptions({
           writeApprove(dataApproveTransaction.request);
         } else {
           setPendingStep("deposit");
+          setDepositTrigger((t) => t + 1);
           if (!dataDepositTransaction?.request) {
             console.log("dataDepositTransaction", dataDepositTransaction);
-            console.log("tokenAddress", tokenAddress);
-            console.log("selectedOption", selectedOption);
-            console.log("amountForTransaction", amountForTransaction);
-            console.log("address", address);
-            console.log(errorDepositTransaction);
+            console.log("errorDepositTransaction", errorDepositTransaction);
             setError("Failed to prepare deposit transaction");
             setButtonStatus("idle");
             setLoadingAction(null);
@@ -338,50 +345,20 @@ export default function InvestOptions({
     }
   }
 
-  // After approval is confirmed, trigger deposit
+  // After approval is confirmed, trigger deposit simulation
   useEffect(() => {
-    if (
-      pendingStep === "approve" &&
-      isSuccessApprove &&
-      dataDepositTransaction?.request
-    ) {
+    if (pendingStep === "approve" && isSuccessApprove) {
+      setDepositTrigger((t) => t + 1); // increment to trigger simulation
       setPendingStep("deposit");
+    }
+  }, [isSuccessApprove, pendingStep]);
+
+  // After deposit simulation is ready, trigger deposit write
+  useEffect(() => {
+    if (pendingStep === "deposit" && dataDepositTransaction?.request) {
       writeDeposit(dataDepositTransaction.request);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessApprove]);
-
-  // After deposit is confirmed, save to Supabase and update status
-  useEffect(() => {
-    if (
-      pendingStep === "deposit" &&
-      isSuccessDeposit &&
-      hashDeposit &&
-      chain &&
-      address
-    ) {
-      (async () => {
-        await supabase.from("investments").insert([
-          {
-            address: address.toLowerCase(),
-            amount: Number(amount),
-            token: selectedToken.label,
-            protocol: "Morpho Vault",
-            tx_hash: hashDeposit,
-            chain_id: chain.id,
-            created_at: new Date().toISOString(),
-            status: "open",
-          },
-        ]);
-        setButtonStatus("done");
-        setTimeout(() => {
-          router.push("/invest");
-        }, 2000);
-        setPendingStep(null);
-      })();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessDeposit, hashDeposit, chain, address, pendingStep]);
+  }, [pendingStep, dataDepositTransaction]);
 
   // Update button text based on status
   let buttonText = "Buy";
