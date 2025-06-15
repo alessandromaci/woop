@@ -72,7 +72,7 @@ export default function InvestOptions({
     () => tokensDetails.filter((t) => t.label !== "USD" && t.label !== "EURO"),
     []
   );
-  const [amount, setAmount] = useState<string>("0.01");
+  const [amount, setAmount] = useState<string>("");
   const [amountForTransaction, setAmountForTransaction] = useState<string>("");
   const [selectedToken, setSelectedToken] = useState(cryptoTokens[0]);
   const [tokenAddress, setTokenAddress] = useState<string>("");
@@ -400,7 +400,7 @@ export default function InvestOptions({
                 type="number"
                 step="0.000000"
                 placeholder="0.00"
-                value={amount === "0.01" ? "" : amount}
+                value={amount}
                 onChange={handleAmountChange}
               />
             </div>
