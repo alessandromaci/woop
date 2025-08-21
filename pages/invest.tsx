@@ -1,12 +1,17 @@
 import * as React from "react";
-import Layout from "../components/layout/LayoutPayment";
+import LayoutInvest from "../components/layout/LayoutInvest";
 import SEO from "../components/common/Seo";
+import InvestOverview from "../components/Invest/InvestOverview";
+import InvestPositions from "../components/Invest/InvestPositions";
+import InvestOptions from "../components/Invest/InvestOptions";
 
 export default function Invest() {
   const [activeModule, setActiveModule] = React.useState<
     "receive" | "invest" | "nfts"
-  >("receive");
+  >("invest");
   const [buttonColor, setButtonColor] = React.useState("#007BFF");
+  const [showInvestOptions, setShowInvestOptions] = React.useState(false);
+
   return (
     <>
       <SEO
@@ -14,18 +19,31 @@ export default function Invest() {
         description="Invest in cryptocurrency easily with Woop. Coming soon!"
         rrssImg="./RRSS.jpg"
       />
-      <Layout
-        activeModule={activeModule}
-        setActiveModule={setActiveModule}
-        buttonColor={buttonColor}
-      >
-        <div className="flex flex-col items-center justify-center p-8 text-center">
-          <h1 className="text-2xl font-bold mb-4">Coming Soon!</h1>
-          <p className="text-gray-600">
-            {`We're working hard to bring you the best investment experience.`}
-          </p>
-        </div>
-      </Layout>
+      {showInvestOptions ? (
+        <LayoutInvest
+          activeModule={activeModule}
+          setActiveModule={setActiveModule}
+          buttonColor={buttonColor}
+          onBack={() => setShowInvestOptions(false)}
+        >
+          <InvestOptions
+            theme="light"
+            buttonColor={buttonColor}
+            onBack={() => setShowInvestOptions(false)}
+          />
+        </LayoutInvest>
+      ) : (
+        <LayoutInvest
+          activeModule={activeModule}
+          setActiveModule={setActiveModule}
+          buttonColor={buttonColor}
+        >
+          <div className="flex flex-col gap-2">
+            <InvestOverview onInvestClick={() => setShowInvestOptions(true)} />
+            <InvestPositions />
+          </div>
+        </LayoutInvest>
+      )}
     </>
   );
 }
